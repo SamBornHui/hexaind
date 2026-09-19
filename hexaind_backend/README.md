@@ -374,7 +374,7 @@ To test code in BE, use APIs tagged with custom_python_widget.
 
 **_ Scenario-1 _**
 
-- using CUSTOM_CODE widget to generate sql_query and use it to ingest data from BigQuery
+
 
 - create a python file with below code:
 
