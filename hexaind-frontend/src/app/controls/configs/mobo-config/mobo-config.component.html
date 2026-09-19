@@ -1,0 +1,407 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100" *ngIf="hasValidInputWidgets()">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div *ngIf="inputWidgets.length === 0 || !hasValidInputWidgets()">
+              There are no inputs selected from the prior widget.
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <!-- Feature Lists -->
+              <mat-accordion class="global-accordion">
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>Features List</mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <table mat-table [dataSource]="selectedDataset.features_io_info">
+                    <ng-container matColumnDef="select">
+                      <th mat-header-cell *matHeaderCellDef width="20">
+                        <mat-checkbox [disabled]="workflowCanvasService.IsViewingRunMode" color="primary"
+                          disableRipple="true" class="" [(ngModel)]="selectAll"
+                          (change)="selectUnselectFeatures()"></mat-checkbox>
+                      </th>
+                      <td mat-cell *matCellDef="let feature">
+                        <mat-checkbox [disabled]="workflowCanvasService.IsViewingRunMode" disableRipple="true"
+                          color="primary" [(ngModel)]="feature.selected"
+                          (change)="changeFeaturesConfig()"></mat-checkbox>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                      <th mat-header-cell *matHeaderCellDef>Feature</th>
+                      <td mat-cell *matCellDef="let feature">
+                        {{ feature.name }}
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="input">
+                      <th mat-header-cell *matHeaderCellDef width="40">
+                        Input
+                      </th>
+                      <td mat-cell *matCellDef="let feature">
+                        <mat-slide-toggle [disabled]="workflowCanvasService.IsViewingRunMode" color="primary"
+                          disableRipple [(ngModel)]="feature.input" class="custom-disabled" (change)="
+                            changedInputOutput(feature, 'input', $event)
+                          "></mat-slide-toggle>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="output">
+                      <th mat-header-cell *matHeaderCellDef width="40">
+                        Output
+                      </th>
+                      <td mat-cell *matCellDef="let feature">
+                        <mat-slide-toggle [disabled]="workflowCanvasService.IsViewingRunMode" color="primary"
+                          disableRipple [(ngModel)]="feature.output" class="custom-disabled" (change)="
+                            changedInputOutput(feature, 'output', $event)
+                          "></mat-slide-toggle>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="featureColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: featureColumns"></tr>
+                  </table>
+                </mat-expansion-panel>
+              </mat-accordion>
+
+              <!-- Constraints -->
+              <mat-accordion class="global-accordion">
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>Constraints</mat-panel-title>
+                    <button color="primary" mat-stroked-button [matMenuTriggerFor]="autofillMenu"
+                      (click)="$event.stopPropagation()" class="global-button-sm me-4">
+                      Auto Fill
+                    </button>
+                  </mat-expansion-panel-header>
+                  <div fxLayout="column" fxLayoutGap="16px">
+                    <table mat-table [dataSource]="dataSource">
+                      <ng-container matColumnDef="inputName">
+                        <th mat-header-cell *matHeaderCellDef>Input</th>
+                        <td mat-cell *matCellDef="let input">
+                          {{ input.name }}
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="min">
+                        <th mat-header-cell *matHeaderCellDef width="140">
+                          Min <span class="text-red">*</span>
+                        </th>
+                        <td mat-cell *matCellDef="let input" class="text-grey">
+                          <div class="p-relative">
+                            <mat-form-field appearance="outline" [ngClass]="{
+                                required:
+                                  !validationCheck &&
+                                  input.min !== 0 &&
+                                  !input.min || !validationCheck && checkInputEquality(input)
+                              }">
+                              <input matInput type="text" id="min" placeholder="Value" [ngModel]="getInputMin(input)"
+                                (ngModelChange)="setInputMin(input, $event)" [disabled]="
+                                  workflowDetail['_id'] !== '' && !updateFlag
+                                " (keypress)="validateInput($event)" />
+                            </mat-form-field>
+                          </div>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="max">
+                        <th mat-header-cell *matHeaderCellDef width="140">
+                          Max <span class="text-red">*</span>
+                        </th>
+                        <td mat-cell *matCellDef="let input" class="text-grey">
+                          <div class="p-relative">
+                            <mat-form-field appearance="outline" [ngClass]="{
+                                required:
+                                  !validationCheck &&
+                                  input.max !== 0 &&
+                                  !input.max || !validationCheck && checkInputEquality(input)
+                              }">
+                              <input matInput type="text" name="max" placeholder="Value" [ngModel]="getInputMax(input)"
+                                (ngModelChange)="setInputMax(input, $event)" [disabled]="
+                                  workflowDetail['_id'] !== '' && !updateFlag
+                                " (keypress)="validateInput($event)" />
+                            </mat-form-field>
+                          </div>
+                        </td>
+                      </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="inputColumns"></tr>
+                      <tr mat-row *matRowDef="let row; columns: inputColumns"></tr>
+                    </table>
+                    <table mat-table [dataSource]="outputDataSource">
+                      <ng-container matColumnDef="outputName">
+                        <th mat-header-cell *matHeaderCellDef>Output</th>
+                        <td mat-cell *matCellDef="let output">
+                          {{ output.name }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="min">
+                        <th mat-header-cell *matHeaderCellDef width="30" class="text-center">
+                          Min
+                        </th>
+                        <td mat-cell *matCellDef="let output; let i = index" class="text-center">
+                          <mat-radio-button color="primary" name="{{ output.name }}" (click)="updateMinMax('1', i)"
+                            class="custom-disabled" [checked]="output.min_max_value == '1'" [ngClass]="{
+                              required:
+                                !validationCheck && output.min_max_value == ''
+                            }">
+                          </mat-radio-button>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="max">
+                        <th mat-header-cell *matHeaderCellDef width="30" class="text-center">
+                          Max
+                        </th>
+                        <td mat-cell *matCellDef="let output; let i = index" class="text-center">
+                          <mat-radio-button color="primary" name="{{ output.name }}" (click)="updateMinMax('2', i)"
+                            class="custom-disabled" [checked]="output.min_max_value == '2'" [ngClass]="{
+                              required:
+                                !validationCheck && output.min_max_value == ''
+                            }">
+                          </mat-radio-button>
+                        </td>
+                      </ng-container>
+                      <ng-container matColumnDef="threshold">
+                        <th mat-header-cell *matHeaderCellDef width="140">
+                          Threshold <span class="text-red">*</span>
+                        </th>
+                        <td mat-cell *matCellDef="let output">
+                          <div class="p-relative">
+                            <mat-form-field appearance="outline" [ngClass]="{
+                                required:
+                                  !validationCheck &&
+                                  output.threshold !== 0 &&
+                                  !output.threshold
+                              }">
+                              <input matInput type="text" placeholder="Value" [ngModel]="getOutputThreshold(output)"
+                                (ngModelChange)="
+                                  setOutputThreshold(output, $event)
+                                " (keypress)="validateInput($event)" />
+                            </mat-form-field>
+                          </div>
+                        </td>
+                      </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="outputColumns"></tr>
+                      <tr mat-row *matRowDef="let row; columns: outputColumns"></tr>
+                    </table>
+                    <div>
+                      <div class="fw-bold pb-1">Select module name</div>
+                      <mat-form-field appearance="outline">
+                        <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select module name"
+                          [ngModel]="getConstraintsModuleId()" (ngModelChange)="selectModule($event)">
+                          <mat-option *ngFor="let module of module_list" [value]="module._id">
+                            {{ module.name }}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="mt-4 fw-bold">
+                      <mat-slide-toggle color="primary" disableRipple [(ngModel)]="
+                          workflowDetail['outcome_constraints_active']
+                        " (ngModelChange)="setTheOutcomeConstraints($event)" class="custom-disabled"><b>Outcome
+                          constraints</b></mat-slide-toggle>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                      <div fxFlex="33%">
+                        <mat-form-field appearance="outline">
+                          <mat-select disableOptionCentering="true" placeholder="Select Feature"
+                            [(ngModel)]="outcome_constraints_variable" (selectionChange)="
+                              unselectedFeatureSelection($event.value)
+                            " [disabled]="
+                              !workflowDetail['outcome_constraints_active']
+                            ">
+                            <mat-option [value]="'None'">None</mat-option>
+                            <mat-option *ngFor="
+                                let feature of workflowDetail['config'][
+                                  'unselectedFeatures'
+                                ]
+                              " [value]="feature.name">
+                              {{ feature["name"] }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="33%">
+                        <mat-form-field appearance="outline">
+                          <mat-select disableOptionCentering="true" placeholder="Select Condition"
+                            [(ngModel)]="operator" (selectionChange)="operatorSelection($event.value)">
+                            <mat-option *ngFor="let operator of assignOperators" [value]="operator">
+                              {{ operator }}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="33%">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="text" placeholder="Input Value" [(ngModel)]="inputValue"
+                            style="width: 90%" [disabled]="
+                              !workflowDetail['outcome_constraints_active'] ||
+                              (workflowDetail['_id'] !== '' && !updateFlag)
+                            " />
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+
+              <!-- Run Optimization Trials -->
+              <mat-accordion class="global-accordion">
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>Run optimization trials</mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <mat-tab-group [selectedIndex]="1">
+                    <mat-tab label="Single trial run" disabled="true">
+                      <div class="p-4">
+                        <div class="fw-bold pb-1">Acquisition function</div>
+                        <mat-form-field appearance="outline">
+                          <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" class="custom-select-mini"
+                            panelClass="custom-select-mini-dropdown" disableOptionCentering="true"
+                            [(ngModel)]="workflowDetail.selectedAcquisition" placeholder="Select Termination Criteria">
+                            <mat-option [value]="'Expected Hypervolume Improvement'">Expected Hypervolume
+                              Improvement</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </mat-tab>
+                    <mat-tab label="Batch trial run" active>
+                      <div class="pt-4" style="overflow: hidden">
+                        <div class="fw-bold pb-1">Acquisition function</div>
+                        <mat-form-field appearance="outline">
+                          <mat-select disableOptionCentering="true" [(ngModel)]="workflowDetail.selectedAcquisition"
+                            disabled="true" placeholder="Expected Hypervolume Improvement">
+                            <mat-option [value]="'Expected Hypervolume Improvement'">Expected Hypervolume
+                              Improvement</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                        <h3 class="text-grey my-4">Termination Criteria</h3>
+                        <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                          <div fxFlex="50">
+                            <div class="fw-bold pb-1">
+                              Maximum no. of iterations
+                              <span class="text-red">*</span>
+                            </div>
+                            <mat-form-field appearance="outline" [ngClass]="{
+                                required: !validationCheck && !getIterations()
+                              }">
+                              <input matInput type="text" [ngModel]="getIterations()"
+                                (ngModelChange)="setIterations($event)" placeholder="Enter Value" min="1"
+                                (keypress)="validateInput($event)" required />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="50">
+                            <div class="fw-bold pb-1">
+                              Maximum no. of trials per iteration
+                              <span class="text-red">*</span>
+                            </div>
+                            <mat-form-field appearance="outline" [ngClass]="{
+                                required: !validationCheck && !getBatchSize()
+                              }">
+                              <input matInput type="text" [ngModel]="getBatchSize()"
+                                (ngModelChange)="setBatchSize($event)" placeholder="Enter Value" min="1"
+                                (keypress)="validateInput($event)" />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                        <div div fxLayout="row" fxLayoutAlign="end center" class="mt-4">
+                        </div>
+                      </div>
+                    </mat-tab>
+                  </mat-tab-group>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<mat-menu #autofillMenu="matMenu" xPosition="before" class="global-menu">
+  <ng-container *ngFor="let percent of percentageArray">
+    <div mat-menu-item (click)="getAutoFilledValues(percent)" [class.disabled]="percent !== 0">
+      {{ "+/- " + percent + "%" }}
+    </div>
+  </ng-container>
+</mat-menu>
+
+<app-config-action-bar widgetName="MOBO" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

@@ -1,0 +1,377 @@
+.mat-column-expandIcon {
+  width: 70px;
+  /* Set a fixed width for the first column */
+}
+
+table {
+  width: 100%;
+}
+
+tr.example-detail-row {
+  height: 0;
+}
+
+tr.example-element-row:not(.example-expanded-row):hover {
+  background-color: var(--hovered-surface);
+  cursor: pointer;
+}
+
+tr.example-element-row:not(.example-expanded-row):active {
+  background-color: var(--selected-surface);
+  cursor: pointer;
+}
+
+/* Keep pointer cursor for expanded rows */
+tr.example-element-row.example-expanded-row {
+  cursor: pointer;
+}
+
+.example-element-row td {
+  border-bottom-width: 0;
+}
+
+.example-element-detail {
+  width: 100%;
+}
+
+.expanded-content {
+  width: 100%;
+  /* Ensure the content within the expanded row spans the full width */
+}
+
+.example-element-diagram {
+  width: 100%;
+  border: 0.5px solid var(--grey-lite);
+  border-radius: 8px;
+  /* Add rounded corners */
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.example-element-symbol {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: normal;
+}
+
+.example-element-description {
+  padding: 16px;
+}
+
+.example-element-description-attribution {
+  opacity: 0.5;
+}
+
+.example-element-diagram {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expand-button {
+  margin-left: auto;
+  /* Align the button to the right */
+}
+
+.expanded-row {
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 8px;
+  /* Add rounded corners */
+}
+
+.expanded-row:hover {
+  background-color: #f0f0f0;
+}
+
+.highlighted {
+  background-color: var(--red);
+  border-radius: 8px;
+}
+
+.expanded-content-columns {
+  display: flex;
+}
+
+.example-element-row:hover {
+  background-color: var(--hovered-surface);
+  cursor: pointer;
+}
+
+.expanded-content:hover {
+  background-color: var(--hovered-surface);
+  cursor: pointer;
+}
+
+.number-circle {
+  background-color: #aaa; // Dark Cyan background color
+  color: white; // White text color
+  border-radius: 50%; // Makes the span a circle
+  padding: 0.3em; // Adjusted for visual balance
+  display: inline-flex; // Keeps the content centered
+  align-items: center; // Center alignment vertically
+  justify-content: center; // Center alignment horizontally
+  width: 1.6em; // Adjusted diameter of the circle
+  height: 1.6em; // Adjusted diameter of the circle
+  font-size: 0.65em; // Adjust font size for readability
+  transform: translateY(-8px); // Move the element up by 5 pixel
+}
+
+.vertical-container {
+  display: flex;
+  flex-direction: column;
+  /* Stack children vertically */
+  align-items: center;
+  /* Center items horizontally */
+  text-align: center;
+  vertical-align: middle;
+}
+
+.book-mark-icon {
+  position: relative;
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+  transform: rotate(.03deg);
+  top: 3px;
+  cursor: pointer;
+  color: var(--grey);
+}
+
+.book-mark-icon:hover {
+  color: var(--primary);
+}
+
+.text-container {
+  position: relative;
+  height: 20px;
+}
+
+.status-chip {
+  display: inline-block;
+  color: var(--grey);
+  background-color: var(--secondary-surface) !important;
+  border-radius: 4px !important;
+  padding: 2px 4px;
+  opacity: 1 !important;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.icon-star {
+  cursor: pointer;
+}
+
+.workflow-table {
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 80px;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2),
+  .column-name {
+    width: 200px;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4),
+  .column-version {
+    width: 100px;
+  }
+
+  th:nth-child(5),
+  td:nth-child(5),
+  th:nth-child(6),
+  td:nth-child(6),
+  th:nth-child(7),
+  td:nth-child(7),
+  .column-date {
+    width: 200px;
+  }
+
+  th:nth-child(8),
+  td:nth-child(8) {
+    width: 80px;
+  }
+
+  .column-placeholder,
+  .column-name,
+  .column-description,
+  .column-version,
+  .column-date,
+  .column-actions {
+    padding: 16px;
+  }
+
+  .column-placeholder {
+    width: 64px;
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .column-name {
+    padding-left: 44px;
+  }
+
+  .column-actions {
+    width: 64px;
+    padding: 0 0 0 16px;
+  }
+
+  @media (max-width: 1599px) {
+
+    th,
+    td {
+      padding: 8px;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 64px;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2),
+    .column-name {
+      width: 140px;
+    }
+
+    th:nth-child(4),
+    td:nth-child(4),
+    .column-version {
+      width: 80px;
+    }
+
+    th:nth-child(5),
+    td:nth-child(5),
+    th:nth-child(6),
+    td:nth-child(6),
+    th:nth-child(7),
+    td:nth-child(7),
+    .column-date {
+      width: 170px;
+    }
+
+    th:nth-child(8),
+    td:nth-child(8) {
+      width: 56px;
+    }
+
+    .column-placeholder,
+    .column-name,
+    .column-description,
+    .column-version,
+    .column-date,
+    .column-actions {
+      padding: 16px 8px 8px 8px;
+    }
+
+    .column-placeholder {
+      width: 56px;
+      text-align: center;
+      padding-left: 0;
+      padding-top: 12px;
+    }
+
+    .column-name {
+      padding-left: 32px;
+    }
+
+    .column-actions {
+      width: 52px;
+      padding: 0 0 0 8px;
+    }
+
+    .icon-star,
+    .status-chip {
+      margin-top: -4px;
+    }
+
+    .svg-icon,
+    .mat-icon {
+      width: 20px;
+      height: 20px;
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 1399px) {
+
+    th,
+    td {
+      padding: 4px;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 56px;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2),
+    .column-name {
+      width: 120px;
+    }
+
+    th:nth-child(4),
+    td:nth-child(4),
+    .column-version {
+      width: 70px;
+    }
+
+    th:nth-child(5),
+    td:nth-child(5),
+    th:nth-child(6),
+    td:nth-child(6),
+    th:nth-child(7),
+    td:nth-child(7),
+    .column-date {
+      width: 140px;
+    }
+
+    th:nth-child(8),
+    td:nth-child(8) {
+      width: 56px;
+    }
+
+    .column-placeholder,
+    .column-name,
+    .column-description,
+    .column-version,
+    .column-date,
+    .column-actions {
+      padding: 16px 4px 4px 4px;
+    }
+
+    .column-placeholder {
+      width: 52px;
+      text-align: center;
+      padding-top: 12px;
+      padding-left: 0;
+    }
+
+    .column-name {
+      padding-left: 28px;
+    }
+
+    .column-actions {
+      width: 52px;
+      padding: 0 0 0 4px;
+    }
+
+    .icon-star,
+    .status-chip {
+      margin-top: -4px;
+    }
+
+  }
+
+}

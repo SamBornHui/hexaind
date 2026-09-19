@@ -1,0 +1,65 @@
+.workflow-table {
+    box-shadow: none;
+
+    .workflow-name {
+        cursor: pointer;
+
+        .mat-icon {
+            transform: translateY(4px);
+            transition: transform 0.3s;
+            top: -1px;
+        }
+    }
+
+    .name {
+        position: absolute;
+        top: 6px;
+    }
+
+    .owner {
+        position: absolute;
+        top: 16px;
+    }
+
+    .expand-element-row.expanded-row td .expander {
+        transform: translateY(4px) rotate(90deg);
+    }
+
+    .mat-mdc-header-row {
+        height: 32px !important;
+    }
+
+    .mat-mdc-header-cell,
+    .mat-mdc-cell {
+        padding: 0 4px;
+    }
+
+    tr.expand-detail-row {
+        height: 0;
+    }
+
+    .expand-element-detail {
+        margin-left: 24px;
+    }
+
+    .expanded-row {
+        border-bottom: none;
+    }
+
+    .inner-element-detail {
+        padding: 8px 0;
+        transition: 100ms all linear;
+
+        .thumbnail {
+            height: 80px;
+            width: 80px;
+        }
+    }
+
+    .expanded-element-detail {
+        .inner-element-detail {
+            opacity: 1;
+        }
+
+    }
+}

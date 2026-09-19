@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/460229939257327309/cc2e78d0890940968de2a48b95622d5b/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '460229939257327309'
+lifecycle_stage: active
+run_id: cc2e78d0890940968de2a48b95622d5b
+run_name: grandiose-shrimp-388
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752680812762
+status: 1
+tags: []
+user_id: muhammadumersohailkhan

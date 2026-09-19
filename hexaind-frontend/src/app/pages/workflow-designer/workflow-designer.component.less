@@ -1,0 +1,692 @@
+// .container {
+//   display: flex;
+//   position: relative; // Ensuring it stays within the bounds of its parent
+//   width: 100%; // Make it the full width of its parent
+//   height: calc(100% - 45px);
+//   border-width: 0px;
+//   font-family: inherit;
+//   font-weight: inherit;
+
+//   overflow: hidden;
+// }
+
+.container {
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  font-weight: inherit;
+}
+
+.content {
+  width: 100%;
+  height: calc(100% - 120px);
+  display: flex;
+  position: relative;
+}
+
+.arrow {
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.color-icon {
+  font-size: 24px;
+  cursor: pointer;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.color-slider-popup {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+
+
+// .left-panel {
+//   width: 250px;
+//   min-width: 250px;
+//   position: relative;
+//   background-color: white;
+//   border: 1px solid #ccc;
+// }
+
+.left-panel::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 100%;
+  width: 1px;
+  height: 100%;
+  background-color: #00000033;
+  /* Adjust color as needed */
+}
+
+.canvas-container {
+  width: 100%;
+  /* or any specific size */
+  height: 100%;
+  /* or any specific size */
+  overflow: hidden;
+  /* Clip content that overflows the container */
+  position: relative;
+  padding-left: 5px;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-width: 0px;
+  background-color: white;
+  border: 2px dotted green;
+}
+
+.widget-button {
+  background-color: #f2f5f5;
+  border-radius: 5px;
+  border: none;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  width: 220px;
+  justify-content: space-between;
+}
+
+.list-view {
+  font-family: inherit;
+  font-weight: inherit;
+}
+
+.list-view ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.button-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-weight: inherit;
+
+  li {
+    list-style-type: none;
+    width: 100%;
+
+    button {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: none;
+      color: #333;
+      text-align: left;
+      font-family: inherit;
+      font-weight: 500;
+
+      img {
+        margin-right: 10px; // Space between icon and text
+        width: 18px; // Adjust as needed
+        height: auto;
+      }
+    }
+  }
+}
+
+.button-list li {
+  margin-bottom: 0px;
+}
+
+#tooltip {
+  position: absolute;
+  background-color:rgba(67, 66, 66, 0.9) !important; 
+  color: hwb(0 96% 3%); 
+  border: 1px solid #070707; 
+  padding: 10px; 
+  pointer-events: none; 
+  font-weight: 500; 
+  font-size: 14px; 
+  max-width: 250px; 
+  word-wrap: break-word; 
+  white-space: normal; 
+  border-radius: 5px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+  z-index: 1000; 
+  text-align: left;
+}
+
+.custom-scrollbar {
+  padding-top: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #1369f5 #f1f1f1; 
+}
+
+div[fxFlex]::-webkit-scrollbar-thumb {
+  background-color: #e2e2e2; 
+  border-radius: 10px;
+}
+
+button {
+  background-color: white;
+  color: black;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 0px;
+  width: 100%;
+  position: relative;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+button:hover {
+  background-color: #f0f0f0;
+  border-width: 0px;
+}
+
+button:after {
+  content: "";
+  position: absolute;
+  /* Absolutely position relative to the button */
+  bottom: 0;
+  /* Position at the bottom of the button */
+  left: 0;
+  /* Align to the left of the button */
+  width: 100%;
+  /* Full width of the button */
+  height: 1px;
+  /* Height of the line */
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.horizontal-line {
+  border: none;
+  height: 12px;
+  background-color: #555555;
+  /* Use the desired color for the line */
+  margin: 0;
+}
+
+.config-button {
+  border-radius: 2px;
+  background-color: #007bff;
+  /* a blue shade, adjust as per preference */
+  color: white;
+  cursor: pointer;
+  display: flex;
+  /* use flexbox to align items */
+  align-items: center;
+  /* centers items vertically */
+  justify-content: center;
+  /* centers items horizontally */
+  width: 120px;
+  height: 30px;
+  margin-top: 10px;
+}
+
+.config-button:hover {
+  background-color: #007bff;
+  /* Ensure it remains the same color on hover */
+  color: white;
+  /* Ensure text color remains the same on hover */
+}
+
+.fa-regular.fa-floppy-disk {
+  position: absolute;
+  /* Take the icon out of the flow */
+  left: 10px;
+  /* Move the icon a bit from the left edge */
+}
+
+.close-button {
+  position: absolute;
+  /* Positions the button relative to the nearest positioned ancestor, which is .container in this case */
+  top: 1px;
+  /* Offset from the top */
+  right: 5px;
+  /* Offset from the right */
+  background-color: transparent;
+  /* Make button background transparent */
+  cursor: pointer;
+  /* Change cursor to pointer on hover */
+  box-shadow: none;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  background: none;
+  background-image: none;
+}
+
+#source option {
+  border-radius: 0px;
+}
+
+.menu-spans {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  /* This will center the child vertically */
+  justify-content: flex-start;
+}
+
+.checkbox-container {
+  label {
+    margin-right: 10px; // Adjust the space between the label and the checkbox if needed
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  input[type="checkbox"] {
+    vertical-align: middle;
+  }
+}
+
+.context-menu {
+  display: none;
+  position: absolute;
+  border: 1px solid @contextMenuBorderColor;
+  background-color: @contextMenuBgColor;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 200px;
+  width: 175px;
+  border-radius: 5px;
+
+  .context-menu-btn {
+    display: block; // Stack them vertically
+    width: 100%; // Take full width of parent
+    text-align: left;
+    background: none; // Remove default button background
+    border: none; // Remove default borders
+    padding: 8px 12px; // Some padding for better appearance
+    margin: 0; // Remove default margins
+    cursor: pointer; // Indicate it's clickable
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1); // A subtle hover effect
+    }
+
+    &:focus {
+      outline: none; // Remove focus outline for a cleaner look
+    }
+  }
+}
+
+.context-menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: @contextMenuItemHoverBgColor;
+  }
+}
+
+@contextMenuBorderColor: #ccc;
+@contextMenuBgColor: #fff;
+@contextMenuItemHoverBgColor: #eee;
+
+.rotate180 {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+  /* Add a smooth transition effect */
+}
+
+.canvas-bottom-panel {
+  height: 400px;
+  margin: 5px;
+}
+
+#designer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%; // This assumes that the parent of #container has a defined height
+  width: 100%;
+
+  #top {
+    flex-grow: 1;
+    margin: 5px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #resizer {
+    background-color: darkgray;
+    cursor: ns-resize;
+    height: 5px; // Set the height of the resizer bar
+    min-height: 5px;
+  }
+
+  #bottom {
+    // flex-grow: 1;
+    height: 450px;
+    // margin: 5px;
+    // padding: 5px;
+    position: relative;
+  }
+}
+
+/* Button styles */
+#saveButton,
+#closeButton {
+  width: 100px;
+  height: 30px;
+  border: 1px solid #000000;
+  /* Example: 1px solid black border */
+}
+
+.left-panel {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
+  transition: width 0.3s ease;
+  scrollbar-width: thin;
+  /* Firefox */
+  //scrollbar-color: transparent transparent;
+  /* Firefox */
+  scroll-behavior: smooth;
+  /* Enable smooth scrolling */
+  width: 250px;
+  min-width: 250px;
+  position: relative;
+  background-color: #f6f8fb;
+  // border: 1px solid #ccc;
+}
+
+.left-panel.collapsed {
+  width: 50px;
+  min-width: 50px;
+  overflow-y: auto;
+  max-height: 100vh;
+  transition: width 0.3s ease;
+  scrollbar-width: thin;
+  /* Firefox */
+  scroll-behavior: smooth;
+  /* Enable smooth scrolling */
+  position: relative;
+  background-color: #f6f8fb;
+  // border: 1px solid #ccc;
+}
+
+.left-panel::-webkit-scrollbar {
+  width: 12px;
+  /* Width of the scrollbar */
+}
+
+.left-panel::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  /* Color of the scrollbar thumb */
+}
+
+.left-panel::-webkit-scrollbar-track {
+  background-color: transparent;
+  /* Color of the scrollbar track */
+}
+
+.right-aligned-button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  /* Aligns content to the right */
+  width: 100%;
+  /* Ensures the button takes full width of its container */
+  border: none;
+  background: none;
+  padding: 10px;
+  /* Adjust padding as needed */
+  cursor: pointer;
+  /* Changes cursor to pointer on hover */
+
+  img {
+    margin-left: auto;
+    /* Pushes the image to the right */
+    opacity: 0.5;
+  }
+}
+
+.left-panel.collapsed .widget-list {
+  // width: 200px;
+  width: auto;
+  position: relative;
+}
+
+.left-panel.collapsed ul ul {
+  position: fixed;
+  z-index: 999;
+  margin-left: 5px;
+  border: 1px solid var(--stroke-dark);
+  // overflow: hidden;
+  overflow-y: auto;
+  max-height: 200px;
+  background-color: var(--white);
+}
+
+.arrow-btn {
+  cursor: pointer;
+  position: absolute;
+  z-index: 99;
+  top: 10px;
+  right: 10px;
+  color: var(--grey);
+
+  &:hover {
+    color: var(--primary);
+    background-color: var(--secondary-surface);
+  }
+}
+
+.left-panel.collapsed .widget-list-collapsed {
+  display: inline-block;
+}
+
+.left-panel.collapsed .widget-ullist-collapsed {
+  display: inline-block;
+}
+
+li.widget-list-collapsed.active {
+  background-color: #dcecf7;
+}
+
+ul.widget-ullist-collapsed.active {
+  background-color: #dcecf7;
+}
+
+// .left-panel li.widget-list:hover {
+//   background-color: #dcecf7;
+// }
+
+.drag-over {
+  border-color: #009688;
+  /* Change border color when drag-over */
+  cursor: move;
+  /* Change cursor style when drag-over */
+}
+
+.widget-block {
+  background-color: var(--secondary-surface);
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 12px;
+
+  &:hover {
+    background-color: var(--selected-surface);
+  }
+
+  &.disabled {
+    pointer-events: none;
+    color: var(--grey-lite);
+
+    .mat-icon {
+      color: var(--grey-lite);
+    }
+  }
+}
+
+.widget-block .icon {
+  color: var(--primary);
+  top: 2px;
+}
+
+.widget-block .drag-icon {
+  color: var(--stroke-dark);
+}
+
+.left-panel.collapsed .widget-block {
+  margin: 0;
+  border-radius: 0px;
+  border-bottom: 1px solid var(--white);
+}
+
+.wf-play-toolbar {
+  position: absolute;
+  z-index: 999;
+  top: 5px;
+  right: 100px;
+  background-color: var(--white);
+  border: 1px solid var(--stroke-lite);
+  border-radius: 4px;
+}
+
+.arrow-color-icon {
+  position: absolute;
+  z-index: 999;
+  top: 300px;
+  right: 30px;
+  border-radius: 7px;
+}
+
+.align-button-icon {
+  position: absolute;
+  z-index: 999;
+  top: 7px;
+  background-color: #eff6ff;
+  justify-content: center;
+}
+
+
+.custom-color-picker {
+  padding: 10px;
+  position: absolute;
+  z-index: 999;
+  top: 45px;
+  right: 70px;
+}
+
+.wf-save-toolbar {
+  position: absolute;
+  z-index: 999;
+  top: 16px;
+  right: 75px;
+  background-color: var(--white);
+  border: 1px solid var(--stroke-lite);
+  border-radius: 4px;
+}
+
+.wf-toolbar {
+  position: absolute;
+  z-index: 99;
+  top: 40px;
+  right: 16px;
+  background-color: var(--white);
+  border: 1px solid var(--stroke-lite);
+  border-radius: 4px;
+}
+
+.wf-slider .thumb {
+  height: 16px;
+  width: 16px;
+  position: absolute;
+  top: 0;
+  left: -10px;
+  color: var(--primary);
+}
+
+.wf-fit-btn {
+  position: absolute;
+  z-index: 999;
+  top: 250px;
+  right: 16px;
+  background-color: var(--white);
+  border: 1px solid var(--stroke-lite);
+  border-radius: 4px;
+}
+
+.wf-play-btn {
+  position: absolute;
+  z-index: 999;
+  top: 20px;
+  right: 116px;
+  background-color: var(--white);
+  border: 1px solid var(--stroke-lite);
+  border-radius: 4px;
+}
+
+.vertical-slider[type="range"][orient="vertical"] {
+  appearance: slider-vertical;
+  width: 8px;
+  height: 120px;
+  padding: 0 5px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  cursor: pointer;
+}
+
+input[type="range"]::-ms-thumb {
+  cursor: pointer;
+}
+
+.resizer-vertical {
+  cursor: ew-resize;
+  width: 3px;
+  min-width: 3px;
+}
+
+::ng-deep .mat-tooltip-class {
+  text-align: left;
+  white-space: pre-line;
+
+}
+
+  .mat-tooltip.custom-tooltip {
+    text-align: left;
+    white-space: pre-line;
+    background-color: #fff; /* Example background color */
+    border: 1px solid #ccc; /* Example border */
+    padding: 10px; /* Example padding */
+  }
+  
+  .mat-tooltip.custom-tooltip strong {
+    font-weight: bold;
+  }

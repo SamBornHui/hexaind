@@ -1,0 +1,53 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none">
+    <app-header></app-header>
+  </div>
+  <div fxFlex fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-1 px-2">
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+        <div>
+          <button mat-icon-button class="global-back-button" (click)="openConfirmationDialog()">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="image-feature-title"
+          [matMenuTriggerFor]="imageFeatureMenu">
+          <div>
+            {{feature | replaceAndCapitalize}}
+
+          </div>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </div>
+      </div>
+      <div>
+        <div class="text-lg pe-2">{{datasetName}}</div>
+      </div>
+    </div>
+    <div fxFlex class="y-auto p-6">
+      <ng-container *ngIf="feature === 'cleanup'">
+        <app-image-cleanup></app-image-cleanup>
+      </ng-container>
+      <ng-container *ngIf="feature === 'segment'">
+        <app-image-segment [featureName]="featureName"></app-image-segment>
+      </ng-container>
+      <ng-container *ngIf="feature === 'annotate'">
+        <app-image-annotate></app-image-annotate>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<mat-menu #imageFeatureMenu="matMenu">
+  <button mat-menu-item *ngFor="let feature of featuresList"
+    (click)="switchFeatureView(feature.value)">{{feature.name}}</button>
+</mat-menu>
+
+<ng-template #confirmationDialogTemplate>
+  <div mat-dialog-content>
+    <p>Are you sure you want to go back to the Datasets page?</p>
+  </div>
+  <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+    <button mat-flat-button (click)="dialogRef.close()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="goBack()">Confirm</button>
+  </div>
+</ng-template>

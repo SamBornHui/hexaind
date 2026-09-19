@@ -1,0 +1,21 @@
+.tree-node {
+    padding: 5px;
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    gap: 10px;
+    border-radius: 5px;
+    min-width:250px;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effect */
+  }
+
+  .selected-node {
+    background-color: #cccccc; /* Or any other styling you prefer */
+  }
+  .tree-node:hover {
+    background-color: #e0e0e0; /* Light grey background on hover */
+    color: #000000; /* Optional: Change text color on hover */
+    cursor: pointer; /* Changes the mouse cursor to a pointer */
+  }
+  ul {
+    list-style-type: none;
+  }

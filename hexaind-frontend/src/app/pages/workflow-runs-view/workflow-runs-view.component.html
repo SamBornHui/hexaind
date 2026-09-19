@@ -1,0 +1,103 @@
+<div class="h-100 p-7" fxLayout="column" fxLayoutGap="8px">
+    <div fxLayout="row" fxFlex="none">
+        <button mat-icon-button (click)="goBackToPrevPage()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1 class="global-main-title ms-2">Workflow Run View</h1>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="fixed-header mx-4">
+        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+            <div fxFlex="220px" fxFlex.lt-md="150px">
+                <mat-form-field appearance="outline">
+                    <mat-label>Search</mat-label>
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput placeholder="Search" [(ngModel)]="searchText" (ngModelChange)="onSearchTextChange()"/>
+                </mat-form-field>
+            </div>
+            <div fxFlex="160px" fxHide.lt-lg>
+                <mat-form-field appearance="outline">
+                    <mat-label>Select owner</mat-label>
+                    <mat-select>
+                        <mat-option value="admin">Mike Snow</mat-option>
+                        <mat-option value="admin">Rohan Lam</mat-option>
+                        <mat-option value="user">Kireeti Kunam</mat-option>
+                        <mat-option value="guest">Rahul Bachina</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxFlex="none">
+                <div class="global-icon-button" (click)="onToggleSort()">
+                    <mat-icon>swap_vert</mat-icon>
+                </div>
+            </div>
+            <div fxFlex="none">
+                <div class="global-icon-button">
+                    <mat-icon>cached</mat-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div fxFlex>
+        <mat-table [dataSource]="searchResults">
+            <ng-container matColumnDef="Run ID">
+                <mat-header-cell *matHeaderCellDef>Run ID</mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    {{ element._id ? element._id : "Unknown" }}
+                </mat-cell>
+            </ng-container>
+            <!-- <ng-container matColumnDef="owner">
+                <mat-header-cell *matHeaderCellDef>Owner</mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    {{ element.owner_name ? element.owner_name : "Unknown" }}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef>Description</mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    {{ element.description ? element.description : "Unknown" }}
+                </mat-cell>
+            </ng-container> -->
+            <ng-container matColumnDef="status">
+                <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <div class="wf-status running" *ngIf="element.run_status == 'RUNNING'">
+                        RUNNING
+                    </div>
+                    <div class="wf-status failed" *ngIf="element.run_status == 'FAILED'">
+                        FAILED
+                    </div>
+                    <div class="wf-status paused" *ngIf="element.run_status == 'PAUSE'">
+                        PAUSED
+                    </div>
+                    <div class="wf-status idle" *ngIf="element.run_status == 'IDLE'">
+                        PENDING
+                    </div>
+                    <div class="wf-status succeeded" *ngIf="element.run_status == 'SUCCEEDED'">
+                        COMPLETED
+                    </div>
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="lastModified">
+                <mat-header-cell *matHeaderCellDef>Last Modified <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1" matTooltip="User's local time">info</mat-icon></mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    {{ element.last_modified_at | date:'d-MMM-yyyy h:mm a' }}
+                </mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="more_vert">
+                <mat-header-cell *matHeaderCellDef>&nbsp;</mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <button mat-icon-button mat-icon-button (click)="menuItem = element; $event.stopPropagation()"
+                    [matMenuTriggerFor]="actionsMenu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                </mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        </mat-table>
+    </div>
+</div>
+<mat-menu #actionsMenu="matMenu">
+      <button mat-menu-item (click)="onWorkflowView(menuItem)">View</button>
+  
+  </mat-menu>

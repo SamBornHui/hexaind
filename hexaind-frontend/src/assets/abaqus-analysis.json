@@ -1,0 +1,121 @@
+[
+    {
+      "name": "AI Can End",
+      "test_mode": false,
+      "run_job": true,
+      "software": {
+        "analysis": {
+          "code": "abaqus-dsls",
+          "version": "2021-golden-DSLS"
+        },
+        "hardware": {
+          "coresPerSlot": 4,
+          "slots": 1,
+          "coreType": "starlite_max",
+          "walltime": 3
+        },
+        "command": "abaqus cae noGUI=MG_Forming.py; abaqus job=FormingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive parallel=domain double=both output_precision=full; abaqus cae noGUI=MG_Springback.py; abaqus job=SpringbackJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus cae noGUI=MG_Buckling.py; abaqus job=BucklingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus python PostProcessing.py",
+        "output_file": "PerfMetricsFile.csv",
+        "envVars": {
+          "DSLS_LICENSE_FILE": "4085@novelis"
+        }
+      }
+    },
+    {
+      "name": "AI Can End Visualize",
+      "test_mode": false,
+      "run_job": true,
+      "software": {
+        "analysis": {
+          "code": "abaqus-dsls",
+          "version": "2021-golden-DSLS"
+        },
+        "hardware": {
+          "coresPerSlot": 4,
+          "slots": 1,
+          "coreType": "starlite_max",
+          "walltime": 3
+        },
+        "command": "abaqus cae noGUI=MG_Forming.py; abaqus job=FormingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive parallel=domain double=both output_precision=full; abaqus cae noGUI=MG_Springback.py; abaqus job=SpringbackJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus cae noGUI=MG_Buckling.py; abaqus job=BucklingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus python PostProcessing.py;abaqus cae noGUI=Visualizer.py",
+        "output_file": "PerfMetricsFile.csv",
+        "visualize_files": [
+          "ShellGeometry.png",
+          "ShellGeometry_Closeup.png",
+          "FormingAnimation_Script.avi"
+        ],
+        "envVars": {
+          "DSLS_LICENSE_FILE": "4085@novelis"
+        }
+      }
+    },
+    {
+      "name": "AI Can End Visualize - short",
+      "test_mode": true,
+      "run_job": true,
+      "software": {
+        "analysis": {
+          "code": "abaqus-dsls",
+          "version": "2021-golden-DSLS"
+        },
+        "hardware": {
+          "coresPerSlot": 4,
+          "slots": 1,
+          "coreType": "starlite_max",
+          "walltime": 3
+        },
+        "command": "abaqus cae noGUI=abaqus_job.py; abaqus job=rescale_test.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi double=both interactive; abaqus python post_process.py; abaqus cae noGUI=visualizer.py",
+        "output_file": "output.csv",
+        "visualize_files": [
+          "visualization_test.png",
+          "FormingAnimation_Script.avi"
+        ],
+        "envVars": {
+          "DSLS_LICENSE_FILE": "4085@novelis"
+        }
+      }
+    },
+    {
+      "name": "AI Can End - Test",
+      "test_mode": true,
+      "run_job": true,
+      "software": {
+        "analysis": {
+          "code": "abaqus-dsls",
+          "version": "2021-golden-DSLS"
+        },
+        "hardware": {
+          "coresPerSlot": 4,
+          "slots": 1,
+          "coreType": "starlite_max",
+          "walltime": 3
+        },
+        "command": "abaqus cae noGUI=abaqus_job.py; abaqus job=rescale_test.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi double=both interactive; abaqus python post_process.py",
+        "output_file": "output.csv",
+        "envVars": {
+          "DSLS_LICENSE_FILE": "4085@novelis"
+        }
+      }
+    },
+    {
+      "name": "AI Can End - Test - short",
+      "test_mode": true,
+      "run_job": false,
+      "software": {
+        "analysis": {
+          "code": "abaqus-dsls",
+          "version": "2021-golden-DSLS"
+        },
+        "hardware": {
+          "coresPerSlot": 4,
+          "slots": 1,
+          "coreType": "starlite_max",
+          "walltime": 3
+        },
+        "command": "abaqus cae noGUI=abaqus_job.py; abaqus job=rescale_test.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi double=both interactive; abaqus python post_process.py",
+        "output_file": "output.csv",
+        "envVars": {
+          "DSLS_LICENSE_FILE": "4085@novelis"
+        }
+      }
+    }
+  ]

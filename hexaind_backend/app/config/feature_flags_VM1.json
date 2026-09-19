@@ -1,0 +1,13 @@
+{
+    "disabledThirdPartyWidgets": [],
+    "disabledAIMLWidgets": [],
+    "disabledApps": [
+        "UC6",
+        "UC7/Data Catalog",
+        "UC12",
+        "UC1-Configuration",
+        "Data Catalog",
+        "UC2-Visualization-results",
+        "UC3-Dashboard"
+    ]
+}

@@ -1,0 +1,166 @@
+<div fxLayout="column" class="dc-container h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Configure Traveler Step(s)</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onClose()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" fxLayoutGap="24px" class="p-6 y-auto">
+    <div
+      fxFlex="280px"
+      fxLayout="column"
+      fxLayoutGap="8px"
+      class="border-right pe-6"
+    >
+      <div fxFlex="none" class="fw-bold pb-1">
+        Manufacturing Area(s)
+        <span class="text-sm fw-normal text-grey">Optional</span>
+      </div>
+      <div fxFlex="none">
+        <mat-checkbox color="primary" (change)="toggleSelectAllTopLevelKeys()"
+          [checked]="selectAllTopLevelKeys">Select All</mat-checkbox>
+      </div>
+      <div fxFlex="none">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput [(ngModel)]="searchTopLevelKeys" (ngModelChange)="onSearchTopLevelKeys()" placeholder="Search" />
+        </mat-form-field>
+      </div>
+      <div fxFlex class="y-auto">
+        <mat-accordion class="global-accordion" multi>
+          <mat-accordion>
+            <mat-expansion-panel *ngFor="let key of filteredTopLevelKeys">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-checkbox
+                    color="primary"
+                    (click)="$event.stopPropagation()"
+                    (change)="onTopLevelKeyChange(key, $event.checked)"
+                    [checked]="isAllSelected(key)"
+                    [(ngModel)]="selectedTopLevelKeys[key]"
+                  >
+                    <span class="fw-bold">{{ key }}</span>
+                  </mat-checkbox>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div fxLayout="column">
+                <mat-checkbox
+                  *ngFor="let category of categoriesMap[key]"
+                  color="primary"
+                  [(ngModel)]="selectedCategories[key][category]"
+                  (change)="onCategoryChange(key, category, $event.checked)"
+                >
+                  {{ category }}
+                </mat-checkbox>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-accordion>
+      </div>
+    </div>
+    <div
+      fxFlex="240px"
+      fxLayout="column"
+      fxLayoutGap="8px"
+      class="border-right pe-6"
+    >
+      <div fxFlex="none" class="fw-bold pb-1">
+        Loop(s)
+        <span class="text-sm fw-normal text-grey">Optional</span>
+      </div>
+      <div fxFlex="none">
+        <mat-checkbox color="primary" (change)="toggleSelectAllSuffixes()"
+      [checked]="selectAllSuffixes">Select All</mat-checkbox>
+      </div>
+      <div fxFlex="none">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="searchSuffixes" (ngModelChange)="onSearchSuffixes()"/>
+        </mat-form-field>
+      </div>
+      <div fxFlex fxLayout="column" class="y-auto">
+        <mat-checkbox
+          *ngFor="let suffix of filteredSuffixes"
+          color="primary"
+          (change)="onSuffixChange(suffix, $event.checked)"
+          [checked]="selectedSuffixes.includes(suffix)"
+        >
+          {{ suffix }}
+        </mat-checkbox>
+      </div>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="8px" class="border-right pe-6">
+      <div fxFlex="none" class="fw-bold pb-1">Traveler Step(s)</div>
+      <div fxFlex="none">
+        <mat-checkbox color="primary" (change)="toggleSelectAllItems()"
+      [checked]="selectAllItems">Select All</mat-checkbox>
+      </div>
+      <div fxFlex="none">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Search"
+            [(ngModel)]="searchItems"
+            (ngModelChange)="onSearchItems()"
+          />
+          <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">            
+            <mat-icon class="global-icon-button-grey" (click)="addName()">check</mat-icon>
+            <mat-icon class="global-icon-button-grey" (click)="clearSearch()">clear</mat-icon>
+          </div>
+        </mat-form-field>
+      </div>
+      <div style="display: flex; flex-direction: column; height: 100%; width: 100%;overflow: auto;">
+        <cdk-virtual-scroll-viewport itemSize="30" style="height: 100%;display:flex;flex-direction: column;">
+          <mat-checkbox style="padding-right: 20px;" *cdkVirtualFor="let item of getAllItemKeys()" [(ngModel)]="filteredItems[item]" (change)="onItemChange(item, $event.checked)" color="primary">
+            {{ item }}
+          </mat-checkbox>
+        </cdk-virtual-scroll-viewport>   
+      </div>     
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="fw-bold pb-1">Selected Traveler Step(s)</div>
+      <div fxFlex="none">
+        <mat-checkbox color="primary" (change)="toggleSelectAllTopLevelKeys()"
+      [checked]="selectAllItems" [disabled]="true" >Select All</mat-checkbox>
+      </div>
+      <div fxFlex="none">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="searchItems" (ngModelChange)="onSearchItems()" />
+        </mat-form-field>
+      </div>
+      <cdk-virtual-scroll-viewport itemSize="30" style="height: 100%;overflow:auto" fxLayout="column">
+        <mat-checkbox style="padding-right: 20px;" *cdkVirtualFor="let item of getSelectedTravelerSteps()"  [(ngModel)]="filteredItems[item]" color="primary" [disabled]="true">
+          {{ item }}
+        </mat-checkbox>
+      </cdk-virtual-scroll-viewport>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6 pt-0"
+  >
+    <button mat-stroked-button color="primary" (click)="onClose()">
+      Cancel
+    </button>
+    <button mat-stroked-button color="primary" (click)="resetTravelerSteps()">
+      Reset
+    </button>
+    <button mat-flat-button color="primary" (click)="saveTravelerSteps()">
+      Save
+    </button>
+  </div>
+</div>

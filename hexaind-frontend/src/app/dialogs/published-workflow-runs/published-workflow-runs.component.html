@@ -1,0 +1,54 @@
+<div class="dialog-overlay h-100 p-8">
+  <div class="dialog">
+    <div fxLayout="column">
+      <div
+        fxFlex="none"
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        class="border-bottom"
+      >
+        <div>
+          <h1>Select run</h1>
+        </div>
+        <div>
+          <button mat-icon-button (click)="onClosePanel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="pt-7" fxLayout="column" fxLayoutGap="16px">
+      <mat-form-field appearance="outline">
+        <mat-label>Select run...</mat-label>
+        <mat-select [(ngModel)]="selectedRun">
+          <mat-option *ngIf="workflowRuns.length === 0" disabled
+            >No runs available.</mat-option
+          >
+          <mat-option *ngFor="let run of workflowRuns" [value]="run">
+            Run: {{ run.last_modified_at | date:'d-MMM-yyyy h:mm a' }} ({{
+              run.run_status
+            }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div
+      class="buttons-container"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      fxLayoutGap="18px"
+    >
+      <button mat-stroked-button color="primary" (click)="onClosePanel()">
+        Cancel
+      </button>
+      <button
+        [disabled]="!this.selectedRun"
+        mat-flat-button
+        color="primary"
+        (click)="onViewSelectedRun()"
+      >
+        View Run
+      </button>
+    </div>
+  </div>
+</div>

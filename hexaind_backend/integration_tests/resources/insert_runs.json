@@ -1,0 +1,138 @@
+[
+    {
+        "_id": {
+            "$oid": "668ac62745ca9c5bddcd65d7"
+        },
+        "interactive_mode": true,
+        "is_single_widget_run": false,
+        "schedule_to_delete_widgets": [],
+        "name": "test-sample-wf1",
+        "description": "used for testing purposes contains csv widget, save widget",
+        "run_source": "WORKFLOW",
+        "run_state": "START",
+        "run_status": "IDLE",
+        "actions": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "workflow_id": "668ac62745ca9c5bddcd65d6",
+        "version": "1.0"
+    }
+    ,
+    {
+        "_id": {
+            "$oid": "66954b51f6e3119e7f21705b"
+        },
+        "interactive_mode": true,
+        "is_single_widget_run": false,
+        "schedule_to_delete_widgets": [],
+        "name": "test-sample-wf1",
+        "description": "used for testing purposes contains csv widget, save widget",
+        "run_source": "WORKFLOW",
+        "run_state": "START",
+        "run_status": "IDLE",
+        "actions": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "workflow_id": "66954ada4649cf54ee4c3daa",
+        "version": "1.0"
+    },
+    {
+        "_id": {
+            "$oid": "66960f184f562876f26228d1"
+        },
+        "interactive_mode": true,
+        "is_single_widget_run": false,
+        "schedule_to_delete_widgets": [],
+        "name": "test-sample-wf1",
+        "description": "used for testing purposes contains csv widget, save widget",
+        "run_source": "WORKFLOW",
+        "run_state": "START",
+        "run_status": "IDLE",
+        "actions": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "workflow_id": "66960ecc51dcbc2e63b9678a",
+        "version": "1.0"
+    },
+    {
+        "_id": {
+            "$oid": "669791fd76558ad6dfe79a7a"
+        },
+        "interactive_mode": true,
+        "is_single_widget_run": false,
+        "schedule_to_delete_widgets": [],
+        "name": "test-sample-wf1",
+        "description": "used for testing purposes contains csv widget, save widget",
+        "run_source": "WORKFLOW",
+        "run_state": "START",
+        "run_status": "IDLE",
+        "actions": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "workflow_id": "669791eabeb903bc34831a7f",
+        "version": "1.0"
+    },
+    {
+        "_id": {
+            "$oid": "6698b27e317a3d745d48cc1d"
+        },
+        "interactive_mode": true,
+        "is_single_widget_run": false,
+        "schedule_to_delete_widgets": [],
+        "name": "P3-master_wf_run",
+        "description": "used for P3 E2E test",
+        "run_source": "WORKFLOW",
+        "run_state": "START",
+        "run_status": "IDLE",
+        "actions": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-22T11:58:52.183Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "workflow_id": "6698b27440feaaf9aab0e23e",
+        "version": "1.0"
+    }
+]

@@ -1,0 +1,27 @@
+<div class="table">
+  <!-- Header Row -->
+  <div class="row header">
+    <div class="cell checkbox-cell">
+      <input
+        type="checkbox"
+        [(ngModel)]="toggleAllChecked"
+        (change)="toggleAll()"
+      />
+    </div>
+    <!-- Empty cell for header row -->
+    <div class="cell">Column Header</div>
+    <div class="cell">Type</div>
+  </div>
+
+  <!-- Data Rows -->
+  <!-- <div
+        class="row"
+        *ngFor="let column of widgetControl!.csvHeadersWithTypes"
+    >
+        <div class="cell checkbox-cell">
+        <input type="checkbox" [(ngModel)]="column.checked" />
+        </div>
+        <div class="cell">{{ column.header }}</div>
+        <div class="cell">{{ column.type }}</div>
+    </div> -->
+</div>

@@ -1,0 +1,124 @@
+.project-dropdown {
+  width: 250px;
+  min-width: 250px;
+}
+
+.project-label {
+  margin-left: 20px;
+  font-weight: 400;
+  font-size: 18px;
+  color: white;
+}
+
+.global-header {
+  padding: 6px 16px;
+  background-color:#2c10e0;
+  border-bottom: 1px solid var(--stroke-lite);
+
+  .logo {
+    width: 111px;
+    height: 30px;
+    background-image: url(../../../assets/HexaindLogo.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+    text-indent: -9999px;
+    cursor: pointer;
+
+    @media screen and (max-width: 767px) {
+      width: 50px;
+      background-image: url(../../../assets/favicon.svg);
+    }
+  }
+
+  .user-block {
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+  }
+
+  .initials {
+    width: 36px;
+    height: 36px;
+    color: var(--white);
+    background-color: var(--primary-mid);
+    border-radius: 50%;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .name {
+    max-width: 160px;
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .company {
+    color: var(--grey);
+  }
+}
+
+.global-user-panel {
+  position: absolute;
+  z-index: 9999;
+  top: 64px;
+  right: 16px;
+  border: 1px solid var(--stroke-lite);
+  background-color: var(--secondary-surface);
+  border-radius: 8px;
+  box-shadow:
+    0px 2px 3px 0px rgba(190, 190, 203, 0.1),
+    0px 6px 6px 0px rgba(190, 190, 203, 0.09),
+    0px 14px 8px 0px rgba(190, 190, 203, 0.05),
+    0px 25px 10px 0px rgba(190, 190, 203, 0.01),
+    0px 39px 11px 0px rgba(190, 190, 203, 0);
+  padding: 16px;
+  width: 320px;
+
+  .initials {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+    color: var(--white);
+    background-color: var(--primary-mid);
+    border-radius: 50%;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .name {
+    max-width: 200px;
+    font-size: 18px;
+    line-height: 24px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--secondary);
+  }
+
+  .company {
+    color: var(--grey);
+    line-height: 24px;
+  }
+
+  .close {
+    cursor: pointer;
+    color: var(--grey);
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+}

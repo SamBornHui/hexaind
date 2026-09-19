@@ -1,0 +1,332 @@
+<div fxLayout="row" fxLayoutAlign="center center" class="h-100" *ngIf="apiCall">
+  <mat-spinner [diameter]="24"></mat-spinner>
+</div>
+<div fxLayout="row" fxLayoutGap="16px" class="h-100 p-relative" *ngIf="
+    !apiCall &&
+    segmentationworkflow['selectedCategory'] !== '' &&
+    selectedFolderId !== ''
+  ">
+  <div fxFlex fxLayout="column">
+    <div fxLayout="row" fxLayoutAlign="end center">
+      <mat-radio-group color="primary" [(ngModel)]="imagesDisplayView">
+        <mat-radio-button value="raw" (click)="changeImagesDisplayView('raw')">Raw images</mat-radio-button>
+        <mat-radio-button value="segmented" (click)="changeImagesDisplayView('segmented')">Segmented
+          images</mat-radio-button>
+        <mat-radio-button value="combine" (click)="changeImagesDisplayView('combine')">Raw + Segmented
+          images</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <div fxFlex class="workflow-images-container">
+      <!-- Unassigned Images -->
+      <div fxLayout="column" class="section" *ngIf="
+          getUnassignedImages().length > 0 && imagesDisplayView != 'segmented'
+        ">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="header">
+          <div fxFlex class="title" [class.collapsed]="isCollapsedUnassigned" (click)="toggleCollapse()">
+            Unassigned Images
+          </div>
+          <div fxFlex="none" class="pe-2">
+            No. of images: {{ getUnassignedImages().length }}
+          </div>
+          <div fxFlex="none">
+            <mat-checkbox color="primary" labelPosition="before" [disabled]="
+                !expandedWorkflowData['manageWorkflow'] ||
+                expandedWorkflowData['manageWorkflowType'] == 'add'
+              " [checked]="checkSelectAllButtons(true, {})" (change)="selectAllSegImages($event.checked, true, {})">
+              Select All</mat-checkbox>
+          </div>
+        </div>
+        <div class="content" id="unassigned-sub-container" dragula="IMAGES_LAYER" [dragulaModel]="getUnassignedImages()"
+          *ngIf="!isCollapsedUnassigned">
+          <ng-container *ngFor="let image of getUnassignedImages(); let imgIndex = index">
+            <div class="grid-item">
+              <images-grid [image]="image" [imgIndex]="imgIndex" [unassigned]="true" [workflow]="{}"
+                [selectedSegmentImages]="selectedSegmentImages" [expandedWorkflowData]="expandedWorkflowData"
+                [isBatchProcessingStarted]="isBatchProcessingStarted" (selectSegImagesEvent)="selectSegImages($event)"
+                (deassignWorkflowEvent)="deassignWorkflow($event)" (displaySegmentationImageEvent)="
+                  displaySegmentationImageParams($event)
+                "></images-grid>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <!-- Unassigned Images - Ends -->
+      <!-- Workflow Images -->
+
+      <div fxLayout="row" style="height: 100%;" *ngIf="noSegmentationDone() == 0 && imagesDisplayView == 'segmented'">
+        <div class="centered-info-message">
+          No images have been segmented in this folder
+        </div>
+      </div>
+
+
+      <div fxLayout="column" class="section" *ngFor="
+          let workflowData of getImageWorkflowsByDirName(selectedFolderName);
+          let workflowIndex = index
+        ">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="header">
+          <div fxFlex class="title" [class.collapsed]="isWorkflowSection[workflowIndex]"
+            (click)="toggleDiv(workflowIndex)">
+            <div class="text">{{ workflowData["Wname"] }}</div>
+          </div>
+          <div fxFlex="none" class="pe-2">
+            No. of images:
+            {{ getAssignedImagesByWorkflow(workflowData).length }}
+          </div>
+          <div fxFlex="none">
+            <mat-checkbox color="primary" labelPosition="before" disabled="true" [disabled]="
+                !expandedWorkflowData['manageWorkflow'] ||
+                expandedWorkflowData['manageWorkflowType'] == 'add' ||
+                (expandedWorkflowData['manageWorkflow'] &&
+                  expandedWorkflowData['expandedWorkflowId'] ==
+                    workflowData['_id'])
+              " [checked]="checkSelectAllButtons(false, workflowData)"
+              (change)="selectAllSegImages($event.checked, false, workflowData)">
+              Select All</mat-checkbox>
+          </div>
+        </div>
+        <div class="content" id="assigned-sub-container_{{ workflowData['_id'] }}" dragula="IMAGES_LAYER"
+          *ngIf="!isWorkflowSection[workflowIndex]">
+          <ng-container *ngFor="
+              let image of getAssignedImagesByWorkflow(workflowData);
+              let imgIndex = index
+            ">
+            <div class="grid-item">
+              <div fxLayout="row">
+                <images-grid *ngIf="
+                    imagesDisplayView == 'raw' || imagesDisplayView == 'combine'
+                  " [image]="image" [imageType]="'raw'" [imgIndex]="imgIndex" [unassigned]="false"
+                  [workflow]="workflowData" [selectedSegmentImages]="selectedSegmentImages"
+                  [expandedWorkflowData]="expandedWorkflowData" [isBatchProcessingStarted]="isBatchProcessingStarted"
+                  (selectSegImagesEvent)="selectSegImages($event)" (deassignWorkflowEvent)="deassignWorkflow($event)"
+                  (displaySegmentationImageEvent)="
+                    displaySegmentationImageParams($event)
+                  "></images-grid>
+                <images-grid *ngIf="
+                    (imagesDisplayView == 'segmented' ||
+                      imagesDisplayView == 'combine') &&
+                    image.segmented_imgthumb != ''
+                  " [imageType]="'segmented'" [image]="image" [imgIndex]="imgIndex" [unassigned]="false"
+                  [workflow]="workflowData" [selectedSegmentImages]="selectedSegmentImages"
+                  [expandedWorkflowData]="expandedWorkflowData" [isBatchProcessingStarted]="isBatchProcessingStarted"
+                  (selectSegImagesEvent)="selectSegImages($event)" (deassignWorkflowEvent)="deassignWorkflow($event)"
+                  (displaySegmentationImageEvent)="
+                    displaySegmentationImageParams($event)
+                  ">
+                </images-grid>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <!-- Workflow Images - Ends -->
+    </div>
+  </div>
+  <div fxFlex="280px" fxFlex.gt-md="320px" fxFlex.gt-lg="360px" fxLayout="column" fxLayoutGap="16px"
+    class="ps-4 border-left">
+    <div class="fw-bold border-bottom p-2">Segmentation Workflows</div>
+    <div fxFlex="none">
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search workflow" [(ngModel)]="searchText" />
+      </mat-form-field>
+    </div>
+    <div fxFlex class="y-auto">
+      <div id="workflowscontainer">
+        <mat-accordion class="type-of-workflows-expansion">
+          <!-- <mat-expansion-panel togglePosition="before" [disabled]="
+              expandedWorkflowData['manageWorkflow'] || isBatchProcessingStarted
+            " [expanded]="
+              expandedWorkflowData['expandedFolder'] == 0 &&
+              !isBatchProcessingStarted
+            " (opened)="expandWorkflowFolder(0)" (closed)="closeExpandedWorkflowFolder()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Recommended Workflows</mat-panel-title>
+              <mat-panel-description>
+                {{ getRecommendedWorkflows(selectedFolderName).length }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="py-2 ps-2">
+              <workflows-grid [folderType]="0" [datasetId]="datasetId" [selectedFolderId]="selectedFolderId"
+                [selectedFolderName]="selectedFolderName" [workflows]="getRecommendedWorkflows(selectedFolderName)"
+                [expandedWorkflowData]="expandedWorkflowData" [selectedSegmentImages]="selectedSegmentImages"
+                (changeFavoriteEvent)="changeFavorite($event)" (changeOutputDirEventt)="changeOutputDir($event)"
+                (expandedWorkflowEvent)="expandedWorkflow($event)"
+                (manageAssignWorkflowEvent)="manageAssignWorkflow($event)"
+                (assignWorkflowToImagesEvent)="assignWorkflowToImages($event)"
+                (deleteWorkflowEvent)="deleteWorkflow($event)"
+                (editWorkflowEventt)="editWorkflowParams($event)"></workflows-grid>
+            </div>
+          </mat-expansion-panel> -->
+          <mat-expansion-panel togglePosition="before" [disabled]="
+              expandedWorkflowData['manageWorkflow'] || isBatchProcessingStarted
+            " [expanded]="
+              expandedWorkflowData['expandedFolder'] == 1 &&
+              !isBatchProcessingStarted
+            " (opened)="expandWorkflowFolder(1)" (closed)="closeExpandedWorkflowFolder()">
+            <mat-expansion-panel-header>
+              <mat-panel-title> Current Subfolder Workflows </mat-panel-title>
+              <mat-panel-description>
+                {{ getWorkflowsByDirName(selectedFolderName).length }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="py-2 ps-2">
+              <workflows-grid [folderType]="1" [datasetId]="datasetId" [selectedFolderId]="selectedFolderId"
+                [selectedFolderName]="selectedFolderName" [workflows]="getWorkflowsByDirName(selectedFolderName)"
+                [expandedWorkflowData]="expandedWorkflowData" [selectedSegmentImages]="selectedSegmentImages"
+                (changeFavoriteEvent)="changeFavorite($event)" (changeOutputDirEventt)="changeOutputDir($event)"
+                (expandedWorkflowEvent)="expandedWorkflow($event)"
+                (manageAssignWorkflowEvent)="manageAssignWorkflow($event)"
+                (assignWorkflowToImagesEvent)="assignWorkflowToImages($event)"
+                (deleteWorkflowEvent)="deleteWorkflow($event)"
+                (editWorkflowEventt)="editWorkflowParams($event)"></workflows-grid>
+            </div>
+          </mat-expansion-panel>
+          <mat-expansion-panel togglePosition="before" [disabled]="
+              expandedWorkflowData['manageWorkflow'] || isBatchProcessingStarted
+            " [expanded]="
+              expandedWorkflowData['expandedFolder'] == 2 &&
+              !isBatchProcessingStarted
+            " (opened)="expandWorkflowFolder(2)" (closed)="closeExpandedWorkflowFolder()">
+            <mat-expansion-panel-header>
+              <mat-panel-title> Favorite Workflows </mat-panel-title>
+              <mat-panel-description>
+                {{ getFavoriteWorkflows(selectedFolderName).length }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="py-2 ps-2">
+              <workflows-grid [folderType]="2" [datasetId]="datasetId" [selectedFolderId]="selectedFolderId"
+                [selectedFolderName]="selectedFolderName" [workflows]="getFavoriteWorkflows(selectedFolderName)"
+                [expandedWorkflowData]="expandedWorkflowData" [selectedSegmentImages]="selectedSegmentImages"
+                (changeFavoriteEvent)="changeFavorite($event)" (changeOutputDirEventt)="changeOutputDir($event)"
+                (expandedWorkflowEvent)="expandedWorkflow($event)"
+                (manageAssignWorkflowEvent)="manageAssignWorkflow($event)"
+                (assignWorkflowToImagesEvent)="assignWorkflowToImages($event)"
+                (deleteWorkflowEvent)="deleteWorkflow($event)"
+                (editWorkflowEventt)="editWorkflowParams($event)"></workflows-grid>
+            </div>
+          </mat-expansion-panel>
+          <mat-expansion-panel togglePosition="before" [disabled]="
+              expandedWorkflowData['manageWorkflow'] || isBatchProcessingStarted
+            " [expanded]="
+              expandedWorkflowData['expandedFolder'] == 4 &&
+              !isBatchProcessingStarted
+            " (opened)="expandWorkflowFolder(4)" (closed)="closeExpandedWorkflowFolder()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Workflows From Other Subfolders
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ getOtherDirWorkflowsByDirName(selectedFolderName).length }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="py-2 ps-2">
+              <workflows-grid [folderType]="4" [datasetId]="datasetId" [selectedFolderId]="selectedFolderId"
+                [selectedFolderName]="selectedFolderName"
+                [workflows]="getOtherDirWorkflowsByDirName(selectedFolderName)"
+                [expandedWorkflowData]="expandedWorkflowData" [selectedSegmentImages]="selectedSegmentImages"
+                (changeFavoriteEvent)="changeFavorite($event)" (changeOutputDirEventt)="changeOutputDir($event)"
+                (expandedWorkflowEvent)="expandedWorkflow($event)"
+                (manageAssignWorkflowEvent)="manageAssignWorkflow($event)"
+                (assignWorkflowToImagesEvent)="assignWorkflowToImages($event)"
+                (deleteWorkflowEvent)="deleteWorkflow($event)"
+                (editWorkflowEventt)="editWorkflowParams($event)"></workflows-grid>
+            </div>
+          </mat-expansion-panel>
+          <mat-expansion-panel togglePosition="before" [disabled]="
+              expandedWorkflowData['manageWorkflow'] || isBatchProcessingStarted
+            " [expanded]="
+              expandedWorkflowData['expandedFolder'] == 5 &&
+              !isBatchProcessingStarted
+            " (opened)="expandWorkflowFolder(5)" (closed)="closeExpandedWorkflowFolder()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Workflows From Other Dataset Subfolders
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ getOtherDatasetWorkflows().length }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="py-2 ps-2">
+              <workflows-grid [folderType]="5" [datasetId]="datasetId" [selectedFolderId]="selectedFolderId"
+                [selectedFolderName]="selectedFolderName" [workflows]="getOtherDatasetWorkflows()"
+                [expandedWorkflowData]="expandedWorkflowData" [selectedSegmentImages]="selectedSegmentImages"
+                (changeFavoriteEvent)="changeFavorite($event)" (changeOutputDirEventt)="changeOutputDir($event)"
+                (expandedWorkflowEvent)="expandedWorkflow($event)"
+                (manageAssignWorkflowEvent)="manageAssignWorkflow($event)"
+                (assignWorkflowToImagesEvent)="assignWorkflowToImages($event)"
+                (deleteWorkflowEvent)="deleteWorkflow($event)"
+                (editWorkflowEventt)="editWorkflowParams($event)"></workflows-grid>
+            </div>
+          </mat-expansion-panel>
+          <!-- <mat-expansion-panel togglePosition="before" [disabled]="
+              expandedWorkflowData['manageWorkflow'] || isBatchProcessingStarted
+            " [expanded]="
+              expandedWorkflowData['expandedFolder'] == 3 &&
+              !isBatchProcessingStarted
+            " (opened)="expandWorkflowFolder(3)" (closed)="closeExpandedWorkflowFolder()">
+            <mat-expansion-panel-header>
+              <mat-panel-title> Create New Workflow </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="py-2" fxLayout="column" fxLayoutGap="16px">
+              <p class="text-center">Select an image to add workflow</p>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <button mat-stroked-button color="primary" (click)="
+                    manageAssignWorkflow({ expanded: false, type: 'add' })
+                  ">
+                  Cancel
+                </button>
+                <button mat-flat-button color="primary" (click)="editWorkflow('new', '')">
+                  Create <span class="hide-lg">Workflow</span>
+                </button>
+              </div>
+            </div>
+          </mat-expansion-panel> -->
+        </mat-accordion>
+      </div>
+    </div>
+
+    <div fxFlex="none" *ngIf="warningMessageVisible" class="bg-surface rounded-1 p-2 mb-2">
+
+      <div style="display: flex; align-items: center;" *ngIf="missingMasksMessage">
+        <mat-icon class="me-2 text-red">circle</mat-icon>
+        <span *ngIf="missingMasksMessage">{{ missingMasksMessage }}</span><br />
+      </div>
+
+      <div style="display: flex; align-items: center;" *ngIf="missingScaleBarsMessage">
+        <mat-icon class="me-2 text-orange">circle</mat-icon>
+        <span>{{ missingScaleBarsMessage }}</span>
+      </div>
+      <div style="display: flex; justify-content: flex-end;" *ngIf="missingScaleBarsMessage || missingMasksMessage">
+        <span class="clickable-link" (click)="goToCleanUpPage()"
+          matTooltip="Go to the cleanup page to apply masks and read-scale for these image(s)"
+          matTooltipPosition="above">Go to Cleanup</span>
+      </div>
+    </div>
+
+    <div fxFlex="none" *ngIf="isBatchProcessingStarted" class="bg-surface rounded-1 p-2 mb-2">
+      <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+        <div>Applying Workflow...</div>
+        <div>{{ workflowProgress | number: '1.0-0' }}%</div>
+      </div>
+
+      <mat-progress-bar mode="determinate" color="primary" [value]="workflowProgress"></mat-progress-bar>
+    </div>
+
+    <div fxFlex="none" class="text-end">
+      <button *ngIf="!warningMessageVisible" mat-flat-button color="primary"
+        [disabled]="apiCall || isBatchProcessingStarted || enableApplyWorkflowButtone()" (click)="applyWorkflows()">
+        Apply Workflows
+      </button>
+      <ng-container *ngIf="warningMessageVisible">
+        <button class="me-2" mat-stroked-button color="primary" (click)="resetImageHighlights()">
+          Cancel
+        </button>
+        <button mat-flat-button color="primary" (click)="applyWorkflows()">
+          Proceed Anyway
+        </button>
+      </ng-container>
+    </div>
+
+  </div>
+</div>

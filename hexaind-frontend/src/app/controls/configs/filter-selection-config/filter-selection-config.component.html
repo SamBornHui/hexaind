@@ -1,0 +1,54 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" 
+  class="border-bottom p-5">
+    <div>
+      <h1>Filter Selection</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="closeDialog()">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-4 y-auto" *ngIf="isLoading || isError" fxLayoutAlign="center center">
+    <div *ngIf="isLoading && !isError" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
+    <div *ngIf="!isLoading && isError" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center" class="error-text">
+      Error loading unique values for column {{columnName}}
+    </div>
+  </div>
+  <div fxFlex class="p-4 y-auto" *ngIf="!isLoading && !isError">
+    <div *ngIf="isCategorical">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput (keyup)="filterResults()" placeholder="Search" [(ngModel)]="searchKeyword" />
+        <mat-icon matSuffix (click)="clearKeyword()">clear</mat-icon>
+      </mat-form-field>
+  
+      <div class="count-value">
+        Total Count: {{filteredUniqueValues ? filteredUniqueValues.length : 0}}
+      </div>
+      <div class="unique-values-container">
+        <cdk-virtual-scroll-viewport itemSize="50" class="unique-values-viewport">
+          <div *cdkVirtualFor="let element of filteredUniqueValues; let i = index" class="row-item">
+            <mat-checkbox [(ngModel)]="element.checked" (change)="onValueSelected(i)" />
+              <span>
+                {{element.value}}
+              </span>
+          </div>
+        </cdk-virtual-scroll-viewport> 
+      </div> 
+      
+      <div class="button-controls" fxLayout="row" fxLayoutAlign="end center">
+        <button [disabled]="!isChangeMade" mat-stroked-button color="primary" id="closeButton" (click)="onClear()" class="control-button">
+          Clear
+        </button>
+        <button [disabled]="!isChangeMade" mat-flat-button color="primary" id="saveButton" (click)="onSave()" class="control-button">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  

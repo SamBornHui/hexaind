@@ -1,0 +1,22 @@
+<div class="mst-tree-item__icon">
+  <mst-button
+    *ngIf="item.hasChildren"
+    styleName="icon"
+    class="mst-tree-item__icon__button"
+    [class.expanded]="item.expanded"
+    iconName="chevron_right"
+    (click)="onArrowClick($event)"
+  />
+</div>
+<div class="mst-tree-item__icon" *ngIf="item[iconField]">
+  <mst-icon
+    class="mst-tree-item__icon__type-icon"
+    [iconName]="item[iconField]"
+  />
+</div>
+<span
+  *ngIf="nameField"
+  class="mst-tree-item__name mst-shared-truncate"
+  [title]="item[nameField]"
+  >{{ item[nameField] }}</span
+><mst-loader *ngIf="item.loading" [diameter]="20" />

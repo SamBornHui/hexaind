@@ -1,0 +1,92 @@
+<header class="mst-dashboard__header">
+  <div class="mst-dashboard__header__contents">
+    <div class="mst-dashboard__header__title">
+      <ng-container *ngIf="!editable; else elseTitleBlock">{{
+        config.name
+      }}</ng-container>
+      <ng-template #elseTitleBlock
+        ><input [value]="config.name" (change)="onConfigUpdate($event, 'name')"
+      /></ng-template>
+    </div>
+    <div class="mst-dashboard__header__description">
+      <ng-container
+        *ngIf="!editable && config.description; else elseDescriptionBlock"
+        >{{ config.description }}</ng-container
+      >
+      <ng-template #elseDescriptionBlock
+        ><input
+          [value]="config.description"
+          (change)="onConfigUpdate($event, 'description')"
+      /></ng-template>
+    </div>
+  </div>
+  <div class="mst-dashboard__header__controls">
+    <ng-container *ngIf="editable">
+      <mst-button [disabled]="isEmpty" styleName="flat" (click)="onUpdate()"
+        >Save</mst-button
+      ><mst-button
+        styleName="icon"
+        iconName="delete"
+        [disabled]="isEmpty"
+        (click)="onDelete()"
+      >
+      </mst-button>
+      <mst-button styleName="icon" iconName="close" (click)="onCancel()"
+        >Cancel</mst-button
+      >
+    </ng-container>
+    <mst-button
+      *ngIf="showEditButton"
+      styleName="icon"
+      iconName="settings"
+      (click)="onEdit()"
+    ></mst-button>
+    <mst-button
+      styleName="icon"
+      [iconName]="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+      (click)="onFullscreen()"
+    ></mst-button>
+  </div>
+</header>
+<div class="mst-dashboard__body">
+  <div
+    [class]="'mst-dashboard__body__row mst-dashboard__body__row--' + rowIndex"
+    *ngFor="
+      let row of config.config?.rows;
+      trackBy: trackByRow;
+      let rowIndex = index
+    "
+    [style.height.px]="row.height || defaultRowHeight"
+    [style.min-height.px]="row.height || defaultRowHeight"
+  >
+    <div
+      [class]="
+        'mst-dashboard__body__row__cell mst-dashboard__body__row__cell--' +
+        cellIndex
+      "
+      style="flex-basis: 0"
+      [style.flex]="cell.flex || 1"
+      *ngFor="
+        let cell of row.cells;
+        trackBy: trackByCell;
+        let cellIndex = index
+      "
+    >
+      <mst-viz-panel
+        [editable]="editable"
+        [config]="cell.viz || { id: '' }"
+        [data]="datas[rowIndex] ? datas[rowIndex][cellIndex] : undefined"
+        (itemDrop)="onItemDrop($event, rowIndex, cellIndex)"
+        (edit)="onVizEdit($event, rowIndex, cellIndex)"
+        (delete)="onVizDelete($event, rowIndex, cellIndex)"
+        (load)="onVizDataLoad($event, rowIndex, cellIndex)"
+        (resize)="onVizResize($event, rowIndex, cellIndex)"
+      />
+    </div>
+  </div>
+  <mst-empty
+    *ngIf="isEmpty && !editable"
+    message="No visualizations in this dashboard"
+    ><mst-button (click)="onEdit()">Edit Dashboard</mst-button></mst-empty
+  >
+</div>

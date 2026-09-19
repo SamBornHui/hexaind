@@ -1,0 +1,66 @@
+<div fxFlex fxLayout="row" style="height: 100%; width: 100%; padding: 5px;">
+  <!-- File List -->
+  <div fxFlex="20" style="margin: 5px;" fxLayout="column" class="file-list">
+    <div>
+      <div class="file-list-header">Files</div>
+      <div *ngFor="let file of arrayOfFiles; let i = index" (click)="changeFileContentInTheEditor(file, i)"
+        class="file-item" [class.selected]="i === selectedFileIndex">
+        {{ file.name }}
+        <mat-icon>file_copy</mat-icon>
+      </div>
+    </div>
+    <div *ngIf="isEditingInWorkflow" style="margin-top: 40px;">
+      <!-- In your template -->
+      <div class="file-list-header">Argument Values</div>
+      <div *ngFor="let item of argumentsForPythonFunction">
+        <p>{{ item.argumentName }} : <span style="color: greenyellow"> {{ item.argumentValue }} </span> </p>
+      </div>
+
+    </div>
+  </div>
+
+  <div fxFlex="80" fxLayout="column">
+    <div fxFlex="90" class="editor-container">
+      <app-code-editor (codeChange)="saveFileChanges($event)" [code]="selectedFileContent">
+      </app-code-editor>
+    </div>
+
+    <!-- Terminal -->
+    <!-- <div fxFlex="10" style="margin-left: 0.4vw; margin-right: 0.5vw" class="terminal-container">
+      <div class="terminal-header" >
+        Validation
+      </div>
+     
+    </div> -->
+
+    <div fxFlex="10" fxLayout="row" fxLayoutAlign="flex-end center">
+
+      <div *ngIf="isTerminalVisible" style="margin-right: 30px;">
+        <div *ngFor="let log of backendLogs" class="log-entry">
+          {{ log }}
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="flex-end flex-end">
+        <div *ngIf="isSavingInProgress" fxLayout="row" fxLayoutAlign="center center" style="text-align: center;">
+          <mat-spinner style="width:20%" diameter="25"></mat-spinner>
+          <p style="margin-top: 10px; font-size: 14px; color: #666;">
+            uploading the changes...
+          </p>
+        </div>
+        <!-- <button *ngIf="isEditingInWorkflow" (click)="runThePythonCode()" mat-flat-button color="primary" style="margin-right: 10px; height:40px !important;">
+                Run With Configured Parameters
+              </button> -->
+        <button *ngIf="!isSavingInProgress" (click)="onSave()" mat-flat-button color="primary"
+          style="margin-right: 10px;">
+          Save
+        </button>
+        <button *ngIf="!isSavingInProgress" (click)="onCancel()" mat-flat-button color="primary"
+          style="margin-right: 10px;">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+
+  </div>
+</div>

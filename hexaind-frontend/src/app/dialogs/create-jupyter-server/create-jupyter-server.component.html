@@ -1,0 +1,102 @@
+<div class="p-7" fxLayout="column" fxLayoutGap="24px">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="border-bottom"
+  >
+    <div>
+      <h1>{{ updateButton ? "Edit Jupyter Server" : "Create Jupyter Server" }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div>
+    <div
+      fxLayout="row"
+      fxLayoutGap="8px"
+      fxLayoutAlign=" center"
+      class="fw-bold mb-1"
+    >
+      <div>Name</div>
+      <mat-icon
+        class="material-symbols-outlined text-grey"
+        matTooltip="The name of the Server."
+        >info</mat-icon
+      >
+    </div>
+    <mat-form-field appearance="outline">
+      <input
+        matInput
+        required
+        id="name"
+        name="newProjectName"
+        [(ngModel)]="newProjectName"
+        #newProjectNameModel="ngModel"
+        placeholder="Enter name"
+      />
+    </mat-form-field>
+    <mat-error *ngIf="projectNameError">
+      {{ projectNameError }}
+    </mat-error>
+    <mat-error *ngIf="projectNameExistsError">{{
+      projectNameExistsError
+    }}</mat-error>
+  </div>
+  
+  <div>
+    <div
+      fxLayout="row"
+      fxLayoutGap="8px"
+      fxLayoutAlign=" center"
+      class="fw-bold mb-1"
+    >
+      <div>Description</div>
+      <mat-icon
+        class="material-symbols-outlined text-grey"
+        matTooltip="The description of the project."
+        >info</mat-icon
+      >
+    </div>
+    <mat-form-field appearance="outline">
+      <textarea
+        matInput
+        required
+        id="description"
+        [(ngModel)]="newProjectDescription"
+        placeholder="Enter description"
+      ></textarea>
+    </mat-form-field>
+
+    <mat-error *ngIf="projectDescriptionError">{{
+      projectDescriptionError
+    }}</mat-error>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+    <div *ngIf="isCreatingProject">
+      <!-- <mat-spinner diameter="24"></mat-spinner> -->
+    </div>
+    <button
+      mat-stroked-button
+      color="primary"
+      id="closeButton"
+      [disabled]="isCreatingProject"
+      mat-dialog-close
+    >
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      [disabled]="isCreatingProject"
+      color="primary"
+      id="createButton"
+      (click)="updateButton ? onUpdateProject() : onCreateProject()"
+    >
+      {{ updateButton ? " Save " : "Create Jupyter Server" }}
+    </button>
+  </div>
+</div>

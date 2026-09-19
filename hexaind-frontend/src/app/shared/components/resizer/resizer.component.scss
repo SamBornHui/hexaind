@@ -1,0 +1,45 @@
+:host {
+  --size: 5px;
+}
+.mst-resizer {
+  &__bar {
+    position: absolute;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    &--left {
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: var(--size);
+      cursor: col-resize;
+    }
+    &--right {
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: var(--size);
+      cursor: col-resize;
+    }
+    &--top {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--size);
+      cursor: row-resize;
+    }
+    &--bottom {
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: var(--size);
+      cursor: row-resize;
+    }
+  }
+  &__indicator {
+    display: none;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 99;
+  }
+}

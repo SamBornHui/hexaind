@@ -1,0 +1,48 @@
+<div fxLayout="column" fxLayoutGap="16px" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom pb-1">
+        <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center">
+            <div class="fw-bold">Image Preview</div>
+            <div fxFlex="250px">
+                <mat-form-field appearance="outline">
+                    <mat-select value="0">
+                        <mat-option value="0">Raw images</mat-option>
+                        <mat-option value="1">Segmented images</mat-option>
+                        <mat-option value="2">Raw + Segmented images</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <div>
+            <button mat-icon-button>
+                <mat-icon>zoom_in</mat-icon>
+            </button>
+            <button mat-icon-button disabled>
+                <mat-icon>zoom_out</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div fxFlex class="images-preview-container">
+        <div fxLayout="row wrap" fxLayoutGap="12px grid">
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+            <div fxFlex="none"><img src="../../../../assets/sample-img2.png" class="thumbnail" (click)="imagePreview()">
+            </div>
+        </div>
+    </div>
+</div>

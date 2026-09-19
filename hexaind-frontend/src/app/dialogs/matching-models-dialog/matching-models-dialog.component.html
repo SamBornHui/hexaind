@@ -1,0 +1,89 @@
+<mat-dialog-content class="mat-typography" style="height: calc(91vh - 98px)">
+  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center" class="mb-2 border-bt">
+    <div class="steps">Select Model</div>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+      <mat-icon class="close-icon">close</mat-icon>
+    </button>
+  </div>
+
+  <div fxLayout="column" fxLayoutGap="16px">
+    <div fxFlex>
+      <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let element">
+            <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+              <mat-radio-button name="table-radio-button" [value]="element" (click)="$event.stopPropagation()"
+                (change)="onRadioChange(element)">
+              </mat-radio-button>
+              <div fxFlex>{{ element.model.name }}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="file-type-bg">{{ element.model.type }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="problem_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Problem Type
+          </th>
+          <td mat-cell *matCellDef="let element" class="first-capital">
+            <span class="file-type-bg">{{
+              element.model.configs.problem_type
+              }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="input">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Inputs</th>
+          <td mat-cell *matCellDef="let element">
+            <span matTooltip="{{ element.model.configs.input_cols.join(', ') }}" matTooltipPosition="above">
+              {{ element.model.configs.input_cols.slice(0, 4).join(", ") }}
+              <span *ngIf="element.model.configs.input_cols.length > 4">...</span>
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="output">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Output</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.model.configs.output_cols?.join(", ") || element.model.configs.output_col }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="created_by">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Created by</th>
+          <td mat-cell *matCellDef="let element">{{ element.user_name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Date created
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.created_at | date: "d-MMM-yyyy h:mm a" }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="ml_deployed_status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.ml_deployed_status.status | replaceAndCapitalize }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="selectedRow = row"></tr>
+      </table>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end" *ngIf="dataSource">
+  <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" (click)="onSubmit()"
+    [disabled]="dataSource.length === 0 || !selectedRow">Import</button>
+</mat-dialog-actions>

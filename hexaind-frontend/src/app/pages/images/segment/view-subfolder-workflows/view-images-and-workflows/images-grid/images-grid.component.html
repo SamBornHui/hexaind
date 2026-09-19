@@ -1,0 +1,81 @@
+<div class="grid-item-container" *ngIf="showRawImage()">
+  <div class="mask-indicator" *ngIf="image.highlightNoMask"></div>
+  <div class="read-scale-indicator" *ngIf="image.highlightNoScaleBar"></div>
+  <mat-checkbox color="primary" #imagecheckbox class="select-images" [checked]="checkImageSelected(image.path)"
+    [class.hide-chekbox]="
+      !expandedWorkflowData['manageWorkflow'] ||
+      (expandedWorkflowData['manageWorkflow'] &&
+        expandedWorkflowData['expandedWorkflowId'] != '' &&
+        expandedWorkflowData['expandedWorkflowId'] == image['workflowId'])
+    " [value]="imgIndex" (click)="
+      !expandedWorkflowData['manageWorkflow'] ? $event.preventDefault() : ''
+    " (change)="
+      expandedWorkflowData['manageWorkflow']
+        ? selectSegImages($event.checked, image, unassigned, workflow)
+        : ''
+    "></mat-checkbox>
+  <div class="image-block" (click)="
+      expandedWorkflowData['manageWorkflow']
+        ? selectSegImages(
+            imagecheckbox.checked ? false : true,
+            image,
+            unassigned,
+            workflow
+          )
+        : ''
+    ">
+    <!-- <img loading="lazy" src="{{imageDisplayUrl}}{{image['croppedimage_thumb']}}" matTooltipPosition="above"/> -->
+    <img loading="lazy" src="{{ image['croppedimage_thumb_url'] }}" matTooltip="{{ image['imagename'] }}"
+      (click)="imageFullView(image)" />
+  </div>
+  <div class="action-items" fxLayout="row" fxLayoutGap="8px">
+    <div class="status-icon" *ngIf="checkWorkflowAssigned()" matTooltip="Image {{ imgIndex + 1 }}">
+      <mat-spinner *ngIf="isBatchProcessingStarted && !checkWorkflowApplied()" [diameter]="24"></mat-spinner>
+      <mat-icon class="text-green" *ngIf="checkWorkflowApplied()">check_circle</mat-icon>
+      <mat-icon class="text-red" *ngIf="!isBatchProcessingStarted && !checkWorkflowApplied()">remove</mat-icon>
+    </div>
+    <div class="action-icon" *ngIf="
+        !expandedWorkflowData['manageWorkflow'] && !isBatchProcessingStarted
+      " (click)="displaySegmentationImage(image, 'image')" matTooltip="{{
+        checkWorkflowAssigned() ? 'View Segmentation' : 'Create Workflow'
+      }}">
+      <mat-icon class="material-symbols-outlined">{{
+        checkWorkflowAssigned() ? "edit" : "add"
+        }}</mat-icon>
+    </div>
+    <div class="action-icon" *ngIf="
+        !isBatchProcessingStarted &&
+        checkWorkflowAssigned() &&
+        !expandedWorkflowData['manageWorkflow']
+      " (click)="deassignWorkflow(image)" matTooltip="{{ 'Remove from Workflow' }}">
+      <mat-icon *ngIf="!expandedWorkflowData['manageWorkflow']">close</mat-icon>
+    </div>
+  </div>
+</div>
+<div class="grid-item-container" *ngIf="showSegmentedImage()">
+  <div class="image-block">
+    <!-- <img loading="lazy" src="{{imageDisplayUrl}}{{image['croppedimage_thumb']}}" matTooltipPosition="above"/> -->
+    <img loading="lazy" src="{{ image['segmented_imgthumb_url'] }}" matTooltip="{{ image['imagename'] }}"
+      (click)="imageFullView(image)" />
+  </div>
+  <div class="action-items" fxLayout="row" fxLayoutGap="8px">
+    <div class="status-icon" *ngIf="checkWorkflowAssigned()" matTooltip="Image {{ imgIndex + 1 }}">
+      <mat-spinner *ngIf="isBatchProcessingStarted && !checkWorkflowApplied()" [diameter]="24"></mat-spinner>
+      <mat-icon class="text-green" *ngIf="checkWorkflowApplied()">check_circle</mat-icon>
+      <mat-icon class="text-red" *ngIf="!isBatchProcessingStarted && !checkWorkflowApplied()">remove</mat-icon>
+    </div>
+    <div class="action-icon" *ngIf="
+        !expandedWorkflowData['manageWorkflow'] && !isBatchProcessingStarted
+      " (click)="displaySegmentationImage(image, 'image')" matTooltip="{{
+        checkWorkflowAssigned() ? 'View Segmentation' : 'Create Workflow'
+      }}">
+      <mat-icon class="material-symbols-outlined">{{
+        checkWorkflowAssigned() ? "edit" : "add"
+        }}</mat-icon>
+    </div>
+    <div class="action-icon" *ngIf="!isBatchProcessingStarted && checkWorkflowAssigned()"
+      (click)="deassignWorkflow(image)" matTooltip="{{ 'Remove from Workflow' }}">
+      <mat-icon *ngIf="!expandedWorkflowData['manageWorkflow']">close</mat-icon>
+    </div>
+  </div>
+</div>

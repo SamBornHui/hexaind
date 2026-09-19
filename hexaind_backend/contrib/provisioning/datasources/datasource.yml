@@ -1,0 +1,24 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    basicAuth: false
+    isDefault: true
+    editable: true
+
+  - name: Elasticsearch-Logs
+    type: elasticsearch
+    access: proxy
+    url: http://es:9200
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      esVersion: 7
+      timeField: "@timestamp"
+    version: 1
+    editable: true
+    index: "[logs]-*"

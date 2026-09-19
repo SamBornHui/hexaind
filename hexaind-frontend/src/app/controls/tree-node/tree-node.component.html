@@ -1,0 +1,17 @@
+<li>
+  <div class="tree-node" [class.selected-node]="isSelected" (click)="onSingleClick()" (dblclick)="onDoubleClick()">
+    <!-- <i *ngIf="node.type === 'file'" class="fa-regular fa-file"></i> -->
+    <img *ngIf="node.type === 'folder'" src="assets/folder.png" width="18" alt="PNG file" class="logo">
+    <img *ngIf="isPngFile(node.name)" src="assets/png.png" width="18" alt="PNG file" class="logo">
+    <img *ngIf="isJpgFile(node.name)" src="assets/jpg.png" width="18" alt="JPG file" class="logo">
+    <img *ngIf="isTiffFile(node.name)" src="assets/tiff.png" width="18" alt="TIF file" class="logo">
+    <img *ngIf="isPdfFile(node.name)" src="assets/pdf.png" width="18" alt="PDF file" class="logo">
+    <img *ngIf="isCsvFile(node.name)" src="assets/csv.png" width="18" alt="CSV file" class="logo">
+    {{ node.name }}
+    <label *ngIf="node.type !== 'folder'">({{formatSize(node)}})</label>
+  </div>
+  <ul *ngIf="isExpanded && node.children">
+    <app-tree-node *ngFor="let child of node.children" [node]="child" (nodeClick)="onChildNodeSingleClick($event)" (nodeDoubleClick)="onChildNodeDoubleClicked($event)"></app-tree-node>
+  </ul>
+</li>
+  

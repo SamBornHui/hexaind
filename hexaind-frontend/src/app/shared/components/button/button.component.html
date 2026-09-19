@@ -1,0 +1,32 @@
+<button
+  *ngIf="
+    (styleName !== 'icon' && styleName !== 'menu') ||
+    (styleName === 'menu' && !iconName)
+  "
+  mat-button
+  [type]="type"
+  [color]="color"
+  [matMenuTriggerFor]="menu"
+  [ngClass]="{
+    'mat-mdc-button mat-mdc-raised-button': styleName === 'raised',
+    'mdc-button--outlined mat-mdc-outlined-button': styleName === 'stroked',
+    'mat-mdc-unelevated-button': styleName === 'flat',
+    'mat-mdc-menu-item mdc-list-item': styleName === 'menu'
+  }"
+  [disabled]="disabled"
+  (click)="onClick($event)"
+>
+  <mst-icon *ngIf="iconName" [iconName]="iconName" />
+  <ng-content />
+</button>
+<button
+  *ngIf="styleName === 'icon' || (styleName === 'menu' && iconName)"
+  [type]="type"
+  [color]="color"
+  [matMenuTriggerFor]="menu"
+  [disabled]="disabled"
+  mat-icon-button
+  (click)="onClick($event)"
+>
+  <mst-icon [iconName]="iconName" />
+</button>

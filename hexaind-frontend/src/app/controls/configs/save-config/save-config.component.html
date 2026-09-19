@@ -1,0 +1,194 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex"
+      (selectedIndexChange)="onTabChange($event)">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div *ngIf="inputWidgets.length > 0">
+                <div *ngFor="let widgetObject of allOutputs; let i = index">
+                  <div class="fw-bold pb-1">Select Input</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="getSelectedInputOutputConfig(i)"
+                      (ngModelChange)="setSelectedInputOutputConfig($event, i)" name="inputWidgetSelector{{ i }}"
+                      placeholder="Select input widget">
+                      <mat-option *ngFor="let inputOutputConfig of allOutputs" [value]="inputOutputConfig">
+                        {{ getWidgetOutputName(inputOutputConfig) }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div *ngIf="inputWidgets.length === 0">
+                There are no inputs selected from the prior widget.
+              </div>
+              <div *ngIf="
+          configCache &&
+          configCache.datasetConfig &&
+          configCache.datasetConfig.length == 0 && inputWidgets.length > 0
+        ">
+                There are no inputs selected from the prior widget.
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div *ngIf="
+          configCache &&
+          configCache.datasetConfig &&
+          configCache.datasetConfig.length > 0
+        ">
+            <mat-accordion class="global-accordion">
+              <mat-expansion-panel *ngFor="
+              let dataset of configCache?.datasetConfig;
+              let i = index;
+              first as isFirst
+            " [expanded]="isFirst">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <b>Dataset:</b> &nbsp;&nbsp; {{ dataset["dataset_name"] }}
+                  </mat-panel-title>
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" class="me-4">
+                    <!-- <mat-checkbox
+                  color="primary"
+                  [(ngModel)]="saveFlag"
+                  (ngModelChange)="setSaveFlag(i, $event)"
+                  (click)="$event.stopPropagation()"
+                >
+                  Do not save
+                </mat-checkbox>
+                <mat-icon (click)="$event.stopPropagation()">
+                  content_copy
+                </mat-icon> -->
+                  </div>
+                </mat-expansion-panel-header>
+
+                <div class="content">
+                  <div fxLayout="row" fxLayoutGap="250px">
+                    <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <div class="fw-bold">File Name</div>
+                        <mat-checkbox color="primary" [checked]="isOverwriteChecked(i)"
+                          (change)="setOverwriteOption(i, $event.checked)" [(ngModel)]="overwriteChecked">
+                          Overwrite, if existing.
+                        </mat-checkbox>
+                      </div>
+
+                      <div fxFlex="50" *ngIf="getSaveOptions(i) === 'SAVE_AS'">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="text" placeholder="System generated file name"
+                            [ngModel]="getFileName(i)" (ngModelChange)="setFileName(i, $event)" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex *ngIf="getSaveOptions(i) === 'REPLACE'">
+                        <div fxFlex="50">
+                          <mat-form-field appearance="outline">
+                            <mat-label>Choose dataset</mat-label>
+                            <mat-select placeholder="Select dataset" [ngModel]="getDatasetId(i)"
+                              (ngModelChange)="setDatasetId(i, $event)">
+                              <mat-option *ngFor="let dataset of datasets" [value]="dataset._id">{{ dataset.name
+                                }}</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <!-- File Format -->
+                      <div fxLayout="row" fxLayoutAlign="left" fxLayoutGap="8px">
+                        <div class="fw-bold">File Format</div>
+                      </div>
+                      <div fxFlex>
+                        <mat-radio-group color="primary" [ngModel]="getFileFormatoptions(i)"
+                          (ngModelChange)="setFileFormatoptions(i, $event)">
+                          <mat-radio-button value="CSV">CSV</mat-radio-button>
+                          <mat-radio-button value="PARQUET">PARQUET</mat-radio-button>
+                          <mat-radio-button value="TEXT">TEXT</mat-radio-button>
+                          <mat-radio-button value="EXCEL">EXCEL</mat-radio-button>
+                        </mat-radio-group>
+                      </div>
+
+                      <div fxLayout="row" fxLayoutAlign="left" fxLayoutGap="8px">
+                        <div class="fw-bold">Location</div>
+                      </div>
+                      <div fxFlex fxLayout="row" fxLayoutGap="8px">
+                        <mat-form-field appearance="outline">
+                          <mat-select [ngModel]="getDestinationSelectionType(i)" placeholder="Select file location type"
+                            (selectionChange)="
+                          onLocationTypeSelection(i, $event.value)
+                        " placeholder="Select file location type">
+                            <mat-option *ngFor="let destinationType of destinationTypes" [value]="destinationType">
+                              {{ destinationType }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <ng-container *ngIf="isMountedDriveSelected(i)">
+                        <div fxFlex>
+                          <div class="fw-bold">
+                            Destination path: {{ getMountedPath(i) }}
+                          </div>
+                        </div>
+                      </ng-container>
+                      <div fxFlex fxLayout="row" fxLayoutGap="8px" *ngIf="isMountedDriveSelected(i)">
+                        <div>
+                          <button class="ms-4" mat-flat-button color="primary" (click)="showMountedDriveDialog(i)">
+                            Explore
+                          </button>
+                        </div>
+                      </div>
+                      <ng-container *ngIf="!isMountedDriveSelected(i)">
+                        <div fxLayout="row" fxLayoutAlign="left" fxLayoutGap="8px">
+                          <div class="fw-bold">
+                            Destination path: /hexaind-data
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <div *ngIf="
+          configCache &&
+          configCache.datasetConfig &&
+          configCache.datasetConfig.length == 0
+        ">
+            There are no inputs selected for this widget.
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          This tab is empty for this widget
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+  <button mat-stroked-button color="primary" id="closeButton" [disabled]="!changeMade" (click)="onCancel()">
+    Cancel
+  </button>
+  <button mat-flat-button color="primary" id="createBeutton" [disabled]="!changeMade" (click)="onSave()">
+    Save
+  </button>
+</div>
+
+<app-config-action-bar widgetName="Save" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

@@ -1,0 +1,31 @@
+<div fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+  <div>
+    <h1>Rename Dataset</h1>
+  </div>
+  <div>
+    <button mat-icon-button [mat-dialog-close]="false">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+<div class="p-6">
+  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="fw-bold mb-1">
+    <div>Dataset Name</div>
+    <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="The name of the dataset.">info</mat-icon>
+  </div>
+  <mat-form-field appearance="outline">
+    <input matInput required id="name" name="newDatasetName" [(ngModel)]="newDatasetName" #newDatasetNameModel="ngModel"
+      placeholder="Enter name" />
+    <mat-error *ngIf="emptyName">Name should not be empty.</mat-error>
+    <mat-error *ngIf="datasetNameError">{{ datasetNameError }}</mat-error>
+    <mat-error *ngIf="datasetNameExistsError">{{ datasetNameExistsError }}</mat-error>
+  </mat-form-field>
+</div>
+<div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="p-6">
+  <button mat-stroked-button color="primary" id="closeButton" mat-dialog-close>
+    Cancel
+  </button>
+  <button mat-flat-button color="primary" id="createButton" (click)="onUpdateDatasets()">
+    Save
+  </button>
+</div>

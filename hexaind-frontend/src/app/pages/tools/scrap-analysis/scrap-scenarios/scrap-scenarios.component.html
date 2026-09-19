@@ -1,0 +1,575 @@
+<div fxLayout="row" class="h-100">
+    <div fxFlex="280px" fxLayout="column" fxLayoutGap="16px" class="border-right p-4">
+        <div fxFlex="none" *ngIf="showEditModeOption()">
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex class="text-ellipse fw-bold">{{!changeMade ? 'Read Only Mode' : 'Editable Mode'}}</div>            
+                <div fxFlex="none">
+                    <button mat-icon-button color="primary" [matTooltip]="!changeMade ? 'Read Only Mode' : 'Editable Mode'" (click)="toggleLock()">
+                        <mat-icon>{{ !changeMade?'lock' : 'lock_open' }}</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div fxFlex="none">
+            <div class="fw-bold pb-1">Use Case Name</div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="py-2" *ngIf="!editUsecCaseName">
+                <div fxFlex class="text-ellipse">{{use_case_name}}</div>
+                <div fxFlex="none" [class.disable-content]="disabledEvent()">
+                    <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                        (click)="toggleUsecCaseName('edit')">edit</mat-icon>
+                </div>
+            </div>
+            <div *ngIf="editUsecCaseName">
+                <mat-form-field appearance="outline">
+                    <input matInput placeholder="Enter name" [(ngModel)]="edit_case_name" />
+                    <div matSuffix fxLayout="row" class="pe-2" >
+                        <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                            (click)="toggleUsecCaseName('cancel')">close</mat-icon>
+                        <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                            (click)="toggleUsecCaseName('done')">check</mat-icon>
+                    </div>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex="none">
+            <div class="fw-bold pb-1">Description</div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="py-2" >
+                <mat-form-field appearance="outline">
+                    <textarea
+                        [disabled]="disabledEvent()" 
+                        matInput 
+                        placeholder="Enter usecase description" 
+                        [(ngModel)]="use_case_description" 
+                        (keyup)="changeMade=true" >
+                    </textarea>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex="none">
+            <div class="fw-bold pb-1">Select Baseline File</div>
+            <div>
+                <div fxFlex="90%">
+                    <mat-form-field appearance="outline">
+                        <mat-select placeholder="Select Baseline File" [(ngModel)]="selectedToDisplayFile" [disabled]="disabledEvent() || disableBaselineSelection()">    
+                            <mat-option *ngFor="let file of displayFilteredFiles()" 
+                                (click)="getFormatScrapData(file._id,false)"
+                                value="{{file._id}}">
+                                {{file.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>                
+                <button
+                    [disabled]="disabledEvent() || disableBaselineSelection()"
+                    title="Filter files"
+                    class="trigger-icon"
+                    mat-icon-button
+                    matSuffix
+                    [matMenuTriggerFor]="filterFileMenu"
+                    #filterFileMenuTrigger="matMenuTrigger"
+                    aria-label="Filter options">
+                    <mat-icon>tune</mat-icon>
+                </button>
+            </div>
+            <mat-menu #filterFileMenu="matMenu" class="custom-menu" [hasBackdrop]="false">
+                <button mat-menu-item
+                    *ngFor="let item of filterFileMenuList"
+                    (click)="selectedFileMenu = item.value"
+                    [class.selected-option]="selectedFileMenu == item.value">
+                    {{ item.title }}
+                </button>
+            </mat-menu>  
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="8px">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex class="fw-bold pb-1">Scenarios list</div>
+                <div fxFlex="none">
+                    <button mat-flat-button color="primary" (click)="addNewscenario()"
+                        [disabled]="selectedFile =='' || disabledEvent()">Add</button>
+                </div>
+            </div>
+            <div fxFlex class="y-auto">
+                <div fxLayout="row" [class.disable-content]="disabledEvent()" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1"
+                    *ngFor="let scenario of scenarios; let counter=index">
+                    <div 
+                        (click)="expandScenario(counter)"
+                        fxFlex class="text-ellipse" 
+                        *ngIf="editScenarioOriginalName != scenario.scenario_name"
+                    >{{scenario.scenario_name}}</div>
+                    <div *ngIf="editScenarioName && editScenarioOriginalName == scenario.scenario_name">
+                        <mat-form-field appearance="outline">
+                            <input matInput placeholder="Enter name" [(ngModel)]="editScenarioNewName" />
+                            <div matSuffix fxLayout="row" class="pe-2">
+                                <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                                    (click)="toggleScenarioName('cancel',scenario)">close</mat-icon>
+                                <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                                    (click)="toggleScenarioName('done',scenario)">check</mat-icon>
+                            </div>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="none">
+                        <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                            *ngIf="editScenarioOriginalName != scenario.scenario_name"
+                            (click)="toggleScenarioName('edit',scenario)">edit</mat-icon>
+                        <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                            *ngIf="editScenarioOriginalName != scenario.scenario_name"
+                            (click)="deleteScenario(scenario)">delete</mat-icon>
+                        <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                            *ngIf="editScenarioOriginalName != scenario.scenario_name"
+                            (click)="duplicateScenario(scenario)">content_copy</mat-icon>
+                    </div>
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+            <button mat-stroked-button color="primary" class="w-100" [disabled]="disableActionButton()"
+                (click)="saveScenarios()">{{saveScenarioText()}}</button>
+            <div class="p-relative">
+                <button mat-stroked-button color="primary" class="w-100" [disabled]="disableRunScenActionButton()"
+                    (click)="runScenarios()">
+                    Run Scenarios
+                </button>
+                <mat-spinner class="button-spinner" diameter="24" *ngIf="runScenario"></mat-spinner>
+            </div>
+           
+            <button mat-stroked-button color="primary" class="w-100" [disabled]="disableRunViewActionButton()"
+                (click)="viewScenarioRun()">View Scenario Run</button>
+
+            <button mat-stroked-button color="primary" class="w-100"
+                (click)="goScenarioRuns()">View Scenario Runs</button>    
+
+        </div>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="24px" class="p-4 y-auto">   
+        <div fxLayout="column" fxLayoutGap="12px" *ngIf="scenarios.length==0">
+            <div fxLayout="column" fxLayoutGap="8px" class="bg-white rounded-2 p-3">
+                <div fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="fw-bold text-md">Scrap Input</div>                    
+                </div>
+                <table mat-table [dataSource]="showEmptyResult()">
+                    <ng-container *ngFor="let column of scrapColumns">
+                        <ng-container *ngIf="column !='actions'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef>{{columnNameMap(column) | replaceAndCapitalize}}</th>
+                            <td mat-cell *matCellDef="let element"></td>
+                        </ng-container>
+                        <ng-container *ngIf="column =='actions'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef width="48">&nbsp;</th>
+                            <td mat-cell *matCellDef="let element"> </td>
+                        </ng-container>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="scrapColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: scrapColumns"></tr>
+
+                </table>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px" class="bg-white rounded-2 p-3">
+                <div fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="fw-bold text-md">Demand Input</div>
+                </div>
+                <table mat-table [dataSource]="showEmptyResult()">
+                    <ng-container *ngFor="let column of demandColumns">
+                        <ng-container *ngIf="column !='actions'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef>{{columnNameMap(column) | replaceAndCapitalize}}</th>
+                            <td mat-cell *matCellDef="let element"></td>
+                        </ng-container>
+                        <ng-container *ngIf="column =='actions'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef width="48">&nbsp;</th>
+                            <td mat-cell *matCellDef="let element">
+                            </td>
+                        </ng-container>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="demandColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: demandColumns"></tr>
+                </table>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px" class="bg-white rounded-2 p-3">
+                <div fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="fw-bold text-md">Limits</div>                    
+                </div>
+                <table mat-table [dataSource]="showEmptyResult()">
+                    <ng-container *ngFor="let column of limitColumns">
+                        <ng-container *ngIf="column !='actions'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef>{{transformLimitHeader(column) | replaceAndCapitalize}}</th>
+                            <td mat-cell *matCellDef="let element"></td>
+                        </ng-container>
+                        <ng-container *ngIf="column =='actions'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef width="48">&nbsp;</th>
+                            <td mat-cell *matCellDef="let element"></td>
+                        </ng-container>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="limitColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: limitColumns"></tr>
+                </table>
+            </div>
+        </div>     
+        <mat-accordion class="global-accordion" *ngIf="scenarios.length>0">
+            <mat-expansion-panel 
+                *ngFor="let scenario of scenarios; let i = index" 
+                [expanded]="i === expandedAccrodian" 
+                (expandedChange)="onExpandedChange($event, i)">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <div fxLayout="row" fxLayoutAlign="space-between center" class="w-100">
+                            <div class="text-lg">{{scenario.scenario_name}}</div>
+                            <div [class.disable-content]="disabledEvent()">
+                                <mat-icon class="material-symbols-outlined global-icon-button-sm mt-1"
+                                    matTooltip="Delete Scenario" (click)="deleteScenario(scenario)">delete</mat-icon>
+                            </div>
+                        </div>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" fxLayoutGap="12px" [class.disable-content]="disabledEvent()">
+                    <div fxLayout="column" fxLayoutGap="8px" class="bg-white rounded-2 p-3">
+                        <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <div class="fw-bold text-md">Scrap Input</div>
+                            <div fxLayout="row" fxLayoutGap="4px">
+                                <div fxFlex="250px">
+                                    <mat-form-field appearance="outline">                                        
+                                        <input 
+                                            matInput 
+                                            placeholder="Enter alloy name"
+                                            [matMenuTriggerFor]="scrapMenu"
+                                            #scrapMenuTrigger="matMenuTrigger"
+                                            [formControl]="searchScrapControl"
+                                            (keyup)="scrapMenuTrigger.openMenu()"
+                                            />
+                                        <mat-menu #scrapMenu="matMenu" class="custom-menu custom-position" [hasBackdrop]="false">
+                                            <div class="menu-top-container">
+                                                <span class="select-options" (click)="selectedScrapAlloys = [];$event.stopPropagation();">Clear All</span>                                                
+                                            </div>                                            
+                                            <div class="scrollable-menu-items">
+                                                <button mat-menu-item
+                                                    *ngFor="let alloy of (filteredScrapAlloys | async)"
+                                                    (click)="selectAlloy(alloy, 'scrap');$event.stopPropagation();"
+                                                    [class.selected-option]="selectedScrapAlloys.includes(alloy)">
+                                                    {{ alloy }}
+                                                </button>
+                                            </div>                                            
+                                        </mat-menu>
+                                    </mat-form-field>
+                                </div>
+                                <div fxFlex="none">
+                                    <button mat-flat-button color="primary" (click)="scrapMenuTrigger.closeMenu();addScrap(scenario)"
+                                        [disabled]="disableAddScrap()">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                        <table mat-table [dataSource]="getSource(scenario,'scrap')">
+                            <ng-container *ngFor="let column of scrapColumns">
+                                <ng-container *ngIf="column !='actions'" matColumnDef="{{column}}">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{columnNameMap(column) | replaceAndCapitalize}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <div *ngIf="column !='Source' && column !='Alloy'">
+                                            <input [(ngModel)]="element[column]" step="0.1" min="0" type="number"
+                                                class="sa-custom-input" />
+                                        </div>
+                                        <span *ngIf="column =='Alloy'">{{element[column]}}</span>
+                                        <span *ngIf="column =='Source' && !element.new">{{element[column]}}</span>
+                                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                                            *ngIf="column =='Source' && element.new">
+                                            <div fxFlex>
+                                                <input 
+                                                    matInput
+                                                    class="sa-custom-input" 
+                                                    placeholder="All"
+                                                    #sourceMenuTrigger="matMenuTrigger" 
+                                                    [matMenuTriggerFor]="sourceMenu"
+                                                    (keyup)="sourceMenuTrigger.openMenu()" />
+                                                <mat-menu #sourceMenu="matMenu" class="custom-menu" [hasBackdrop]="false">
+                                                    <button mat-menu-item
+                                                        *ngFor="let option of getAlloySources(element.Alloy)"
+                                                        (click)="toggleSourceSelection(option,element);$event.stopPropagation();"
+                                                        [class.selected-option]="element.Source.includes(option)">
+                                                        {{ option }}
+                                                    </button>
+                                                </mat-menu>
+                                            </div>
+                                            <div fxFlex="none">
+                                                <button [disabled]="element.Source.length==0" mat-flat-button
+                                                    color="primary" class="change-button"
+                                                    (click)="sourceMenuTrigger.closeMenu();addSourceToList(element,scenario)">
+                                                    Change
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container *ngIf="column =='actions'" matColumnDef="{{column}}">
+                                    <th mat-header-cell *matHeaderCellDef width="48">&nbsp;</th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <button mat-icon-button color="primary" matTooltip="Delete"
+                                            (click)="deleteEntry(scenario, 'scrap', element)">
+                                            <mat-icon class="material-symbols-outlined">close</mat-icon>
+                                        </button>
+                                    </td>
+                                </ng-container>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="scrapColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: scrapColumns"></tr>
+
+                        </table>
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="8px" class="bg-white rounded-2 p-3">
+                        <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <div class="fw-bold text-md">Demand Input</div>
+                            <div fxLayout="row" fxLayoutGap="4px">
+                                <div fxFlex="250px">
+                                    <mat-form-field appearance="outline">
+                                        <input 
+                                            matInput 
+                                            placeholder="Enter alloy name"
+                                            [matMenuTriggerFor]="demandMenu"
+                                            #demandMenuTrigger="matMenuTrigger"
+                                            [formControl]="searchDemandControl"
+                                            (keyup)="demandMenuTrigger.openMenu()"
+                                            />
+                                        <mat-menu #demandMenu="matMenu" class="custom-menu custom-position" [hasBackdrop]="false">
+                                            <div class="menu-top-container">
+                                                <span class="select-options" (click)="selectedDemandAlloys = [];$event.stopPropagation();">Clear All</span>                                                  
+                                            </div>                                            
+                                            <div class="scrollable-menu-items">
+                                                <button mat-menu-item
+                                                    *ngFor="let alloy of (filteredDemandAlloys | async)"
+                                                    (click)="selectAlloy(alloy, 'demand');$event.stopPropagation();"
+                                                    [class.selected-option]="selectedDemandAlloys.includes(alloy)">
+                                                    {{ alloy }}
+                                                </button>
+                                            </div>
+                                        </mat-menu>
+                                    </mat-form-field>
+                                </div>
+                                <div fxFlex="none">
+                                    <button mat-flat-button color="primary" (click)="demandMenuTrigger.closeMenu();addDemand(scenario)"
+                                        [disabled]="disableAddDemand()">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                        <table mat-table [dataSource]="getSource(scenario,'demand')">
+                            <ng-container *ngFor="let column of demandColumns">
+                                <ng-container *ngIf="column !='actions'" matColumnDef="{{column}}">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{columnNameMap(column) | replaceAndCapitalize}}
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <span *ngIf="column =='Alloy'">{{element[column]}}</span>
+                                        <div *ngIf="columnNotVisualizAndFurnace(column)">
+                                            <input class="sa-custom-input" type="number" step="0.1" min="0"
+                                                [(ngModel)]="element[column]" />
+                                        </div>
+                                        <span *ngIf="column =='Plant' && !element.new">{{element[column]}}</span>
+                                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                                            *ngIf="column =='Plant' && element.new">
+                                            <div fxFlex>
+                                                <input 
+                                                    matInput
+                                                    class="sa-custom-input" 
+                                                    placeholder="All"
+                                                    #furnaceMenuTrigger="matMenuTrigger" 
+                                                    [matMenuTriggerFor]="plantMenu"
+                                                    (keyup)="furnaceMenuTrigger.openMenu()" 
+                                                />
+                                                <mat-menu #plantMenu="matMenu" class="custom-menu" [hasBackdrop]="false">
+                                                    <button mat-menu-item
+                                                        *ngFor="let option of getAlloyFurnace(element.Alloy)"
+                                                        (click)="togglePlantSelection(option,element);$event.stopPropagation()"
+                                                        [class.selected-option]="element.Plant.includes(option)">
+                                                        {{ option }}
+                                                    </button>
+                                                </mat-menu>
+                                            </div>
+                                            <div fxFlex="none">
+                                                <button [disabled]="element.Plant.length==0" mat-flat-button
+                                                    color="primary" class="change-button"
+                                                    (click)="furnaceMenuTrigger.closeMenu();addFurnaceToList(element,scenario)">
+                                                    Change
+                                                </button>
+                                            </div>
+                                        </div>
+                                </ng-container>
+                                <ng-container *ngIf="column =='actions'" matColumnDef="{{column}}">
+                                    <th mat-header-cell *matHeaderCellDef width="48">
+                                        
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <button mat-icon-button color="primary" matTooltip="Delete"
+                                            (click)="deleteEntry(scenario, 'demand', element)">
+                                            <mat-icon class="material-symbols-outlined">close</mat-icon>
+                                        </button>
+                                    </td>
+                                </ng-container>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="demandColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: demandColumns"></tr>
+                        </table>
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="8px" class="bg-white rounded-2 p-3">
+                        <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <div class="fw-bold text-md">Limits</div>
+                            <div fxLayout="row" fxLayoutGap="4px">
+                                <ng-container *ngFor="let option of getSelectedLimitList()">
+                                    <div fxFlex="180px" *ngIf="option=='Plant'">
+                                        <mat-form-field appearance="outline">
+                                            <input 
+                                                matInput 
+                                                placeholder="Enter plant name"
+                                                [matMenuTriggerFor]="limitPlantMenu"
+                                                #limitPlantMenuTrigger="matMenuTrigger"
+                                                [formControl]="limitPlantSearchControl"
+                                                (keyup)="limitPlantMenuTrigger.openMenu();"
+                                            
+                                                />
+                                        </mat-form-field>
+                                        <mat-menu #limitPlantMenu="matMenu" class="custom-menu custom-position" [hasBackdrop]="false">                                       
+                                            <div class="menu-top-container" *ngIf="showPlantSelectClearOption()">
+                                                <span class="select-options" (click)="selectAllLimitOptions('plant');$event.stopPropagation();">Select All</span> | <span class="select-options" (click)="limitSelectedPlants = [];$event.stopPropagation();">Clear All</span>
+                                            </div>                                            
+                                            <div class="scrollable-menu-items">
+                                                <button mat-menu-item
+                                                    *ngFor="let plant of (limtitFilteredPlants | async)"
+                                                    (click)="selectAlloy(plant,'plant');$event.stopPropagation()"
+                                                    [class.selected-option]="limitSelectedPlants.includes(plant)">
+                                                    {{ plant }}
+                                                </button>
+                                            </div>
+                                        </mat-menu>
+    
+                                    </div>
+                                    <div fxFlex="180px" *ngIf="option=='Scrap'">
+                                        <mat-form-field appearance="outline">
+                                            <input 
+                                                matInput 
+                                                placeholder="Enter scrap name"
+                                                [matMenuTriggerFor]="limitScrapMenu"
+                                                #limitScrapMenuTrigger="matMenuTrigger"
+                                                [formControl]="limitScrapSearchControl"
+                                                (keyup)="limitScrapMenuTrigger.openMenu()"
+                                                />
+                                            <mat-menu #limitScrapMenu="matMenu" class="custom-menu custom-position" [hasBackdrop]="false">
+                                                <div class="menu-top-container" *ngIf="showScrapSelectClearOption()">
+                                                    <span class="select-options" (click)="selectAllLimitOptions('scrap');$event.stopPropagation();">Select All</span> | <span class="select-options" (click)="limitSelectedScraps = [];$event.stopPropagation();">Clear All</span>
+                                                </div>                                            
+                                                <div class="scrollable-menu-items">
+                                                    <button mat-menu-item
+                                                        *ngFor="let scrap of (filteredLimitScrapAlloys | async)"
+                                                        (click)="selectAlloy(scrap,'limit-scrap');$event.stopPropagation()"
+                                                        [class.selected-option]="limitSelectedScraps.includes(scrap)">
+                                                        {{ scrap }}
+                                                    </button>
+                                                </div>
+                                            </mat-menu>
+                                        </mat-form-field>
+                                    </div>
+                                    <div fxFlex="180px" *ngIf="option=='Demand'">
+                                        <mat-form-field appearance="outline">
+                                            <input 
+                                                matInput 
+                                                placeholder="Enter demand name"
+                                                [matMenuTriggerFor]="limitDemandMenu"
+                                                #limitDemandMenuTrigger="matMenuTrigger"
+                                                [formControl]="limitDemandSearchControl"
+                                                (keyup)="limitDemandMenuTrigger.openMenu()"
+                                                />
+                                            <mat-menu #limitDemandMenu="matMenu" class="custom-menu custom-position" [hasBackdrop]="false">
+                                                <div class="menu-top-container">
+                                                    <span class="select-options" (click)="selectAllLimitOptions('demand');$event.stopPropagation();">Select All</span> | <span class="select-options" (click)="limitSelectedDemands = [];$event.stopPropagation();">Clear All</span>
+                                                </div>                                            
+                                                <div class="scrollable-menu-items">
+                                                    <button mat-menu-item
+                                                        *ngFor="let demand of (filteredLimitDemandAlloys | async)"
+                                                        (click)="selectAlloy(demand,'limit-demand');$event.stopPropagation()"
+                                                        [class.selected-option]="limitSelectedDemands.includes(demand)">
+                                                        {{ demand }}
+                                                    </button>
+                                                </div>
+                                            </mat-menu>
+                                        </mat-form-field>
+                                    </div>
+                                </ng-container>
+
+
+                                  
+                                <div fxFlex="none">
+                                    <button 
+                                        mat-flat-button 
+                                        color="primary" 
+                                        #limitByMenuTrigger="matMenuTrigger"
+                                        [matMenuTriggerFor]="addMenu">
+                                        Add <mat-icon>arrow_drop_down</mat-icon>
+                                    </button>
+                                </div>
+                                  
+
+                                
+                                <div fxFlex="none" *ngIf="limitBySelected !='NONE'">
+                                    <button 
+                                        mat-flat-button color="primary" 
+                                        (click)="limitDemandMenuTrigger.closeMenu();limitScrapMenuTrigger.closeMenu();limitPlantMenuTrigger.closeMenu();limitByMenuTrigger.closeMenu();addLimit(scenario);"
+                                        [disabled]="disableLimitButton()">Add Limit</button>
+                                </div>
+                            </div>
+                        </div>
+                        <table mat-table [dataSource]="getSource(scenario,'limit')">
+                            <ng-container *ngFor="let column of limitColumns">
+                                <ng-container *ngIf="column !='actions'" matColumnDef="{{column}}">
+                                    <th mat-header-cell *matHeaderCellDef>{{transformLimitHeader(column) | replaceAndCapitalize}}</th>
+                                    <td mat-cell *matCellDef="let element">                                        
+                                        <ng-container *ngIf="column!='Limit'">
+                                            {{ element[column] }}
+                                        </ng-container>
+                                        <ng-container *ngIf="column=='Limit'">
+                                            <input [(ngModel)]="element[column]" step="0.1" min="0" max="1" type="number"
+                                                class="sa-custom-input" />
+                                        </ng-container>
+                                    </td>
+                                </ng-container>
+                                <ng-container *ngIf="column =='actions'" matColumnDef="{{column}}">
+                                    <th mat-header-cell *matHeaderCellDef width="48">
+                                        <mat-icon class="material-symbols-outlined global-icon-button-grey"                                            
+                                            (click)="deleteLimitsData(scenario)">delete</mat-icon>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <button mat-icon-button color="primary" matTooltip="Delete"
+                                            (click)="deleteEntry(scenario, 'limit', element)">
+                                            <mat-icon class="material-symbols-outlined">close</mat-icon>
+                                        </button>
+                                    </td>
+                                </ng-container>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="limitColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: limitColumns"></tr>
+                        </table>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>
+<mat-menu #addMenu="matMenu" class="custom-menu custom-position" [hasBackdrop]="false">
+    <button mat-menu-item disabled>
+      <em>Choose to limit by:</em>
+    </button>
+    <button *ngFor="let row of limitsOptions" mat-menu-item (click)="limitBy(row.value)">{{row.title}}</button>
+</mat-menu>
+
+<ng-template #confirmationDialogTemplate>
+    <div fxLayout="column" class="h-100">
+        <div fxFlex="none" class="p-4 border-bottom">
+            <h1>Change Baseline</h1>
+        </div>
+        <ng-container>
+          <div fxFlex="none" class="p-3 y-auto">
+              <p>Changing the baseline will remove all scenario data. Are you sure?</p>
+          </div>
+          <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="px-6 pb-6">
+            <button mat-flat-button (click)="cancelConfirmation()">Cancel</button>
+            <button mat-flat-button color="primary" (click)="changeBaseLine()">Confirm</button>
+          </div>
+        </ng-container>
+    </div>
+</ng-template>

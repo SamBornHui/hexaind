@@ -1,0 +1,71 @@
+{
+  "connector": {
+    "_id": "659d5ec5dc18e4cfbd266396",
+    "id": "",
+    "name": "azure-dev",
+    "description": "Connector Description",
+    "type": "RESCALE",
+    "configuration": {
+      "token": "9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5",
+      "rescale_settings": ""
+    },
+    "owner_id": "",
+    "owner_name": "",
+    "created_at": "",
+    "last_modified_by_id": "",
+    "last_modified_at": "",
+    "project_id": "1",
+    "site_id": "1",
+    "version": "1.0"
+  },
+
+  "configs": {
+    "rescale_connector_id": "659d5ec5dc18e4cfbd266396",
+    "widget_type": "RESCALE",
+    "rescale_configs": {
+      "name": "Sample ABAQUS Simulation",
+      "test_mode": true,
+      "run_job": false,
+      "files_detail": [
+        {
+          "file_name": "abaqus_job.py",
+          "file_path": "/hexaind-data/hexaind-datasets/connection/65a517707518c363e4c0d3fb/abaqus_job.py",
+          "upload_rescale": false,
+          "rescale_id": "dGwGJh"
+        },
+        {
+          "file_name": "PostProcessing.py",
+          "file_path": "PostProcessing.py",
+          "upload_rescale": false,
+          "rescale_id": "GZNYxh"
+        }
+      ],
+      "software": {
+        "analysis": {
+          "code": "abaqus-dsls",
+          "version": "2023-golden-DSLS"
+        },
+        "hardware": {
+          "walltime": 3,
+          "coreType": "starlite_max",
+          "slots": 1,
+          "coresPerSlot": 4
+        },
+        "command": "abaqus cae noGUI=MG_Forming.py; abaqus job=FormingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive parallel=domain double=both output_precision=full; abaqus cae noGUI=MG_Springback.py; abaqus job=SpringbackJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus cae noGUI=MG_Buckling.py; abaqus job=BucklingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus python PostProcessing.py;abaqus cae noGUI=Visualizer.py",
+        "reusable_job_file": "custom_driver.py,MG_Forming.py,MG_Springback.py,MG_Buckling.py,PostProcessing.py,Visualizer.py,scaler.pkl,gp_scaling.pkl,sedata.csv",
+        "dynamic_job_file": "param_values.csv",
+        "pre_python": null,
+        "post_python": null,
+        "output_file": "PerfMetricsFile.csv",
+        "visualize_files": [
+          "ShellGeometry.png",
+          "ShellGeometry_Closeup.png",
+          "FormingAnimation_Script.avi"
+        ],
+        "envVars": {
+          "DSLS_LICENSE_FILE": "4085@novelis"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+<div fxLayout="column" class="sam-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-back-button" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">{{currentView()}}</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader()">
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" class="y-auto">
+    <div fxLayout="column" fxLayoutGap="12px" class="left-panel" *ngIf="view == 'main'">
+      <ng-container *ngFor="let view of subComponents">
+        <div *ngIf="view.show">
+          <button mat-flat-button color="primary" class="w-100" (click)="navigate(view.value)" [class.active-view]="view.value == view" [disabled]="view.disabled">
+            {{view.title}}
+          </button>
+        </div>
+      </ng-container>      
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="24px" class="h-100">
+      <div fxFlex *ngIf="view=='main'" fxLayoutAlign="center center">
+        <div class="global-nodata">Please choose options on the left to proceed.</div>
+        <!-- <div fxLayout="row" fxLayoutGap="24px">
+          <div fxFlex="25">
+              <mat-form-field appearance="outline">
+                  <mat-select placeholder="Select baseline to plot" [(ngModel)]="selectedBaseline">                        
+                      <mat-option *ngFor="let baseline of adminUploadedBaseline()" [value]="baseline._id" (click)="setDefaultSelectedBaseline()">{{baseline.name}}</mat-option>                    
+                  </mat-select>
+              </mat-form-field>
+          </div>   
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="8px" class="loader-alignment" *ngIf="loadingPlot" >
+          <mat-spinner [diameter]="50"></mat-spinner>
+          <span class="seg_img_loader_msg">Loading plots...</span>
+        </div>
+        <div fxLayout="column" fxLayoutGap="8px" class="rounded-2 p-4" *ngIf="!loadingPlot">            
+            <div fxLayout="row" fxLayoutAlign="start center" class="margin-fifty">
+                <div fxFlex #baselineplot id="baselineplot"></div>
+            </div>
+        </div> -->
+      </div>
+      <app-scrap-run-vizualization 
+        *ngIf="view=='vizualization'" 
+        [usecaseDetail]="usecaseVisualization" 
+        (editScenarioEvent)="editScenarioEvent($event)"
+        class="h-100"
+        [scrapAllFiles]="scrapAllFiles"></app-scrap-run-vizualization>
+      <app-scrap-scenarios 
+        [useCaseDetail]="useCaseDetail" 
+        [editScenaro]="editScenaro" 
+        [scrapAllFiles]="scrapAllFiles" 
+        *ngIf="view=='scenarios'" 
+        [useCasesList]="useCasesList" 
+        (useCaseEvent)="useCaseEvent($event)"
+        (viewRunEvent)="viewRunScenarios($event)"
+        class="h-100"
+        ></app-scrap-scenarios>
+      <app-scrap-runs 
+        [scrapAllFiles]="scrapAllFiles" 
+        [useCasesList]="useCasesList" 
+        (viewRunEvent)="viewRunScenarios($event)"
+        (editScenarioEvent)="editScenarioEvent($event)" 
+        *ngIf="view=='runs'" 
+        class="h-100"></app-scrap-runs>
+      <app-scrap-files [scrapAllFiles]="scrapAllFiles" *ngIf="view=='files'" (baselineFileEvent)="baselineFileEvent($event)" class="h-100"></app-scrap-files>      
+    </div>
+  </div>
+</div>

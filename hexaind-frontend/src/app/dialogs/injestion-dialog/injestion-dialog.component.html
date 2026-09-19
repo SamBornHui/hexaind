@@ -1,0 +1,149 @@
+<div fxFlex fxLayout="column">
+<mat-dialog-content class="mat-typography" style="height: calc(91vh - 96px);">
+  <div fxFlex fxLayout="column">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="mb-4">
+      <div class="steps">Step {{currentStep}} of {{totalSteps}}</div>
+      <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+    <div fxFlex="none" fxLayout="column" *ngIf="currentStep==1">
+      <h1 class="title"> Select columns </h1>
+
+      <div fxFlex fxLayout="row" fxLayoutAlign="space-between center" [style.margin-bottom]="'24px'">
+        <div>Select the columns you want to retrieve from the dataset.</div>
+        <div>
+          <mat-form-field appearance="outline">
+            <mat-label>Search columns</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput (input)="onSearchTextChange($event)" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <table mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef width="20px">
+            <mat-checkbox color="primary" (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="column_no">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Column no. </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.column_no}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="column_name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Column name </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.column_name}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="data_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Data type </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.data_type}}</span> </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+
+    <div *ngIf="currentStep==2" fxLayout="column" fxLayoutGap="16px">
+      <h1 class="title"> Preview data </h1>
+      <table mat-table [dataSource]="previewDataSource">
+
+        <ng-container matColumnDef="row_no">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Row no. </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.row_no}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CRIM">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> CRIM </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.CRIM}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="ZN">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> ZN </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.ZN}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="INDUS">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> INDUS </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.INDUS}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="CHAS">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> CHAS </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.CHAS}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="NOX">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> NOX </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.NOX}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="RM">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> RM </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.RM}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="AGE">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> AGE </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.AGE}}</span> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DIS">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> DIS </th>
+          <td mat-cell *matCellDef="let element"> <span class="file-type-bg">{{element.DIS}}</span> </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="previewDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: previewDisplayedColumns;"></tr>
+      </table>
+    </div>
+
+    <div *ngIf="currentStep==3" fxLayout="column" fxLayoutGap="16px">
+      <h1 class="title"> Add details and labels </h1>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="text-sm">Name</div>
+        <div>
+          <mat-form-field appearance="outline">
+            <span matPrefix>PR022-D02_</span>
+            <input matInput placeholder="Enter name">
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="text-sm">Description</div>
+        <div>
+          <mat-form-field appearance="outline">
+            <textarea matInput rows="5"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="text-sm">Data source</div>
+        <div>
+          <mat-form-field appearance="outline">
+            <input matInput disabled="true" placeholder="Local drive">
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" mat-dialog-close *ngIf="currentStep==1">Cancel</button>
+  <button mat-stroked-button color="primary" *ngIf="currentStep>1" (click)="previous()">Back</button>
+  <button mat-flat-button color="primary" (click)="next()" *ngIf="currentStep<=2">Continue</button>
+  <button mat-flat-button color="primary" (click)="finish()" *ngIf="currentStep==3">Ingest dataset</button>
+</mat-dialog-actions>
+</div>

@@ -1,0 +1,231 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div>This widget expects N no. of inputs: Tabular data</div>
+              <div>
+                <div class="fw-bold pb-1">Select Input(s)</div>
+                <div fxLayout="column" fxLayoutGap="16px">
+                  <mat-form-field appearance="outline" *ngFor="let inputWidget of allOutputs">
+                    <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select tabular input"
+                      [ngModel]="inputWidget" (ngModelChange)="setSelectedInputWidget1($event)"
+                      (click)="userInteracted = true" name="inputWidgetSelector">
+                      <mat-option [value]="inputWidget">
+                        {{ getInputingWidgetsOutputName(inputWidget) }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div fxLayout="row" fxLayoutGap="16px">
+            <div fxFlex>
+              <div fxLayout="row" fxLayoutGap="16px">
+                <mat-form-field appearance="outline">
+                  <mat-select
+                    [disabled]="workflowCanvasService.IsViewingRunMode"
+                    placeholder="Select tabular input"
+                    [ngModel]="getSelectedInputWidget2()"
+                    (click)="userInteracted = true"
+                    (ngModelChange)="setSelectedInputWidget2($event)"
+                    name="inputWidgetSelector"
+                  >
+                    <mat-option
+                      *ngFor="let inputWidget of allOutputs"
+                      [value]="inputWidget"
+                    >
+                      {{ getInputingWidgetsOutputName(inputWidget) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div>This widget generate 1 output: Tabular data</div>
+              <div>
+                <div class="fw-bold pb-1">Select Output</div>
+                <mat-form-field appearance="outline">
+                  <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                    placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event"
+                    (input)="handleInputChange()" />
+                  <!--Mat-check for future use-->
+                  <!-- <button mat-icon-button [disabled]="!isOutputChanged" matSuffix (click)="saveOutput()">
+                    <mat-icon>check</mat-icon>
+                  </button> -->
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <!-- Code is commented as per PRD -->
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div class="fw-bold" *ngIf="misMatchColumns.length > 0">
+              <div>MisMatch Columns are:</div>
+            </div>
+            <div *ngIf="misMatchColumns.length > 0">
+              <div fxLayout="column" fxLayoutGap="16px">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+                  *ngFor="let misMatchColumn of misMatchColumns">
+                  <div fxFlex>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Mismatch Column</mat-label>
+                      <input matInput placeholder="Mismatch Column" [ngModel]="misMatchColumn.column"
+                        (ngModelChange)="setAppendInputValue($event)" readonly>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Mismatched Dataset Ids Display -->
+
+                  <div fxFlex>
+                    <mat-form-field appearance="outline" style="display: flex; align-items: center;">
+                      <mat-label>Mismatched Dataset Names</mat-label>
+                      <div fxLayout="row" fxLayoutAlign="start center" style="align-items: center; width: 100%;">
+                        <input matInput [value]="getDisplayedValues(misMatchColumn.details)" readonly 
+                               style="flex-grow: 1; padding-right: 0; border: none; box-shadow: none; margin-right: 0;" />
+                        <span *ngIf="misMatchColumn.details.length > 2" 
+                              (click)="openMoreDialog(misMatchColumn.details)" 
+                              style="cursor: pointer; white-space: nowrap; margin-left: -4px;">
+                          ..{{ displayMisMatchvalues(misMatchColumn.details) }}+
+                        </span>
+                      </div>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Convert Datatype</mat-label>
+                      <mat-select [disabled]="workflowCanvasService.IsViewingRunMode"
+                        [ngModel]="misMatchColumn.pref_type" (ngModelChange)="setSelectedInputDataType($event, misMatchColumn.column)">
+                        <!-- Option for None -->
+                        <mat-option [value]="'None'">None</mat-option>
+                        <!-- Loop Through All Data Type Options -->
+                        
+                        <mat-option *ngFor="let uniqueType  of getUniqueDataTypes(misMatchColumn.details)" [value]="uniqueType">
+                          {{ uniqueType  }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Uncommon Columns Display -->
+            <div class="fw-bold" *ngIf="missingColumns.length">
+              <div>Missing Columns are:</div>
+            </div>
+
+            <div *ngIf="missingColumns.length">
+              <div fxLayout="row" fxLayoutAlign="end" class="p-1" fxLayoutGap="16px" *ngFor="let missingColumn of missingColumns">
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Missing column</mat-label>
+                    <input matInput placeholder="missing Column" [ngModel]="missingColumn.column" readonly>
+                  </mat-form-field>
+                </div>
+                <!-- <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-label>DatasetId</mat-label>
+                    <mat-select [disabled]="workflowCanvasService.IsViewingRunMode"
+                      [ngModel]="missingColumn.details[0]" (ngModelChange)="setSelectedInputWidget2($event)">
+                      <mat-option *ngFor="let inputWidget of missingColumn.details" [value]="inputWidget">
+                        {{ inputWidget }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div> -->
+                <div fxFlex>
+                  <mat-form-field appearance="outline" style="display: flex; align-items: center;">
+                    <mat-label>Missing Dataset Names</mat-label>
+                    <div fxLayout="row" fxLayoutAlign="start center" style="align-items: center;">
+                      <input matInput [value]="getMissingDisplayedValues(missingColumn.details)" readonly 
+                             style="flex-grow: 1"/>
+                      <span *ngIf="missingColumn.details.length > 3" (click)="openMissingDialog(missingColumn.details)" 
+                            style="cursor: pointer; white-space: nowrap;">
+                        ..{{displayMorevalues(missingColumn.details)}}+
+                      </span>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
+              
+            </div>
+
+            <!-- No Mismatch Columns Message -->
+            <div *ngIf="!misMatchColumns">
+              No MisMatch Columns
+            </div>
+          </div>
+          <div *ngIf="misMatchColumns.length == 0 && missingColumns.length == 0">
+            No MisMatch and missing Columns.
+          </div>
+        </div>
+      </mat-tab>
+      <!--Ali Mehdi - This code is for General tab may be used in the future -->
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()"></app-settings>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+  <button mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+    Cancel
+  </button>
+  <button [disabled]="!changeMade" mat-flat-button color="primary" (click)="onSave()" id="createBeutton">
+    Save
+  </button>
+</div>
+<app-config-action-bar widgetName="Append" widgetUrn="{{ this.widgetControl?.Widget?.urn }}"
+  siteId="1"></app-config-action-bar>
+<app-notification #notification></app-notification>
+
+<ng-template #moreDialog let-details>
+  <h1 mat-dialog-title>Additional Dataset Ids</h1>
+  <div mat-dialog-content>
+    <mat-list>
+      <mat-list-item *ngFor="let inputWidget of details">
+        {{ inputWidget.name }} ({{inputWidget.data_type}})
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Close</button>
+  </div>
+</ng-template>
+
+<ng-template #missingDialog let-detailsMissing>
+  <h1 mat-dialog-title>Additional Dataset Ids</h1>
+  <div mat-dialog-content>
+    <mat-list>
+      <mat-list-item *ngFor="let inputWidget of detailsMissing">
+        {{ inputWidget }} 
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Close</button>
+  </div>
+</ng-template>

@@ -1,0 +1,167 @@
+<ng-container *ngIf="workflows.length > 0; else noWorkflows">
+  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort (matSortChange)="sortData($event)"
+    class="workflow-table">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="Wname" class="ps-7">
+        Name
+      </th>
+      <td mat-cell *matCellDef="let workflow">
+        <div fxLayout="row" class="workflow-name">
+          <div fxFlex="none">
+            <mat-icon class="expander">arrow_right</mat-icon>
+          </div>
+          <div fxFlex class="p-relative">
+            <div class="text-ellipse name" matTooltip="{{ workflow['Wname'] }}">
+              {{ workflow["Wname"] }}
+            </div>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="noOfImages">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="username" width="120">
+        Owner
+      </th>
+      <td mat-cell *matCellDef="let workflow" style="vertical-align: top">
+        <div class="p-relative">
+          <div class="text-ellipse owner" matTooltip="{{ workflow['username'] }}">
+            {{ workflow["username"] }}
+          </div>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="dataset_name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="dataset_name" width="120">
+        Dataset
+      </th>
+      <td mat-cell *matCellDef="let workflow" style="vertical-align: top">
+        <div class="p-relative">
+          <div class="text-ellipse owner" matTooltip="{{ workflow['dataset_name'] }}">
+            {{ workflow["dataset_name"] }}
+          </div>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef width="70">&nbsp;</th>
+      <td mat-cell *matCellDef="let workflow; let rowIndex = dataIndex" class="text-right"
+        (click)="$event.stopPropagation()">
+        <div fxLayout="row" fxLayoutGap="4px">
+
+          <mat-icon class="icon-star" [ngClass]="
+          isFavorited(workflow.favorited_by) ? 'text-primary' : 'text-grey'"
+            (click)="changeFavorite(workflow);">
+            {{ isFavorited(workflow.favorited_by) ? "star" : "star_outline" }}
+          </mat-icon>
+
+          <mat-icon class="material-symbols-outlined icon-20 global-icon-button-grey" *ngIf="
+              workflow['user_id'] == currentUser['_id'] ||
+              currentUser['server_role'] == 'Server Admin' ||
+              currentUser['server_role'] == 'Project Admin'
+            " (click)="editWorkfloww('edit', workflow)">edit</mat-icon>
+          <mat-icon class="material-symbols-outlined icon-20 global-icon-button-grey" *ngIf="
+              workflow['user_id'] == currentUser['_id'] ||
+              currentUser['server_role'] == 'Server Admin' ||
+              currentUser['server_role'] == 'Project Admin'
+            " (click)="deleteWorkflow(workflow)">delete</mat-icon>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let workflow; let rowIndex = dataIndex"
+        [attr.colspan]="['name', 'noOfImages','dataset_name', 'delete'].length">
+        <div class="expand-element-detail" [class.expanded-element-detail]="
+            expandedWorkflowData['expandedFolder'] == folderType &&
+            expandedWorkflowData['expandedWorkflowId'] === workflow['_id']
+          " [@detailExpand]="
+            expandedWorkflowData['expandedFolder'] == folderType &&
+            expandedWorkflowData['expandedWorkflowId'] === workflow['_id']
+              ? 'expanded'
+              : 'collapsed'
+          ">
+          <div class="inner-element-detail" fxLayout="column" fxLayoutGap="8px" *ngIf="expandedWorkflowData['expandedFolder'] == folderType &&
+            expandedWorkflowData['expandedWorkflowId'] === workflow['_id']">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+              <div class="fw-bold">Workflow Preview</div>
+              <mat-icon class="global-icon-button-grey icon-20" (click)="imageFullView(workflow)"
+                matTooltip="Expand Preview">open_in_full</mat-icon>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+              <div>
+                <img loading="lazy" [src]="workflow['orignal_thumb_url']" class="thumbnail" />
+              </div>
+              <div>
+                <img loading="lazy" [src]="workflow['segment_thumb_url']" class="thumbnail" />
+              </div>
+            </div>
+            <div>
+              <div class="fw-bold">Workflow Name</div>
+              <div>{{ workflow["Wname"] }}</div>
+            </div>
+            <div>
+              <!-- Code commented for future use - Taimoor Hassan -->
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+                <div class="fw-bold">Owner Name</div>
+                <!-- <mat-icon class="material-symbols-outlined global-icon-button-grey icon-20"
+                  (click)="editDirectory(workflow)">edit</mat-icon> -->
+              </div>
+              <div>{{workflow['username']}}</div>
+              <!-- <div *ngIf="
+                  workflow['output_directory_options'] == undefined ||
+                  !workflow['output_directory_options']['setDirectory']
+                ">
+                'Default directory'
+              </div>
+              <div *ngIf="
+                  workflow['output_directory_options'] != undefined &&
+                  workflow['output_directory_options']['setDirectory']
+                ">
+                {{
+                workflow["output_directory_options"]["defaultDirectory"]
+                ? "Default directory"
+                : workflow["output_directory_options"]["outputDirectory"]
+                }}
+              </div> -->
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+              <button mat-flat-button color="primary" *ngIf="!expandedWorkflowData['manageWorkflow']"
+                (click)="manageAssignWorkflow({ expanded: true, type: 'edit' })">
+                Select
+              </button>
+              <button mat-stroked-button color="primary" *ngIf="expandedWorkflowData['manageWorkflow']"
+                (click)="manageAssignWorkflow({ expanded: false, type: '' })">
+                Cancel
+              </button>
+              <button mat-flat-button color="primary" [disabled]="!expandedWorkflowData['manageWorkflow']" (click)="
+                  assignWorkflowToImages(
+                    workflow,
+                    selectedSegmentImages,
+                    false,
+                    false,
+                    false
+                  )
+                ">
+                Assign
+              </button>
+            </div>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['name', 'noOfImages','dataset_name', 'delete']"></tr>
+    <tr mat-row *matRowDef="
+        let workflow;
+        columns: ['name', 'noOfImages','dataset_name', 'delete'];
+        let rowIndex = dataIndex
+      " (click)="expandedWorkflow(workflow)" class="expand-element-row" [class.expanded-row]="
+        expandedWorkflowData['expandedFolder'] == folderType &&
+        expandedWorkflowData['expandedWorkflowId'] === workflow['_id']
+      "></tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expand-detail-row"></tr>
+  </table>
+</ng-container>
+<ng-template #noWorkflows>
+  <div class="global-nodata">No Workflows</div>
+</ng-template>

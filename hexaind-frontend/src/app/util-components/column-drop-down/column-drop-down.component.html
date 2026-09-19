@@ -1,0 +1,161 @@
+<ng-container>
+    <div class="popup-overlay"></div>
+    <div class="popup-content">
+      <div style="height:90vh; width:70  vw" fxLayout="column" fxLayoutGap="16px"
+        fxLayoutAlign="start">
+        <div class="disclaimer-message"></div>
+        <div fxLayout="row" fxLayoutAlign="center center" class="fw-bold pb-2">
+          <div fxFlex="30vw">Available Columns</div>
+          <div fxFlex="108px"></div>
+          <div fxFlex="30vw">Selected Columns</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start start">
+          <div fxFlex="30vw" class="columns-section-container"> <!-- Available columns -->
+            <div class="search-keyword-container">
+              <mat-form-field appearance="outline">
+                <mat-label>Filter based on keywords</mat-label>
+                <div class="search-field">
+                  <input matInput (keyup)="applyFilterOnColumns()" placeholder="Search"
+                    [(ngModel)]="columnsFilterWord" class="search-bar">
+                </div>
+              </mat-form-field>
+            </div>
+            <mat-checkbox [(ngModel)]="isAllColumnsChecked" *ngIf="columnsList.length>0" [disabled]="columnsDataSource.length == 0"
+              (change)="toggleAllColumns($event)" class="select-all">Select All</mat-checkbox>
+            <div class="columns-table-outer">
+              <div class="columns-table-container" style="overflow: auto;">   
+                <cdk-virtual-scroll-viewport itemSize="50" style="height: 55vh">
+                  <div *cdkVirtualFor="let element of columnsDataSource" class="example-item">
+                    <ng-container [ngTemplateOutlet]="getTemplateForUnSelectedList()" [ngTemplateOutletContext]="{ $implicit: element}" ></ng-container>
+                  </div>
+                </cdk-virtual-scroll-viewport>                                                                                            
+              </div>
+            </div>
+          </div>
+          <div fxFlex="108px" class="move-buttons-container">
+            <button mat-icon-button (click)="onSelectColumns()"
+              matTooltip="Move to selected columns" matTooltipPosition="above">
+              <span class="material-symbols-outlined">
+                arrow_forward
+              </span>
+            </button>
+            <button mat-icon-button (click)="onUnselectColumns()" matTooltip="Unselect columns"
+              matTooltipPosition="below">
+              <span class="material-symbols-outlined">
+                arrow_back
+              </span>
+            </button>
+          </div>
+          <div fxFlex="30vw" class="columns-section-container"> <!-- Selected columns -->
+            <div class="search-keyword-container">
+              <mat-form-field appearance="outline">
+                <mat-label>Filter based on keywords</mat-label>
+                <div class="search-field">
+                  <input matInput (keyup)="applyFilterOnSelectedColumns()" placeholder="Search"
+                    [(ngModel)]="selectedColumnsFilterWord" class="search-bar">
+                  <!-- <mat-icon class="search-icon">search</mat-icon>                    -->
+                </div>
+              </mat-form-field>
+            </div>
+            <mat-checkbox [(ngModel)]="isAllSelectedColumnsChecked"
+              *ngIf="selectedColumnsList.length>0" (change)="toggleAllSelectedColumns($event)" [disabled]="selectedColumnsDataSource.length == 0"
+              class="select-all">Select All</mat-checkbox>
+            <div class="columns-table-outer">
+              <div class="columns-table-container" style="overflow:auto">
+                <cdk-virtual-scroll-viewport itemSize="50" style="height: 55vh">
+                  <div *cdkVirtualFor="let element of selectedColumnsDataSource" class="example-item">
+                    <ng-container [ngTemplateOutlet]="getTemplateForSelectedList()" [ngTemplateOutletContext]="{$implicit: element}"></ng-container>
+                  </div>
+                </cdk-virtual-scroll-viewport>                                                                       
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div fxLayout="row" style="width:65vw" fxLayoutAlign="flex-end center">
+          <div fxFlex="50" fxLayout="row" fxLayoutAlign="flex-end flex-end">
+            <button fxFlex="15" mat-flat-button color="primary" style="margin-right: 10px;"
+              (click)="saveTheColumns()" [disabled]="isSaveDisabled">
+              Save
+            </button>
+            <button (click)="closeWithoutSaving()" fxFlex="15" mat-flat-button color="primary"
+              >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+
+<ng-template #defaultTemplateUnSelectedList let-element>
+  <mat-checkbox [(ngModel)]="element.checked" (change)="onColumnClicked()" />
+  <span matTooltip="{{element.name}}" matTooltipPosition="above"
+    class="truncate-column-name">
+    {{element.name}}
+  </span>
+</ng-template>
+
+<ng-template #defaultTemplateSelectedList let-element>
+  <mat-checkbox [(ngModel)]="element.checked" (change)="onSelectedColumnClicked()" />
+  <span matTooltip="{{element.name}}" matTooltipPosition="above"
+    class="truncate-column-name">
+    {{element.name}}
+  </span>
+</ng-template>
+
+<ng-template #renameColumnUnselectedList let-element>
+  <mat-checkbox [(ngModel)]="element.checked"  (change)="onColumnClicked()"/> 
+  <span matTooltip="{{element.name}}" matTooltipPosition="above"
+  class="truncate-column-name">
+    {{element.name}}
+  </span>
+</ng-template>
+
+<ng-template #renameColumnSelectedList let-element>
+ <div style="padding-bottom: 15px; border-bottom: 2px solid #afadad;">
+  <mat-checkbox [(ngModel)]="element.checked" (change)="onSelectedColumnClicked()"/> 
+  <span matTooltip="{{element.old_name}}" matTooltipPosition="above"
+        class="truncate-column-name rename-truncate">
+    {{element.old_name}}
+  </span>
+  <mat-form-field appearance="outline">
+    <input matInput [(ngModel)]="element.new_name"/>
+  </mat-form-field>
+ </div>
+</ng-template>
+<ng-template #dataTypeConversionUnselectedList let-element>
+  <mat-checkbox [(ngModel)]="element.checked" (change)="onColumnClicked()" />
+  <span style="padding-right: 15px;" matTooltip="{{element.name}}" matTooltipPosition="above" class="truncate-column-name">
+    {{element.name}}
+  </span>
+  <span style="font-weight: 550;">
+    ({{element.type}})
+  </span>
+</ng-template>
+
+<ng-template #dataTypeConversionSelectedList let-element>
+  <div style="display:flex; flex-direction: column; padding-bottom: 15px; border-bottom: 1px solid #afadad; ">
+    <div>
+      <mat-checkbox [(ngModel)]="element.checked" (change)="onSelectedColumnClicked()" />
+      <span style="padding-right: 10px;" matTooltip="{{element.name}}" matTooltipPosition="above" class="truncate-column-name change-type-truncate">
+        {{element.name}}
+      </span>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px ">
+      <div style="font-weight: 550;">
+        {{element.type}}
+      </div>
+      <span class="material-symbols-outlined">
+        arrow_forward
+      </span>
+      <mat-select placeholder="Please select new type" style="max-width: 200px;" [(ngModel)]="element.new_type">
+        <mat-option *ngFor="let option of datatypeOptions" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-select>
+    </div>
+  </div>
+   
+</ng-template>

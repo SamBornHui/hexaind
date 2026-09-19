@@ -1,0 +1,25 @@
+  .table-container {
+    width: 100%; /* Ensures the table container spans the full width */
+    overflow-x: auto; /* Allows horizontal scrolling for smaller screens */
+  }
+  
+  .full-width-table {
+    width: 100%; /* Ensures the table spans the full width of its container */
+  }
+  
+  .full-width-table .mat-header-row,
+  .full-width-table .mat-row {
+    display: table; /* Keeps the row layout intact */
+    width: 100%; /* Matches the row width to the table's width */
+  }
+  
+  .full-width-table .mat-cell,
+  .full-width-table .mat-header-cell {
+    white-space: nowrap; /* Prevents cell content from wrapping */
+    text-align: left;
+  }
+  
+  .row-hover:hover {
+    cursor: pointer;
+  }
+  

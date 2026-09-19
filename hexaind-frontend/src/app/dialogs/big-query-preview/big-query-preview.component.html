@@ -1,0 +1,451 @@
+<div class="h-100 p-7" fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="border-bottom"
+  >
+    <div>
+      <h1>Data preview</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex>
+    <mat-tab-group mat-stretch-tabs="false" class="h-100">
+      <mat-tab label="Statistics & schema">
+        <div class="py-4 h-100" fxLayout="column" fxLayoutGap="16px">
+          <div
+            fxFlex="none"
+            fxLayout="row"
+            fxLayoutGap="8px"
+            fxLayoutAlign="space-between center"
+          >
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+              <div fxFlex="none" class="bg-surface py-1 px-2 rounded-1">
+                Total columns: <span class="fw-bold">8</span>
+              </div>
+              <div fxFlex="none" class="bg-surface py-1 px-2 rounded-1">
+                Total rows: <span class="fw-bold">100</span>
+              </div>
+            </div>
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput placeholder="Search columns" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="data-container">
+            <div
+              fxLayout="row"
+              fxLayoutGap="16px"
+              fxLayoutAlign=" center"
+              class="heading"
+              (click)="toggleTable('numerical')"
+            >
+              <mat-icon>{{
+                isNumericalExpanded
+                  ? "keyboard_arrow_down"
+                  : "keyboard_arrow_right"
+              }}</mat-icon>
+              <div class="title">Numerical statistics & schema</div>
+              <div class="bg-surface p-1 px-2 rounded-1">
+                Columns: <span class="fw-bold">4</span>
+              </div>
+              <div class="bg-surface p-1 px-2 rounded-1">
+                Rows: <span class="fw-bold">96</span>
+              </div>
+            </div>
+
+            <mat-table *ngIf="isNumericalExpanded" [dataSource]="tableData">
+              <ng-container matColumnDef="column1">
+                <mat-header-cell *matHeaderCellDef>
+                  Column name
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="column2">
+                <mat-header-cell *matHeaderCellDef> Schema </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="mean">
+                <mat-header-cell *matHeaderCellDef> Mean </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="median">
+                <mat-header-cell *matHeaderCellDef> Median </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="std">
+                <mat-header-cell *matHeaderCellDef> STD </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="missingValues">
+                <mat-header-cell *matHeaderCellDef>
+                  Missing values
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="count">
+                <mat-header-cell *matHeaderCellDef> Count </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: columns"></mat-row>
+            </mat-table>
+          </div>
+          <div class="data-container">
+            <div
+              fxLayout="row"
+              fxLayoutGap="16px"
+              fxLayoutAlign=" center"
+              class="heading"
+              (click)="toggleTable('categorical')"
+            >
+              <mat-icon>{{
+                isCategoricalExpanded
+                  ? "keyboard_arrow_down"
+                  : "keyboard_arrow_right"
+              }}</mat-icon>
+              <div class="title">Categorical statistics & schema</div>
+              <div class="bg-surface p-1 px-2 rounded-1">
+                Columns: <span class="fw-bold">4</span>
+              </div>
+              <div class="bg-surface p-1 px-2 rounded-1">
+                Rows: <span class="fw-bold">4</span>
+              </div>
+            </div>
+            <mat-table *ngIf="isCategoricalExpanded" [dataSource]="tableData">
+              <ng-container matColumnDef="column1">
+                <mat-header-cell *matHeaderCellDef>
+                  Column name
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="column2">
+                <mat-header-cell *matHeaderCellDef> Schema </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="unique">
+                <mat-header-cell *matHeaderCellDef> Unique </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="top">
+                <mat-header-cell *matHeaderCellDef> Top </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="freq">
+                <mat-header-cell *matHeaderCellDef> Freq </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="missingValues">
+                <mat-header-cell *matHeaderCellDef>
+                  Missing values
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="count">
+                <mat-header-cell *matHeaderCellDef> Count </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="columnsB"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: columnsB"></mat-row>
+            </mat-table>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Data">
+        <div class="py-4 h-100" fxLayout="column">
+          <div
+            fxFlex="none"
+            fxLayout="row"
+            fxLayoutGap="8px"
+            fxLayoutAlign="space-between center"
+            class="border-bottom pb-2"
+          >
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+              <div fxFlex="none" class="bg-surface py-1 px-2 rounded-1">
+                Total columns: <span class="fw-bold">8</span>
+              </div>
+              <div class="bg-surface py-1 px-2 rounded-1">
+                Row counts: <span class="fw-bold">100</span>
+              </div>
+              <div>Slide to show rows:</div>
+              <div>
+                <mat-slider
+                  min="1"
+                  max="5"
+                  step="0.5"
+                  value="1.5"
+                  discrete
+                  [displayWith]="formatLabel"
+                >
+                  <input matSliderThumb />
+                </mat-slider>
+              </div>
+            </div>
+            <div>
+              <mat-form-field appearance="outline">
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput placeholder="Search columns" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div>
+            <mat-table [dataSource]="tableData">
+              <ng-container matColumnDef="rowNo">
+                <mat-header-cell *matHeaderCellDef> Row no. </mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index">
+                  {{ i + 1 }}
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col1">
+                <mat-header-cell *matHeaderCellDef> Col 1 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col2">
+                <mat-header-cell *matHeaderCellDef> Col 2 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col3">
+                <mat-header-cell *matHeaderCellDef> Col 3 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col4">
+                <mat-header-cell *matHeaderCellDef> Col 4 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col5">
+                <mat-header-cell *matHeaderCellDef> Col 5 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col6">
+                <mat-header-cell *matHeaderCellDef> Col 6 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col7">
+                <mat-header-cell *matHeaderCellDef> Col 7 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column2 }} </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="col8">
+                <mat-header-cell *matHeaderCellDef> Col 8 </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.column1 }} </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="columnsC"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: columnsC"></mat-row>
+            </mat-table>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Metadata">
+        <div class="py-4 h-100" fxLayout="column" fxLayoutGap="16px">
+          <div class="data-container">
+            <div
+              fxLayout="row"
+              fxLayoutGap="16px"
+              fxLayoutAlign=" center"
+              class="heading"
+              (click)="toggleTable('general')"
+            >
+              <mat-icon>{{
+                isGeneralInfoExpanded
+                  ? "keyboard_arrow_down"
+                  : "keyboard_arrow_right"
+              }}</mat-icon>
+              <div class="title">General info</div>
+            </div>
+            <div
+              *ngIf="isGeneralInfoExpanded"
+              fxLayout="column"
+              fxLayoutGap="24px"
+              class="mt-4"
+            >
+              <div fxLayout="column" fxLayoutGap="8px">
+                <div class="fw-bold">Name</div>
+                <div class="text-md">PR01-D09_parquet</div>
+              </div>
+              <div fxLayout="column" fxLayoutGap="8px">
+                <div class="fw-bold">Data source</div>
+                <div class="text-md">Local Drive</div>
+              </div>
+              <div fxLayout="column" fxLayoutGap="8px">
+                <div class="fw-bold">Description</div>
+                <div class="text-md">Parquet</div>
+              </div>
+              <div fxLayout="column" fxLayoutGap="8px">
+                <div class="fw-bold">Dataset ID</div>
+                <div class="text-md">abcdef-12345</div>
+              </div>
+            </div>
+          </div>
+          <div class="data-container">
+            <div
+              fxLayout="row"
+              fxLayoutGap="16px"
+              fxLayoutAlign=" center"
+              class="heading"
+              (click)="toggleTable('dataset-history')"
+            >
+              <mat-icon>{{
+                isDatasetHistoryExpanded
+                  ? "keyboard_arrow_down"
+                  : "keyboard_arrow_right"
+              }}</mat-icon>
+              <div class="title">Dataset history</div>
+            </div>
+            <div *ngIf="isDatasetHistoryExpanded">
+              <div>
+                <mat-table [dataSource]="datasetHistory">
+                  <ng-container matColumnDef="user">
+                    <mat-header-cell *matHeaderCellDef fxFlex>
+                      User
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.user }} </mat-cell>
+                  </ng-container>
+
+                  <ng-container matColumnDef="action">
+                    <mat-header-cell *matHeaderCellDef fxFlex>
+                      Action
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                      {{ row.action }}
+                    </mat-cell>
+                  </ng-container>
+
+                  <ng-container matColumnDef="date">
+                    <mat-header-cell *matHeaderCellDef fxFlex>
+                      Date
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{ row.date }} </mat-cell>
+                  </ng-container>
+
+                  <mat-header-row
+                    *matHeaderRowDef="datasetHistorycolumns"
+                  ></mat-header-row>
+                  <mat-row
+                    *matRowDef="let row; columns: datasetHistorycolumns"
+                  ></mat-row>
+                </mat-table>
+              </div>
+              <div>
+                <div
+                  *ngIf="!datasetHistory || datasetHistory.length === 0"
+                  class="global-nodata"
+                >
+                  You have no dataset history
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="data-container">
+            <div
+              fxLayout="row"
+              fxLayoutGap="16px"
+              fxLayoutAlign=" center"
+              class="heading"
+              (click)="toggleTable('curation-history')"
+            >
+              <mat-icon>{{
+                isCurationHistoryExpanded
+                  ? "keyboard_arrow_down"
+                  : "keyboard_arrow_right"
+              }}</mat-icon>
+              <div class="title">Curation history</div>
+            </div>
+            <div
+              *ngIf="isCurationHistoryExpanded"
+              fxLayout="column"
+              fxLayoutGap="24px"
+              class="mt-4"
+            >
+              <div class="global-nodata">You have no curation history</div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Visualize">
+        <div class="py-4 h-100">
+          <div fxLayout="row" fxLayoutGap="8px">
+            <div fxFlex fxLayoutGap="8px">
+              <div class="fw-bold">X-axis</div>
+              <div class="text-md">
+                <mat-form-field appearance="outline">
+                  <mat-select placeholder="X_POS">
+                    <mat-option></mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxFlex fxLayoutGap="8px">
+              <div class="fw-bold">Y-axis</div>
+              <div class="text-md">
+                <mat-form-field appearance="outline">
+                  <mat-select placeholder="Y_POS">
+                    <mat-option></mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxFlex fxLayoutGap="8px">
+              <div class="fw-bold">Color by</div>
+              <div class="text-md">
+                <mat-form-field appearance="outline">
+                  <mat-select placeholder="Select value">
+                    <mat-option></mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <button mat-flat-button color="primary">Generate</button>
+            <button mat-flat-button color="primary">Plot all</button>
+          </div>
+          <div fxLayout="row" class="py-4" style="height: 85%"></div>
+          <div fxLayout="row">
+            <div fxFlex>
+              <mat-slide-toggle color="primary"
+                >Interactive Plot</mat-slide-toggle
+              >
+              <mat-checkbox></mat-checkbox>
+            </div>
+            <div fxFlex="none">
+              <mat-radio-group color="primary">
+                <mat-radio-button value="1">Distribution</mat-radio-button>
+                <mat-radio-button value="2">Contour</mat-radio-button>
+                <mat-radio-button value="3">Splinefit</mat-radio-button>
+                <mat-radio-button value="4">Linearfit</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+        </div>
+        <!-- </div> -->
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

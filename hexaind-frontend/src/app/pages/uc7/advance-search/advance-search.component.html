@@ -1,0 +1,84 @@
+<div fxLayout="column" class="dc-container h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <h1>Advance Filter</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onClose()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" fxLayoutGap="24px" class="p-6 y-auto">
+    <div fxFlex fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex fxLayout="column" fxLayoutGap="8px" class="y-auto">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+          *ngFor="let filter of filters; let index=index">
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-label>Method</mat-label>
+              <mat-select [(ngModel)]="filter.function">
+                <mat-option *ngFor="let function of functionList" [value]="function">{{function}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-label>Text</mat-label>
+              <input matInput placeholder="Input value" [(ngModel)]="filter.value">
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-label>Operator</mat-label>
+              <mat-select [(ngModel)]="filter.operator">
+                <mat-option *ngFor="let operator of operatorList" [value]="operator">{{operator}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex="52px" fxLayout="row" fxLayoutGap="4px">
+            <mat-icon class="material-symbols-outlined global-icon-button-grey" (click)="removeFilter(filter.id)"
+              *ngIf="index!==0">remove_circle</mat-icon>
+            <mat-icon class="material-symbols-outlined global-icon-button-grey" (click)="addNewFilter()"
+              *ngIf="index==0">add_circle</mat-icon>
+          </div>
+        </div>
+      </div>
+      <div fxFlex="none" class="text-end">
+        <button mat-flat-button color="primary" [disabled]="filters.length == 0" (click)="applyFiltersFunction()">
+          Search
+        </button>
+      </div>
+    </div>
+    <div fxFlex="50" fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="fw-bold">Filtered Data ({{filteredData().length}})</div>
+      <div fxFlex="none" *ngIf="dropdownType == 'traveler_id'">
+        <mat-checkbox color="primary" (change)="toggleSelectAll()" [checked]="selectAllItems">Select All</mat-checkbox>
+      </div>
+      <div fxFlex="none">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="searchItems" />
+        </mat-form-field>
+      </div>
+      <div fxFlex fxLayout="column" class="y-auto">
+        <div *ngFor="let item of filteredData()">
+          <mat-checkbox [(ngModel)]="item.selected" color="primary" (change)="onSelectionChange($event, item)">
+            {{ item.name }}
+          </mat-checkbox>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="p-6 pt-0">
+    <button mat-stroked-button color="primary" (click)="resetAdvanceSearch()">
+      Reset
+    </button>
+    <button mat-stroked-button color="primary" (click)="onClose()">
+      Cancel
+    </button>
+    <button mat-flat-button color="primary" [disabled]="enableApplyButton()" (click)="onApplyFilter()">
+      Save
+    </button>
+  </div>
+</div>

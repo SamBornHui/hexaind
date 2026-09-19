@@ -1,0 +1,78 @@
+<div class="login-container">
+    <div class="login-box">
+      <div class="logo"><img src="../../../assets/logo.png" /></div>
+      <div class="title">Workfow Driver</div>
+      <div class="sub-title">Sign in</div>
+      <div class="text-center pb-4">Welcome to Databrick</div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="pb-5">
+        <div class="pb-2">First Name</div>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="firstName" placeholder="Enter First Name">
+            <mat-error *ngIf="formValues['firstName'].invalid && formValues['firstName'].touched">
+              First Name is required.
+            </mat-error>
+          </mat-form-field>
+      </div>
+
+      <div class="pb-5">
+        <div class="pb-2">Last Name</div>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="lastName" placeholder="Enter Last Name">
+            <mat-error *ngIf="formValues['lastName'].invalid && formValues['lastName'].touched">
+              Last Name is required.
+            </mat-error>
+          </mat-form-field>
+      </div>
+
+      <div class="pb-5">
+          <div class="pb-2">Email</div>
+          <mat-form-field appearance="outline">
+            <input matInput formControlName="email" placeholder="Enter Email" readonly>
+          </mat-form-field>
+      </div>
+
+        <div class="pb-2" *ngIf="user_type!=='SSO'">
+          <div>Password</div>
+          <mat-form-field appearance="outline">
+            <input matInput [type]="passwordVisible ? 'text' : 'password'" formControlName="password" placeholder="Enter Password">
+            <mat-icon matSuffix (click)="passwordVisible = !passwordVisible">
+              {{passwordVisible ? 'visibility_off' : 'visibility'}}
+            </mat-icon>
+            <mat-error *ngIf="formValues['password'].errors && formValues['password'].touched">
+              <span *ngIf="formValues['password'].errors['required']">Password is required.</span>
+              <span *ngIf="formValues['password'].errors['minlength']">Password must be at least 12 characters long.</span>
+              <span *ngIf="formValues['password'].errors['pattern']">Password must contain at least one uppercase, one lowercase, one digit, and one special character.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="pb-2" *ngIf="user_type!=='SSO'">
+          <div>Confirm Password</div>
+          <mat-form-field appearance="outline">
+            <input matInput [type]="confirmPasswordVisible ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Confirm Password">
+            <mat-icon matSuffix (click)="confirmPasswordVisible = !confirmPasswordVisible">
+              {{confirmPasswordVisible ? 'visibility_off' : 'visibility'}}
+            </mat-icon>
+            <mat-error *ngIf="formValues['confirmPassword'].errors && formValues['confirmPassword'].touched">
+              <span *ngIf="formValues['confirmPassword'].errors['required']">Confirm Password is required.</span>
+              <span *ngIf="form.errors?.['mismatch']">Passwords must match.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <button mat-flat-button color="primary" class="w-100" type="submit" [disabled]="form.invalid">
+            Register
+          </button>
+        </div>  
+        </form> 
+    </div>
+  </div>
+  
+  <div *ngIf="showLoader" class="login-loader">
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <mat-spinner  diameter="48"></mat-spinner>
+      <div class="text-grey pt-2">Loading...</div>
+    </div>
+  </div>

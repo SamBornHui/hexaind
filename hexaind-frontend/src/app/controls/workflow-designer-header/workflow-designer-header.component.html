@@ -1,0 +1,130 @@
+<div class="global-header" fxLayout="row" fxLayoutAlign="space-between center">
+  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+
+    <div fxFlex="none">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon style="font-size: 28px" class="material-symbols-outlined">arrow_back</mat-icon>
+      </button>
+    </div>
+
+    <div fxFlex="180px" [matTooltip]="master_workflow_name??''" class="fw-bold" (click)="navigateToMasterWorkflow()">{{
+      truncateName(master_workflow_name ?? '') }}
+    </div>
+
+    <div fxFlex="200px">
+      <mat-form-field appearance="outline">
+        <mat-select [(ngModel)]="selectedWorkflow" (ngModelChange)="onSelectWorkflow($event)" name="publishedWorkflows"
+          placeholder="Select published workflows">
+          <mat-option *ngFor="let workflow of publishedWorkflows" [value]="workflow">
+            {{ workflow.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+
+  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" fxFlex="40px" matTooltip="Start Workflow Execution">
+      <button mat-icon-button (click)="onRunWorkflowExecution()" [disabled]="!hasWidgets || disableSaveAndRun">
+        <mat-icon class="material-symbols-outlined">play_arrow</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" fxFlex="40px"
+      [matTooltip]="workflowCanvasService.WorkflowRunStatus?.run_status !== 'RUNNING'?'':'Stop Workflow Execution'">
+      <button mat-icon-button (click)="onStopWorkflowExecution()"
+        [disabled]="workflowCanvasService.WorkflowRunStatus?.run_status !== 'RUNNING'">
+        <mat-icon class="material-symbols-outlined">stop</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" class="vertical-line-separator"></div>
+
+
+    <div *ngIf="
+    !workflowCanvasService.IsVersionedWorkflow &&
+    !workflowCanvasService.IsViewingRunMode
+    " fxFlex="40px" matTooltip="Save as template">
+      <button mat-icon-button (click)="onCreateWorkflowTemplate()" [disabled]="disabledSaveAsTemplate()">
+        <mat-icon class="material-symbols-outlined">collections_bookmark</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" fxFlex="40px" matTooltip="Load templates">
+      <button mat-icon-button (click)="onLoadWorkflowTemplate()">
+        <mat-icon class="material-symbols-outlined">deployed_code_update</mat-icon>
+      </button>
+    </div>
+
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" class="vertical-line-separator"></div>
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" fxFlex="40px" matTooltip="Save Workflow">
+      <button mat-icon-button (click)="onSaveWorkflow()" [disabled]="!hasWidgets || disableSaveAndRun">
+        <mat-icon class="material-symbols-outlined">save</mat-icon>
+      </button>
+    </div>
+    <!-- Vertical Line Separator -->
+
+    <!-- <div fxFlex="40px" matTooltip="Save Workflow as...">
+    <button
+      mat-icon-button
+      (click)="onSaveAsWorkflow()"
+      [disabled]="!isViewRunMode"
+    >
+      <mat-icon class="material-symbols-outlined">save_as</mat-icon>
+    </button>
+  </div> -->
+    <div *ngIf="
+      !workflowCanvasService.IsVersionedWorkflow &&
+      !workflowCanvasService.IsViewingRunMode
+    " fxFlex="40px" matTooltip="Publish workflow">
+      <button mat-icon-button (click)="onPublishWorkflow()" [disabled]="!hasWidgets">
+        <mat-icon class="material-symbols-outlined">publish</mat-icon>
+      </button>
+    </div>
+
+
+
+    <div *ngIf="!workflowCanvasService.IsViewingRunMode" class="vertical-line-separator"></div>
+    <div *ngIf="workflowCanvasService.IsVersionedWorkflow" fxFlex="40px" matTooltip="Set Run Schedule">
+      <button mat-icon-button [disabled]="false" (click)="createNewSchedule(null, versionedWorkflowId)">
+        <mat-icon class="material-symbols-outlined">calendar_month</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="
+      !workflowCanvasService.IsViewingRunMode &&
+      workflowCanvasService.IsVersionedWorkflow
+    " fxFlex="60px" matTooltip="View Runs">
+      <button mat-icon-button (click)="onViewRun()">
+        <mat-icon class="material-symbols-outlined">directions_run</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="
+      !workflowCanvasService.IsViewingRunMode &&
+      !workflowCanvasService.IsVersionedWorkflow
+    " fxFlex="60px" matTooltip="View Run">
+      <button mat-icon-button (click)="onViewRun()">
+        <mat-icon class="material-symbols-outlined">directions_run</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="workflowCanvasService.IsViewingRunMode" fxFlex="180px">
+      <div class="last-run">{{ getLastRunText() }}</div>
+    </div>
+    <div *ngIf="workflowCanvasService.IsViewingRunMode" class="vertical-line-separator"></div>
+    <div *ngIf="workflowCanvasService.IsViewingRunMode" fxFlex="40px" matTooltip="View Run Summary">
+      <button mat-icon-button (click)="onViewRunSummary()">
+        <mat-icon class="material-symbols-outlined">summarize</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="workflowCanvasService.IsViewingRunMode" fxFlex="40px"
+      [matTooltip]="workflowCanvasService.WorkflowRunStatus?.run_status !== 'RUNNING'?'':'Stop Workflow Execution'">
+      <button mat-icon-button (click)="onStopWorkflowExecution()"
+        [disabled]="workflowCanvasService.WorkflowRunStatus?.run_status !== 'RUNNING'">
+        <mat-icon class="material-symbols-outlined">stop</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="workflowCanvasService.IsViewingRunMode" class="vertical-line-separator"></div>
+    <div *ngIf="workflowCanvasService.IsViewingRunMode" fxFlex="60px" matTooltip="Exit Run View">
+      <button mat-icon-button (click)="onCloseViewRunMode()">
+        <mat-icon class="material-symbols-outlined">close</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

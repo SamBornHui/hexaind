@@ -1,0 +1,18 @@
+[
+    {
+        "_id": { "$oid": "664ee2ced73a5a44b61aadd9" },
+        "version": "1.0",        
+        "name": "Automatic-Integration-Tests",
+        "description": "This Project is intended for automatic tests.(please do not use it for other purposes).",
+        "site_id": "1",
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "Test-01 server_admin",
+        "created_at": { "$date": "2024-05-21T08:08:56.139Z" },
+        "created_by": "664c569824e6fd041c96c25b",
+        "last_accessed_at": { "$date": "2024-05-22T11:58:52.183Z" },
+        "last_modified_at": { "$date": "2024-05-22T11:58:52.183Z" },
+        "shared_with": [],
+        "favorited_by": [],
+        "is_active": true
+    }
+]

@@ -1,0 +1,242 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxFlex fxLayout="row" fxLayoutGap="16px" class="spatial-container">
+            <div fxFlex="160px" fxLayout="column" fxLayoutGap="16px" class="pe-4 border-right y-auto">
+              <div class="img-thumbnail" *ngFor="let image of datasetImages" [class.selected]="image.selected">
+                <img 
+                  *ngIf="image" 
+                  [src]="imageUrl(image)" 
+                  alt="" 
+                  title="{{getImageName(image.path)}}"
+                  (click)="imageFeatureStats(image)"
+                  >
+              </div>
+            </div>
+            <div fxFlex="300px" class="pe-4 border-right">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="pb-4">
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select placeholder="Select Options" [(ngModel)]="selectedPhase">
+                      <mat-option [value]="row.title" *ngFor="let row of phaseListToDisplay()">{{row.title}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+
+                <div fxFlex="none">
+                  <button mat-flat-button color="primary" [disabled]="selectedPhase==''" (click)="addPhaseToList()">
+                    <mat-icon>add</mat-icon> Add
+                  </button>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="border-bottom p-1">
+                <div fxFlex class="fw-bold text-primary">Correlation List</div>
+                <div fxFlex="none" *ngIf="addedPhaseList.length > 0">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey" (click)="deleteAddedPhase()">delete</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="border-bottom p-1 phase-item" [class.selected-phase]="phase.title == highlightedPhase" *ngFor="let phase of addedPhaseList">
+                <div fxFlex (click)="highLightPhase(phase.title)" style="cursor: pointer;">{{phase.title}}</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey" (click)="deleteOneAddedPhase(phase.title)">delete</mat-icon>
+                </div>
+              </div>
+            </div>
+            <div fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto" style="overflow-x: hidden;">
+              <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                <div fxFlex="none" class="fw-bold">Image Quantification:</div>
+                <div fxFlex="240px">
+                  <mat-form-field appearance="outline">
+                    <mat-select placeholder="Select Option" [(ngModel)]="selectedQuantification">
+                      <mat-option [value]="type.value" *ngFor="let type of quantificationList" (click)="changeQuantificationTechnique()">{{type.title}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <mat-icon 
+                  matTooltip="Switch Visualization" 
+                  *ngIf="featureTypeResult.length>0 &&  selectedQuantification == 'AngularyResolvedChordLengthDistributions'" 
+                  (click)="changeAngImageView()" 
+                  class="material-icons-outlined global-icon-button-grey">insert_chart_outlined</mat-icon>  
+                </div>
+              </div>
+              <div fxFlex *ngIf="apiCall" fxLayout="column" fxLayoutAlign="center center" style="align-items: center">
+                <mat-spinner diameter="60"></mat-spinner>
+              </div>
+              <ng-container *ngIf="!apiCall">
+                
+                <div fxLayout="row wrap" fxLayoutAlign="start start" *ngFor="let feature of featureTypeResult; let ind=index;">
+                  <div fxFlex="50%" class="p-4">
+                    <div class="global-image-container">
+                      <object 
+                        class="global-graph-fit plots-dimentions"
+                        type="text/html"
+                        [data]="feature.microstructure_image">
+                      </object>
+                    </div>
+                  </div>
+  
+                  <div fxFlex="50%" class="p-4" *ngIf="selectedQuantification == 'AngularyResolvedChordLengthDistributions'" >
+                    <div class="global-image-container">
+                      <img class="global-graph-fit" 
+                        *ngIf="!angImageView" 
+                        [src]="feature.visualized_plot" alt="" 
+                      />
+                      <object 
+                        class="global-graph-fit plots-dimentions"
+                        *ngIf="angImageView"
+                        type="text/html"
+                        [data]="feature.visualize_ARCLD_Angle">
+                      </object>
+                    </div>
+                  </div>
+  
+                  <div fxFlex="50%" class="p-4" *ngIf="selectedQuantification != 'ChordLengthDist' && selectedQuantification != 'AngularyResolvedChordLengthDistributions'" >
+                    <div class="global-image-container">
+                      <img class="global-graph-fit" 
+                        *ngIf="selectedQuantification == 'RotatInvariance'"
+                        [src]="feature.visualized_plot" alt="" 
+                      />
+                      <object 
+                        class="global-graph-fit plots-dimentions"
+                        *ngIf="selectedQuantification == 'PairCorrelation' || selectedQuantification == 'TwoPointStats'"
+                        type="text/html"
+                        [data]="feature.visualized_plot">
+                      </object>
+                    </div>
+                  </div>
+  
+                  <div fxFlex="50%" class="p-4" *ngIf="selectedQuantification == 'ChordLengthDist'" >
+                    <div class="global-image-container">
+                      <object 
+                        class="global-graph-fit plots-dimentions"
+                        type="text/html"
+                        [data]="feature.visualized_plot">
+                      </object>
+                    </div>
+                  </div>
+                </div>
+                <div fxLayout="row" 
+                  fxLayoutAlign="end center" 
+                  fxLayoutGap="8px" 
+                  *ngIf="featureTypeResult.length==1 && selectedQuantification != 'AngularyResolvedChordLengthDistributions' && selectedQuantification != 'ChordLengthDist'">
+                  <div fxFlex="none" class="fw-bold">Cutoff (μm):</div>
+                  <div fxFlex="80px">
+                    {{cutoff}}
+                  </div>
+                  <div fxFlex="160px" class="pe-4">
+                    <mat-slider>
+                      <input matSliderThumb [(ngModel)]="cutoff" [min]="cutoffSlider.min" [max]="cutoffSlider.max" [step]="cutoffSlider.stepValue" (change)="changeSliders()"/>
+                    </mat-slider>
+                  </div>
+                  <div fxFlex="none">Max: {{cutoffSlider.max}} μm</div>
+                </div>
+  
+                <div 
+                  fxLayout="row" 
+                  fxLayoutAlign="end center" 
+                  fxLayoutGap="8px" 
+                  *ngIf="featureTypeResult.length==1 && (selectedQuantification == 'AngularyResolvedChordLengthDistributions' || selectedQuantification == 'ChordLengthDist')">
+                  <div fxFlex="none" class="fw-bold">Coarsening:</div>
+                  <div fxFlex="80px">
+                    {{coarsening}}
+                  </div>
+                  <div fxFlex="160px" class="pe-4">
+                    <mat-slider>
+                      <input matSliderThumb [(ngModel)]="coarsening" (change)="changeSliders()" />
+                    </mat-slider>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<app-config-action-bar widgetName="Spatial Statistics Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1">
+</app-config-action-bar>

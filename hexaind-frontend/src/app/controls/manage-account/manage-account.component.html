@@ -1,0 +1,185 @@
+<div class="h-100 p-7" fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="border-bottom"
+  >
+    <div>
+      <h1>Manage Account</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex>
+    <div class="py-7 border-bottom" fxLayout="column" fxLayoutGap="16px">
+      <div fxFlex="none">
+        <h2>My Profile</h2>
+      </div>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="fw-bold">Name</div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-between center"
+          *ngIf="!fullNameUpdate"
+        >
+          <div class="text-md">{{ this.user.name }}</div>
+          <div>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="updateNameFunc()"
+            >
+              Update Name
+            </button>
+          </div>
+        </div>
+
+        <div fxLayout="column" fxLayoutGap="8px" *ngIf="fullNameUpdate">
+          <div>
+            <mat-form-field appearance="outline">
+              <input matInput [(ngModel)]="name" placeholder="Enter new name" />
+            </mat-form-field>
+          </div>
+          <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="cancelUpdateName()"
+            >
+              Cancel
+            </button>
+            <button mat-flat-button color="primary" (click)="updateName()">
+              Update Name
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="this.user.is_sso_user == false" class="py-7" fxLayout="column" fxLayoutGap="16px">
+      <div fxFlex="none">
+        <h2>Login and Security</h2>
+      </div>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="fw-bold">Email</div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-between center"
+          *ngIf="!updateEmail"
+        >
+          <div class="text-md">{{ this.user.email }}</div>
+        </div>
+      </div>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="fw-bold">Password</div>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-between center"
+          *ngIf="!updatePassword"
+        >
+          <div class="text-md">********</div>
+          <div>
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="updatePasswordFunc()"
+            >
+              Change Password
+            </button>
+          </div>
+        </div>
+
+        <div fxLayout="column" fxLayoutGap="8px" *ngIf="updatePassword">
+          <div class="changePass">
+            <mat-form-field appearance="outline">
+              <mat-label>Old Password</mat-label>
+              <!-- <input matInput type="password" [(ngModel)]="old_password" placeholder="Enter old password"> -->
+              <input
+                matInput
+                [(ngModel)]="old_password"
+                [type]="oldPasswordVisible ? 'text' : 'password'"
+                placeholder="Enter old password"
+                class="input-field"
+              />
+              <i
+                class="fa-regular toggle-icon"
+                [ngClass]="{
+                  'fa-eye': oldPasswordVisible,
+                  'fa-eye-slash': !oldPasswordVisible
+                }"
+                (click)="togglePasswordVisibility('old')"
+              ></i>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>New Password</mat-label>
+              <input
+                matInput
+                [type]="newPasswordVisible ? 'text' : 'password'"
+                [(ngModel)]="password"
+                placeholder="Enter new password"
+                class="input-field"
+              />
+              <i
+                class="fa-regular toggle-icon"
+                [ngClass]="{
+                  'fa-eye': newPasswordVisible,
+                  'fa-eye-slash': !newPasswordVisible
+                }"
+                (click)="togglePasswordVisibility('new')"
+              ></i>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Confirm New Password</mat-label>
+              <input
+                matInput
+                [type]="confPasswordVisible ? 'text' : 'password'"
+                [(ngModel)]="conf_password"
+                placeholder="Re-enter  password"
+                class="input-field"
+              />
+              <i
+                class="fa-regular toggle-icon"
+                [ngClass]="{
+                  'fa-eye': confPasswordVisible,
+                  'fa-eye-slash': !confPasswordVisible
+                }"
+                (click)="togglePasswordVisibility('conf')"
+              ></i>
+            </mat-form-field>
+
+            <div
+              *ngIf="password !== conf_password && conf_password !== ''"
+              class="error-message"
+            >
+              <span class="errorMsg">{{ passwordMismatchError }}</span>
+            </div>
+          </div>
+
+          <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+            <button
+              mat-stroked-button
+              color="primary"
+              (click)="cancelupdatePassword()"
+            >
+              Cancel
+            </button>
+            <button
+              mat-flat-button
+              color="primary"
+              [disabled]="password !== conf_password || conf_password == ''"
+              (click)="updatePass()"
+            >
+              Change Password
+            </button>
+          </div>
+        </div>
+      </div>
+      <app-notification #notification></app-notification>
+    </div>
+  </div>
+</div>

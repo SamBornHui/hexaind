@@ -1,0 +1,111 @@
+/* Custom row hover style */
+.custom-mat-row:hover {
+    cursor: pointer;
+    /* Change cursor to the default arrow */
+    background-color: #f5f5f5;
+    /* Highlight the row */
+}
+
+.custom-dialog-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    text-align: center;
+    height: 350px;
+    width: 500px;
+    padding: 20px;
+}
+
+.custom-dialog-container-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-dialog-container {
+    padding: 20px;
+    max-width: 500px;
+}
+
+h2[mat-dialog-title] {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.workflow-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.workflow-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    background-color: #fbf8f8;
+    color: #f00a0a;
+    font-size: 1.1em;
+}
+
+.workflow-item:hover {
+    background-color: #e0e0e0;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dialog-actions button {
+    background-color: #1976d2;
+    color: white;
+}
+
+.dialog-actions button:hover {
+    background-color: #1565c0;
+}
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 20px 0;
+    background: transparent;
+    background-color: transparent;
+}
+
+.loading-message {
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: #555;
+    background-color: transparent;
+}
+
+.published {
+    color: green;
+    // border: 2px solid green;
+    // border-radius: 1px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.draft {
+    color: rgb(255, 136, 0);
+    // border: 2px solid rgb(255, 136, 0);
+    // border-radius: 1px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    font-weight: bold;
+}

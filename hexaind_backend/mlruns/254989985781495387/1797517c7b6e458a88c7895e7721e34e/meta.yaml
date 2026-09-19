@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/254989985781495387/1797517c7b6e458a88c7895e7721e34e/artifacts
+end_time: 1752683306011
+entry_point_name: ''
+experiment_id: '254989985781495387'
+lifecycle_stage: active
+run_id: 1797517c7b6e458a88c7895e7721e34e
+run_name: defiant-conch-451
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752683279624
+status: 4
+tags: []
+user_id: muhammadumersohailkhan

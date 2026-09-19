@@ -1,0 +1,78 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="border-bottom p-4"
+  >
+    <div>
+      <h1>Data preview : {{fileName | slice: 0: 35}} {{(fileName && fileName.length > 35) ? '...' : '' }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-4 y-auto" *ngIf="isPNG == false">
+    <mat-form-field appearance="outline" class="dataset-selector" *ngIf="isDatasetDropdown">
+      <mat-select [(ngModel)]="datasetId" name="datasetSelecter" (ngModelChange)="onDatasetChange()">
+        <mat-option *ngFor="let dataset of datasetIds" [value]="dataset.id">
+          {{ dataset.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-tab-group
+      mat-stretch-tabs="false"
+      class="h-100"
+      (selectedIndexChange)="activeTab = $event"
+      [selectedIndex]="activeTab"
+    >
+      <mat-tab label="Statistics & Schema">
+        <ng-container *ngIf="activeTab === 0">
+          <app-statistics-schema
+            [dataset_id]="datasetId!"
+            class="h-100 d-block"
+          ></app-statistics-schema>
+        </ng-container>
+      </mat-tab>
+      <mat-tab label="Data">
+        <ng-container *ngIf="activeTab === 1">
+          <app-data-preview-data
+            [dataset_id]="datasetId!"
+            [uc2SigmaFilePath]="UC2SigmaDataPreviewPath"
+            (downloadTriggered)="onDownloadTriggered($event)"
+            class="h-100 d-block"
+          ></app-data-preview-data>
+        </ng-container>
+      </mat-tab>
+      <mat-tab label="Metadata">
+        <ng-container *ngIf="activeTab === 2">
+          <app-metadata
+            [dataset_id]="datasetId!"
+            class="h-100 d-block"
+          ></app-metadata>
+        </ng-container>
+      </mat-tab>
+      <mat-tab label="Visualize">
+        <ng-container *ngIf="activeTab === 3">
+          <app-visualize
+            [dataset_id]="datasetId!"
+            class="h-100 d-block"
+          ></app-visualize>
+        </ng-container>
+      </mat-tab>
+      <mat-tab label="Correlation">
+        <ng-container *ngIf="activeTab === 4">
+          <app-correlation
+            [dataset_id]="datasetId!"
+            class="h-100 d-block"
+          ></app-correlation>
+        </ng-container>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div fxFlex *ngIf="isPNG">
+    <img width="95%" height="95%" *ngIf="resultPNG" [src]="resultPNG" alt="Data Preview Image" />
+  </div>
+</div>

@@ -1,0 +1,213 @@
+<div class="h-100 prd-container" fxLayout="column">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div fxLayoutGap="16px" fxFlex="none"
+  fxLayout="row"
+  fxLayoutAlign="space-between center"
+  class="header">
+    <div fxFlex="none" fxLayout="row">
+      <button
+        mat-icon-button
+        class="global-back-button"
+        (click)="navigate('tools')"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+    <div fxFlex fxLayoutAlign=" center" fxLayoutGap="4px">
+      
+      <h1 class="global-main-title">UC1 Configurations
+        <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="This page is the UC1 Configurations.">
+          info
+        </mat-icon>
+      </h1>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="16px">
+      <div class="border-left">
+        <button
+          mat-icon-button
+          class="global-icon-button"
+          (click)="toggleMainHeader()"
+        >
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div fxFlex fxLayoutAlign="center center" *ngIf="showLoader">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+  <div fxFlex *ngIf="!showLoader" class="p-6">
+    <mat-tab-group class="h-100" [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+      <mat-tab label="Train">
+        <div fxLayout="column" fxLayoutGap="16px" class="pt-6 h-100" style="overflow: hidden;">
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <div fxFlex>
+              <div class="fw-bold pb-1">Choose File</div>
+              <div fxLayout="row" fxLayoutGap="8px">
+                <div fxFlex="none">
+                  <input type="file" #fileInput (change)="onFileSelected($event, 'train')" accept=".zip"
+                    style="display: none;" />
+                  <button mat-flat-button color="primary" (click)="triggerFileInputClick(fileInput)">Upload</button>
+                </div>
+                <div fxFlex fxLayoutAlign="start center">
+                  <span *ngIf="selectedFileName">{{ selectedFileName }}</span>
+                </div>
+              </div>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold pb-1">Unique ID</div>
+              <mat-form-field appearance="outline">
+                <input matInput id="uniqueId" [(ngModel)]="uniqueId" placeholder="Enter unique ID"
+                  (ngModelChange)="checkIfFieldsAreValid()" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="4px" *ngIf="rawDataFilePath">
+            <div class="fw-bold" for="rawDataPath">Raw Data File Path:</div>
+            <div id="rawDataPath">{{ rawDataFilePath || 'No file path available' }}</div>
+          </div>
+          <div fxFlex fxLayout="column" *ngIf="allTrainedDids.length > 0">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+              class="p-2 border-bottom fw-bold">
+              <div fxFlex>All Design ID's</div>
+              <div fxFlex="80px" class="text-center">Train</div>
+              <div fxFlex="80px" class="text-center">Test</div>
+            </div>
+            <div fxFlex class="y-auto">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="p-2 border-bottom"
+                *ngFor="let did of allTrainedDids">
+                <div fxFlex>{{ did }}</div>
+                <div fxFlex="80px" class="text-center">
+                  <mat-slide-toggle color="primary" [checked]="isTrainSelected(did)"
+                    (change)="setAllTrainedDidsValue(did, 'train')">
+                  </mat-slide-toggle>
+                </div>
+                <div fxFlex="80px" class="text-center">
+                  <mat-slide-toggle color="primary" [checked]="isTestSelected(did)"
+                    (change)="setAllTrainedDidsValue(did, 'test')">
+                  </mat-slide-toggle>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div fxFlex class="y-auto">
+        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="p-2 border-bottom" *ngFor="let did of allTrainedDids">
+          <div fxFlex>{{ did }}</div>
+          <div fxFlex="80px" class="text-center">
+            <mat-radio-button color="primary" [name]="did" value="train" [ngModel]="did" ></mat-radio-button>
+          </div>
+          <div fxFlex="80px" class="text-center">
+            <mat-radio-button color="primary" [name]="did" value="test" [ngModel]="did"></mat-radio-button>
+          </div>
+        </div>
+      </div> -->
+          </div>
+
+          <!-- New Dropdown for Design Measurements -->
+          <div fxFlex="none" *ngIf="allTrainedDids.length > 0">
+            <div class="pb-1"><span class="fw-bold"> Target_Material_Designation :</span></div>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select Design Measurement" [ngModel]="get_design_measurements" [compareWith]="compareFn"
+                (ngModelChange)="updateValue($event)">
+                <mat-option *ngFor="let measurement of all_design_measurements" [value]="measurement">
+                  {{ measurement }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div fxFlex fxLayoutAlign="center center" class="global-nodata" *ngIf="allTrainedDids.length === 0">
+            No trained IDs available.
+          </div>
+
+          <div fxFlex="none" fxLayoutAlign="end center">
+            <button mat-flat-button color="primary" [disabled]="isDisabled" (click)="saveConfiguration()">Save</button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Predictions">
+        <div fxLayout="column" fxLayoutGap="16px" class="pt-6 h-100" style="overflow: hidden;">
+          <div fxFlex fxLayout="column" fxLayoutGap="16px">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+              <div fxFlex fxLayoutAlign="center center" *ngIf="showLoader">
+                <mat-spinner diameter="48"></mat-spinner>
+              </div>
+              <div fxFlex *ngIf="!showLoader">
+                <div class="fw-bold pb-1">Choose File</div>
+                <div fxLayout="row" fxLayoutGap="8px">
+                  <div fxFlex="none">
+                    <input type="file" #fileInput (change)="onProdictionFileSelected($event, 'train')" accept=".zip"
+                      style="display: none;" />
+                    <button mat-flat-button color="primary" (click)="triggerFileInputClick(fileInput)">Upload</button>
+                  </div>
+                  <div fxFlex fxLayoutAlign="start center">
+                    <span *ngIf="selectedFileName">{{ selectedPredictionFileName }}</span>
+                  </div>
+                </div>
+              </div>
+              <div fxFlex>
+                <div class="fw-bold pb-1" for="predictionIdSelect">Select Prediction DiD</div>
+                <mat-form-field appearance="outline">
+                  <mat-select id="predictionIdSelect" [(ngModel)]="predictionDropdownData"
+                    (ngModelChange)="getPredictionDropdownData($event)" placeholder="Select Prediction DiD">
+                    <mat-option *ngFor="let id of allPredictionDids" [value]="id">{{ id }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div fxFlex>
+                <div class="fw-bold pb-1" for="uniqueIdSelect">Select Training Unique ID</div>
+                <mat-form-field appearance="outline">
+                  <mat-select id="uniqueIdSelect" [(ngModel)]="selectedUniqueId"
+                    (ngModelChange)="checkPredictionFieldsAreValid()" placeholder="Select Training Unique ID">
+                    <mat-option *ngFor="let id of uniqueIds" [value]="id">{{ id }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div fxFlex>
+                <div class="fw-bold pb-1">Prediction Unique ID</div>
+                <mat-form-field appearance="outline">
+                  <input matInput id="predictionUniqueId" [(ngModel)]="predictionUniqueId"
+                    placeholder="Enter Prediction Unique ID" (input)="checkPredictionFieldsAreValid()" />
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="4px">
+              <div class="fw-bold" for="rawDataPath">Raw Data File Path:</div>
+              <div>{{ predictionFilePath }}</div>
+            </div>
+          </div>
+          <!-- <div fxFlex fxLayout="column" *ngIf="aggregateDids?.allTrainedDids?.length > 0">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+              class="p-2 border-bottom fw-bold">
+              <div fxFlex>Trained IDs</div>
+              <div fxFlex="80px" class="text-center">Prediction</div>
+            </div>
+            <div fxFlex class="y-auto">
+              <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="p-2 border-bottom"
+                *ngFor="let did of aggregateDids.allTrainedDids">
+                <div fxFlex>{{ did }}</div>
+                <div fxFlex="80px" class="text-center">
+                  <mat-radio-button color="primary" name="predictionRadio"
+                    [(ngModel)]="predictionConfig[selectedUniqueId]" (change)="checkIfPredictionFieldsAreValid()"
+                    [value]="did"></mat-radio-button>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <div fxFlex fxLayoutAlign="center center" class="global-nodata"
+            *ngIf="!(aggregateDids?.allTrainedDids?.length > 0)">
+            No trained IDs available.
+          </div>
+          <div fxFlex="none" fxLayoutAlign="end center">
+            <button mat-flat-button color="primary" (click)="savePredictionConfiguration()"
+              [disabled]="isSaveDisabled">Save</button>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+.mst-select-filter-columns {
+  &__item {
+    display: flex;
+    gap: 4px;
+    &__field {
+      flex: 1;
+    }
+  }
+  &__dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

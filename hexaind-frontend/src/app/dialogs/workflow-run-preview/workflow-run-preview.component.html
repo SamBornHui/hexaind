@@ -1,0 +1,29 @@
+<div class="dialog-overlay">
+  <div class="dialog">
+    <div fxLayout="column">
+      <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom">
+        <div>
+          <h1>Workflow Run </h1>
+
+        </div>
+        <div>
+          <button mat-icon-button (click)="onClosePanel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+      </div>
+    </div>
+    <div style="overflow: auto;">
+      <pre>{{ dialogData | json }}</pre>
+    </div>
+    <!-- <canvas width="800" height="600" tabindex="0" class="canvas" #myCanvas>
+    </canvas> -->
+
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <button mat-stroked-button color="primary" id="closeButton" (click)="onClosePanel()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

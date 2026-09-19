@@ -1,0 +1,17 @@
+<div class="pt-4 h-100 y-auto" fxLayout="column">
+    <div fxFlex fxLayout="row" fxLayoutGap="24px">
+        <div fxFlex *ngFor="let instance of compareInstances" class="custom-border">
+            <app-comparison-instance [dataset_id]="dataset_id!" 
+                [interactive]="interactive" class="d-block h-100">
+            </app-comparison-instance>
+        </div>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" style="overflow: hidden;">
+        <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+            <mat-slide-toggle [(ngModel)]="interactive" color="primary">Interactive Plot</mat-slide-toggle>
+            <mat-icon class="material-symbols-outlined" matTooltip="Compare"
+                [ngClass]="compareInstances.length === 1 ? '' : 'text-primary'"
+                (click)="addCompareInstances()">splitscreen_vertical_add</mat-icon>
+        </div>
+    </div>
+</div>

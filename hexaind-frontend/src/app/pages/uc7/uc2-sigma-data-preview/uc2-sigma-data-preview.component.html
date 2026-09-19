@@ -1,0 +1,68 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>{{ dialogTitle }} Catalog Results</h1>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" class="p-6">
+    <div fxFlex="none" class="border-bottom py-1">
+      <mat-checkbox [(ngModel)]="selectAll" (change)="toggleSelectAll()">
+        Select All
+      </mat-checkbox>
+    </div>
+    <div fxFlex class="y-auto">
+      <div *ngFor="let filePath of listOfFilePaths" class="border-bottom py-1">
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <div fxFlex="none">
+            <mat-checkbox
+              [(ngModel)]="selectedFilePaths[filePath]"
+              (change)="toggleIndividualSelection()"
+            ></mat-checkbox>
+          </div>
+          <div
+            fxFlex
+            (dblclick)="openDataPreviewComponent()"
+          >
+            {{ filePath }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="8px"
+    class="p-6"
+  >
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="openDataSetCreation()"
+      [disabled]="!isAnyFileSelected()"
+    >
+      Add to Datasets
+    </button>
+    <!-- Don't Delete this code for future Use -->
+    <!-- <button
+      mat-flat-button
+      color="primary"
+      (click)="openDataPreviewComponent()"
+      [disabled]="!isSingleFileSelected()"
+    >
+      Preview
+    </button> -->
+    <button mat-stroked-button color="primary" mat-dialog-close>Close</button>
+  </div>
+</div>

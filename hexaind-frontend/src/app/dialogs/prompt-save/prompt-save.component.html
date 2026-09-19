@@ -1,0 +1,12 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" class="p-6 border-bottom">
+    <h1>Save Changes</h1>
+  </div>
+  <div fxFlex="none" class="p-6 y-auto">
+    <p>Do you want to save your changes?</p>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="px-6 pb-6">
+    <button mat-stroked-button color="primary" (click)="dialogRef.close(false)">Don't Save</button>
+    <button mat-flat-button color="primary" (click)="dialogRef.close(true)">Save</button>
+  </div>
+</div>

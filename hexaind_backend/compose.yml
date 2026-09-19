@@ -1,0 +1,664 @@
+volumes:
+  certs:
+    driver: local
+  esdata:
+    driver: local
+  grafana-data:
+    driver: local
+  prometheus_data:
+    driver: local
+  logstashdata:
+    driver: local
+  alertmanager:
+    driver: local
+  hexaind-drive:
+    name: hexaind-drive
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HEXAIND_SOURCE}
+      o: bind
+  hexaind-data:
+    name: hexaind-data
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HEXAIND_DESTINATION}
+      o: bind
+  hexaind-logs:
+    name: hexaind-logs
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HEXAIND_HOME_PATH}/logs
+      o: bind
+  hexaind-db:
+    driver: local
+  redisdata:
+    driver: local
+  jupyterhub-data:
+    driver: local
+  hexaind-data-jupyterhub:
+    name: hexaind-data-jupyterhub
+    driver: local
+    driver_opts:
+      type: none
+      device: ${HOST_JUPYTERHUB_WORK_DIR} # generally use HEXAIND_DESTINATION/JUPYTER_HUB
+      o: bind
+  rabbitmq_data:
+    driver: local
+
+networks:
+  default:
+    name: hexaind-network
+    external: false
+  jupyterhub-network:
+    name: jupyterhub-network
+    external: false
+
+services:
+  workflow_apis:
+    container_name: workflow_apis
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: &build
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    command: ["hexaind", "api", "workflow"]
+    ports:
+      - "8081:8000"
+      - "10000-10200:10000-10200" ## port range for deploying app through jupyterhub
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+      - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+      - hexaind-data-jupyterhub:${HEXAIND_DATA}/jupyterhub
+      - ${EXTERNAL_GOOGLE_CREDS_PATH}:${GOOGLE_APPLICATION_CREDENTIALS}
+    env_file: &env-files
+      - monitoring.env
+      - thermocalc.env
+      - jupyterhub.env
+      - celery.env
+      - azure.env
+      - backend.env
+    depends_on:
+      - workflows_apis_mongo_db_setup
+    healthcheck: &api-healthcheck
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    profiles:
+      - backend
+      - all
+    restart: always
+
+  gateway_apis:
+    container_name: gateway_apis
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "api", "gateway"]
+    ports:
+      - "8070:8000"
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    restart: always
+
+  mlflow_apis:
+    container_name: mlflow_apis
+    image: databrick/hexaind_backend_ml:${BACKEND_VERSION:-develop}
+    build: &ml-build
+      context: .
+      dockerfile: Dockerfile
+      target: prod_ml
+    command: ["hexaind", "api", "mlflow", "--workers", "2"]
+    ports:
+      - "8082:8000"
+      - "5001-5300:5001-5300" ## port range for deploying models
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+      - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+      - hexaind-data-jupyterhub:${HEXAIND_DATA}/jupyterhub
+      - ${EXTERNAL_GOOGLE_CREDS_PATH}:${GOOGLE_APPLICATION_CREDENTIALS}
+    env_file: *env-files
+    depends_on:
+      - workflows_apis_mongo_db_setup
+    profiles:
+      - backend
+      - all
+    restart: always
+
+  workflow_apis_aux:
+    container_name: workflow_apis_aux
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "api", "aux"]
+    ports:
+      - "8072:8000"
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+      - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+      - hexaind-data-jupyterhub:${HEXAIND_DATA}/jupyterhub
+    env_file: *env-files
+    depends_on:
+      - workflows_apis_mongo_db_setup
+    healthcheck: *api-healthcheck
+    profiles:
+      - backend
+      - all
+    restart: always
+
+  workflows_apis_mongo_db_setup:
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    command: ["hexaind", "init", "db"]
+    build: *build
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    depends_on:
+      mongo:
+        condition: service_healthy
+    profiles:
+      - backend
+      - all
+    restart: on-failure
+
+  integration_tests:
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    command: ["pytest", "integration_tests", "-svv", "-ra"]
+    build: *build
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - all
+
+  action_manager:
+    container_name: action_manager
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "action_manager"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  action_worker:
+    container_name: action_worker
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "action_worker"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+      - ${EXTERNAL_GOOGLE_CREDS_PATH}:${GOOGLE_APPLICATION_CREDENTIALS}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  action_worker_aux:
+    container_name: action_worker_aux
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "aux"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+      - ${EXTERNAL_GOOGLE_CREDS_PATH}:${GOOGLE_APPLICATION_CREDENTIALS}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  mobo_action_worker:
+    container_name: mobo_action_worker
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "mobo"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  thermocalc_worker:
+    container_name: thermocalc_worker
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "thermocalc"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - all
+      - backend
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  active_learning_action_worker:
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "active_learning"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  ml_actions_worker:
+    container_name: ml_actions_worker
+    image: databrick/hexaind_backend_ml:${BACKEND_VERSION:-develop}
+    build: *ml-build
+    command: ["hexaind", "worker", "ml"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - all
+      - backend
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  ml_actions_worker2:
+    container_name: ml_actions_worker2
+    image: databrick/hexaind_backend_ml:${BACKEND_VERSION:-develop}
+    build: *ml-build
+    command: ["hexaind", "worker", "ml2"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - all
+      - backend
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  mlflow_server:
+    container_name: mlflow_server
+    image: ghcr.io/mlflow/mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --backend-store-uri /hexaind-data/mlflow --host 0.0.0.0 --port 5000 --gunicorn-opts "--timeout 250" --default-artifact-root /hexaind-data/mlflow --workers 2 --artifacts-destination /hexaind-data/mlflow
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  rescale_action_worker:
+    container_name: rescale_action_worker
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    command: ["hexaind", "worker", "rescale"]
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  events_manager_worker:
+    container_name: events_manager_worker
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+    command: ["hexaind", "worker", "events_manager"]
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: always
+
+  custom_code_action_worker:
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *build
+    command: ["hexaind", "worker", "custom_code"]
+    volumes:
+      - hexaind-data:${HEXAIND_DATA}
+      - hexaind-logs:${HEXAIND_HOME}/logs
+      - hexaind-drive:${HEXAIND_DRIVE}
+      - ${EXTERNAL_GOOGLE_CREDS_PATH}:${GOOGLE_APPLICATION_CREDENTIALS}
+    env_file: *env-files
+    profiles:
+      - backend
+      - all
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: always
+
+  rabbit_mq:
+    image: "rabbitmq:management" # https://databricktech.atlassian.net/browse/HEXAIND-13335
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit consumer_timeout 2592000000
+      - RABBITMQ_ERLANG_COOKIE=ZKHL4OH6YJJU7RCCDL2UBJHR3EI=
+    ports:
+      - "5672:5672" # AMQP protocol
+      - "15672:15672" # Management UI
+      - "5671:5671" # AMQP over TLS (if you're using it)
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ~/.erlang.cookie:/var/lib/rabbitmq/.erlang.cookie
+    profiles:
+      - rrm
+      - all
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 20s
+      timeout: 20s
+      retries: 5
+      start_period: 20s
+    restart: always
+
+  redis:
+    image: "redis:latest"
+    # command: redis-server --requirepass ${REDIS_DEFAULT_PASS}
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    profiles:
+      - rrm
+      - all
+    healthcheck:
+      test: redis-cli ping #-a ${REDIS_DEFAULT_PASS} ping
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    restart: always
+
+  mongo:
+    image: "mongo:5.0.12"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER_NAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_PASSWORD}
+    ports:
+      - "27018:27017"
+    command: ["mongod", "--auth"]
+    volumes:
+      - hexaind-db:/data/db
+    profiles:
+      - rrm
+      - all
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017 --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+
+  #Grafana-setup
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    container_name: elasticsearch
+    volumes:
+      - esdata:/var/lib/elastic-search
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    env_file:
+      - monitoring.env
+    ports:
+      - 9200:9200
+    profiles:
+      - monitoring
+      - all
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.1
+    container_name: logstash
+    volumes:
+      - ./contrib/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - hexaind-logs:/var/logs
+      - logstashdata:/var/lib/logstash
+    env_file:
+      - monitoring.env
+    ports:
+      - 6044:6044
+    depends_on:
+      - es
+    profiles:
+      - monitoring
+      - all
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./contrib/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    env_file:
+      - monitoring.env
+    profiles:
+      - monitoring
+      - all
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./contrib/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
+      - "--storage.tsdb.retention.time=30d"
+
+    ports:
+      - 9091:9090
+    profiles:
+      - monitoring
+      - all
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.processes"
+    expose:
+      - 9100
+    profiles:
+      - monitoring
+      - all
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "8100:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    profiles:
+      - monitoring
+      - all
+
+  alertmanager:
+    image: prom/alertmanager:v0.23.0
+    container_name: alertmanager
+    restart: unless-stopped
+    volumes:
+      - ./contrib/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    ports:
+      - 9093:9093
+
+  jupyterhub:
+    image: databrick/jupyterhub:${BACKEND_VERSION:-develop}
+    build:
+      context: .
+      dockerfile: ./docker/jupyterhub.Dockerfile
+      args:
+        JUPYTERHUB_VERSION: latest
+    profiles:
+      - jupyterhub
+      - backend
+      - all
+    restart: always
+    container_name: jupyterhub
+    # networks:
+    #   - jupyterhub-network
+    #   - default
+    volumes:
+      - ./jupyterhub/config.py:/srv/jupyterhub/config.py:ro
+      - ${CONTAINER_SOCKET}:/var/run/docker.sock:rw
+      - jupyterhub-data:/data
+      - hexaind-data-jupyterhub:${HEXAIND_DATA}/jupyterhub
+    ports:
+      - 8181:8000
+    env_file:
+      - jupyterhub.env
+    environment:
+      DOCKER_NETWORK_NAME: hexaind-network
+      DOCKER_NOTEBOOK_IMAGE: databrick/jupyternotebook:develop
+      DOCKER_NOTEBOOK_DIR: /home/jovyan/work
+      HOST_JUPYTERHUB_WORK_DIR: ${HOST_JUPYTERHUB_WORK_DIR}
+      HEXAIND_DATA_JUPYTERHUB_WORK_DIR: ${HEXAIND_DATA_JUPYTERHUB_WORK_DIR}
+      HEXAIND_DATA: ${HEXAIND_DATA}
+      NATIVE_HOST: ${SPECIFY_VM_INTERNAL_IP}
+      JUPYTERHUB_PUBLIC_URL: ${JUPYTERHUB_PUBLIC_URL}
+
+  jupyternotebook:
+    image: databrick/jupyternotebook:develop
+    build:
+      context: .
+      dockerfile: ./docker/jupyternotebook.Dockerfile
+    container_name: jupyternotebook
+    entrypoint: bash -c 'exit 0'

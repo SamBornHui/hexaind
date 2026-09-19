@@ -1,0 +1,264 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Add Users</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-6 y-auto">
+    <mat-tab-group
+      mat-stretch-tabs="false"
+      (selectedTabChange)="tabChanged($event)"
+      class="h-100"
+    >
+      <mat-tab label="Bulk Invite">
+        <div class="pt-4" fxLayout="column" fxLayoutGap="16px">
+          <div>We'll send out an invite via email.</div>
+
+          <div>
+            <div
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              fxLayoutGap="4px"
+              class="pb-1"
+            >
+              <div class="fw-bold">Email(s)</div>
+              <mat-icon
+                class="material-symbols-outlined global-info-icon"
+                matTooltip="Description"
+                >info</mat-icon
+              >
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-chip-grid #chipList>
+                <mat-chip-row
+                  *ngFor="let email of emails"
+                  [removable]="true"
+                  (removed)="removeEmail(email)"
+                >
+                  {{ email }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip-row>
+              </mat-chip-grid>
+              <input
+                matInput
+                [matChipInputFor]="chipList"
+                placeholder="Enter emails"
+                (input)="onEmailInput($event)"
+                #emailInput
+              />
+              <mat-hint>Use a Comma as a Separator</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <div *ngIf="allowedBoth">
+            <div
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              fxLayoutGap="4px"
+              class="pb-1"
+            >
+              <div class="fw-bold">Login Method</div>
+              <mat-icon
+                class="material-symbols-outlined global-info-icon"
+                matTooltip="Description"
+                >info</mat-icon
+              >
+            </div>
+            <mat-form-field appearance="outline">
+              <mat-select
+                placeholder="Select Method"
+                (selectionChange)="onBulkChange($event.value)"
+              >
+                <mat-option
+                  *ngFor="let method of loginMethods"
+                  [value]="method"
+                >
+                  {{ method }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <div
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              fxLayoutGap="4px"
+              class="pb-1"
+            >
+              <div class="fw-bold">Role</div>
+            </div>
+            <mat-form-field appearance="outline">
+              <mat-select
+                placeholder="Select User Role"
+                (selectionChange)="onRoleChange($event.value)"
+              >
+                <mat-option *ngFor="let role of userRoles" [value]="role._id">
+                  {{ role.role_name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Custom Invite">
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="16px">
+          <div fxFlex class="pt-4">
+            <div class="fw-bold pb-1">Name</div>
+          </div>
+          <div fxFlex class="pt-4">
+            <div class="fw-bold pb-1">Email</div>
+          </div>
+          <div fxFlex *ngIf="allowedBoth" class="pt-4">
+            <div class="fw-bold pb-1">Login Method</div>
+          </div>
+          <div fxFlex class="pt-4">
+            <div class="fw-bold pb-1">Role</div>
+          </div>
+
+          <div fxFlex="64px">&nbsp;</div>
+        </div>
+        <form [formGroup]="form">
+          <div
+            formArrayName="rows"
+            class="pt-4"
+            fxLayout="column"
+            fxLayoutGap="16px"
+          >
+            <div
+              *ngFor="
+                let row of rows.controls;
+                let i = index;
+                let first = first;
+                let last = last
+              "
+              [formGroupName]="i"
+              fxLayout="row"
+              fxLayoutAlign="start start"
+              fxLayoutGap="16px"
+            >
+              <!-- name -->
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <input
+                    matInput
+                    formControlName="name"
+                    placeholder="Enter Name"
+                  />
+                  <mat-error
+                    *ngIf="
+                      rows.at(i)?.get('name')?.invalid &&
+                      rows.at(i)?.get('name')?.touched
+                    "
+                  >
+                    Name is required.
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <!-- email -->
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <input
+                    matInput
+                    formControlName="email"
+                    placeholder="Enter Email"
+                  />
+                  <mat-error
+                    *ngIf="
+                      rows.at(i)?.get('email')?.errors?.['required'] &&
+                      rows.at(i)?.get('email')?.touched
+                    "
+                  >
+                    Email is required.
+                  </mat-error>
+                  <mat-error
+                    *ngIf="
+                      rows.at(i)?.get('email')?.errors?.['email'] &&
+                      rows.at(i)?.get('email')?.touched
+                    "
+                  >
+                    Enter a valid email.
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <!-- login method -->
+              <div fxFlex *ngIf="allowedBoth">
+                <mat-form-field appearance="outline">
+                  <mat-select
+                    formControlName="loginMethod"
+                    placeholder="Select Method"
+                    (selectionChange)="onLoginMethodChange(i, $event.value)"
+                  >
+                    <mat-option
+                      *ngFor="let method of loginMethods"
+                      [value]="method"
+                    >
+                      {{ method }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- user role -->
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-select
+                    formControlName="server_role_id"
+                    placeholder="Select User Role"
+                  >
+                    <mat-option
+                      *ngFor="let role of userRoles"
+                      [value]="role._id"
+                    >
+                      {{ role.role_name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div fxFlex="64px" fxLayout="row" fxLayoutGap="8px">
+                <div *ngIf="last" class="global-icon-button-sm mt-2">
+                  <mat-icon (click)="addCustomInviteRow()">add</mat-icon>
+                </div>
+                <div
+                  *ngIf="rows.controls.length !== 1"
+                  class="global-icon-button-sm mt-2"
+                >
+                  <mat-icon (click)="removeRow(i)">remove</mat-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="close()">Cancel</button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="submitInvite()"
+      [disabled]="!isFormValid()"
+    >
+      <mat-icon class="material-symbols-outlined">send</mat-icon> Send Invite
+    </button>
+  </div>
+</div>

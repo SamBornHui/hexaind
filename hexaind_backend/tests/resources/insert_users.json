@@ -1,0 +1,28 @@
+[
+  {
+    "_id": { "$oid": "664c569824e6fd041c96c25b" },
+    "email": "databrickadmin@databrick.tech",
+    "password": {
+      "$binary": {
+        "base64": "JDJiJDEyJFRlcWptdi5Ub21jL2s5a3d1a051aWVyTjFhYVZmanBnWTBISzFLSVpYamQ3bXZweWp0VVVx",
+        "subType": "00"
+      }
+    },
+    "created_at": { "$date": "2024-05-21T08:08:56.139Z" },
+    "updated_at": { "$date": "2024-05-22T06:29:24.514Z" },
+    "status": "Active",
+    "login_status": true,
+    "server_role_value": 1,
+    "last_login_date": { "$date": "2024-05-22T11:58:52.183Z" },
+    "is_sso_user": false,
+    "server_role": "Server Admin",
+    "role_updated_at": { "$date": "2024-05-21T08:08:56.139Z" },
+    "first_name": "Databrick",
+    "last_name": "Admin",
+    "name": "Databrick Admin",
+    "invited_by_id": "664c569824e6fd041c96c25b",
+    "role_updated_by_id": "664c569824e6fd041c96c25b",
+    "account_locked_until": null,
+    "failed_login_attempts": 0
+  }
+]

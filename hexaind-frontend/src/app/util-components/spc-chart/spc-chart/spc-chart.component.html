@@ -1,0 +1,145 @@
+<div *ngIf="showLoader">
+  <div fxLayout="column" fxLayoutAlign="center center">
+      <mat-spinner diameter="48"></mat-spinner>
+  </div>
+</div>
+
+<div *ngIf="!showLoader">
+  <div *ngIf="chamberIdLength == 1">
+    <div class="container-header">
+        <div class="chart-section">
+            <p><strong>Change Date Point</strong></p>
+            <!-- <input type="range" min="1" max="10" step="1" [(ngModel)]="movableX" (input)="moveLine(movableX)" class="slider"/> -->
+            <input type="range" 
+            [min]="minDate.getTime()" 
+            [max]="maxDate.getTime()" 
+            [step]="86400000"
+            [(ngModel)]="movableXTimestamp" 
+            (input)="moveLine($event)" 
+            class="slider"/>
+            <p class="movable-line">Line Position: <strong>{{ movableX | date: 'yyyy-MM-dd' }}</strong></p>
+        </div>
+      <div class="chart-result">
+        <p><strong>Mean Before / After Line :</strong> {{ beforeMeanValue }} / {{ afterMeanValue }}</p>
+        <p><strong>StdDev Before / After Line :</strong> {{ beforeStdValue }} / {{ afterStdValue }}</p>
+        <p *ngIf="before_cpk && after_cpk"><strong>CPK Before / After Line :</strong> {{ before_cpk }} / {{ after_cpk }}</p>
+      </div>
+      <div class="input-section">
+        <label class="input-label">User Input (FLOAT)</label>
+        <div class="input-column">
+          <div class="input-column1">
+            <div class="ucl-input">
+              <span><strong>UCL : </strong></span>
+              <input type="number"  style="max-width: 100px;" required placeholder="UCL" [(ngModel)]="uclInputValue" (ngModelChange)="validate()">
+            </div>
+            <div>
+              <span><strong>LCL : </strong></span>
+            <input type="number"  style="max-width: 100px;"  placeholder="LCL" [(ngModel)]="lclInputValue" (ngModelChange)="validate()">
+            </div>
+            <div>
+              <span><strong>Target:</strong></span>
+              <input type="number" style="max-width: 100px;" placeholder="TARGET" [(ngModel)]="targetInputValue">
+            </div>
+          </div>
+          <div class="input-column2">
+            <button mat-stroked-button color="primary" style="width: 150px" (click)="reset()"> Reset </button>
+            <button mat-flat-button color="primary" style=" height: 70px !important;" [disabled]="isCPKButton" (click)="computeCPK()">Compute CPK</button>
+          </div>
+        </div>
+        <div *ngIf="!isButtonParameter" style="margin-left: 20px;">
+          <button mat-flat-button color="primary" style="margin: 10px;" id="closeButton3" (click)="computeFFParamater()"> Filter by existing FF Parameters </button>
+        </div>
+        <div *ngIf="isButtonParameter" style="margin-left: 20px;">
+          <button mat-flat-button color="primary" id="closeButton3" (click)="returnComputeFFParamater()"> Return existing FF Parameters </button>
+        </div>
+        
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas baseChart [datasets]="chartData" [options]="chartOptions" [type]="'scatter'"></canvas>
+    </div>
+  </div>
+  
+  <div *ngIf="chamberIdLength > 1">
+    <div class="container-header">
+      <div class="Date-chart-section">
+        <label><strong>Select Date Range :</strong></label>
+        <!-- <input type="date" [(ngModel)]="startRange" placeholder="Start"> -->
+        <input type="date" [(ngModel)]="startRangeString" (change)="updateStartRange()" placeholder="Start">
+  
+        <input type="date" [(ngModel)]="endRangeString" (change)="updateEndRange()" placeholder="End"> 
+        <button mat-flat-button color="primary" [disabled]="isDateComputeButton" (click)="filterDataByRange()">Compute</button>
+      </div>
+      <!-- <div class="chart-result">
+        <p><strong>Mean Inside / Outside Range :</strong> {{ meanInside }} / {{ meanOutside }}</p>
+        <p><strong>StdDev Inside / Outside Range :</strong> {{ stdDevInside }} / {{ stdDevOutside }}</p>
+        <p *ngIf="cpkInside && cpkOutside"><strong>CPK Inside / Outside Range :</strong> {{ cpkInside }} / {{ cpkOutside }}</p>
+      </div> -->
+
+      <div class="chart-table-result" fxLayout="column" fxLayoutGap="8px">
+        <table mat-table [dataSource]="Chamber_Table">
+          <ng-container matColumnDef="chamber_id">
+            <th mat-header-cell *matHeaderCellDef> Chamber Id </th>
+            <td mat-cell *matCellDef="let element"> {{element.chamber_id}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Mean">
+            <th mat-header-cell *matHeaderCellDef> Mean Inside <br>/Outside</th>
+            <td mat-cell *matCellDef="let element"> {{element.mean_insideRange}} / {{element.mean_outsideRange}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="stdDev">
+            <th mat-header-cell *matHeaderCellDef> stdDev Inside <br>/Outside</th>
+            <td mat-cell *matCellDef="let element"> {{element.stdDev_insideRange}} / {{element.stdDev_outsideRange}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="CPK">
+            <th mat-header-cell *matHeaderCellDef> CPK Inside<br>/Outside</th>
+            <td mat-cell *matCellDef="let element"> {{element.CPK_insideRange}} / {{element.CPK_outsideRange}} </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <div class="input-section">
+        <label class="input-label">User Input (FLOAT)</label>
+        <div class="input-column">
+          <div class="input-column1">
+            <div class="ucl-input">
+              <span><strong>UCL : </strong></span>
+              <input type="number" style="margin-left: 5px; max-width: 100px;" required placeholder="UCL" [value]="'UCL'" [(ngModel)]="uclDateRangeValue" (ngModelChange)="validateMultiCPKButton()">
+            </div>
+            <div>
+              <span><strong> LCL : </strong></span>
+                <!--  -->
+              <!--  -->
+              <input type="number" style="margin-left: 8px;max-width: 100px;" placeholder="LCL" [value]="'LCL'" [(ngModel)]="lclDateRangeValue" (ngModelChange)="validateMultiCPKButton()">
+            </div>
+            <div>
+              <span><strong>Target:</strong></span>
+              <input type="number" style="max-width: 100px;" placeholder="TARGET" [(ngModel)]="targetInputValue">
+            </div>
+            
+          </div>
+          <div class="input-column2">
+            <button mat-stroked-button color="primary" style="width: 100px" (click)="resetDateRange()"> Reset </button>
+            <button mat-flat-button color="primary" style=" height: 70px !important;width: 100px" [disabled]="isMultiCPkButton" (click)="tableChartData()">Compute CPK</button>
+          </div>
+        </div>
+        <div *ngIf="!isButtonRangeParameter" style="width: 250px;">
+          <button mat-flat-button color="primary" id="closeButton3" (click)="computeFFParamater()"> Filter by existing FF Parameters </button>
+        </div>
+        <div *ngIf="isButtonRangeParameter" style="width: 250px;">
+          <button mat-flat-button color="primary" id="closeButton3" (click)="returnComputeFFParamater()"> Return existing FF Parameters </button>
+        </div>
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas baseChart [datasets]="chartDataRange" [options]="chartRangeOptions" [type]="'scatter'"></canvas>
+    </div>
+  </div>
+</div>
+
+  

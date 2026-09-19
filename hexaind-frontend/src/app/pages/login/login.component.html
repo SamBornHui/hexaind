@@ -1,0 +1,115 @@
+<div class="login-container">
+  <div class="login-box">
+    <div class="logo"><img src="../../../assets/logo.png" /></div>
+    <div class="title">Workfow Driver</div>
+    <div class="sub-title">Sign in</div>
+    <div class="text-center pb-4">Welcome back to Databrick</div>
+    <div *ngIf="showFGErr" class="error-message-container">
+      <p class="error-message">{{ errorMessage }}</p>
+    </div>
+    <div *ngIf="showErr" class="error-message-container">
+      <p class="error-message">{{ errorMessage }}</p>
+    </div>
+    <form [formGroup]="loginForm">
+      <!--*ngIf="loginMethod?.form_login_allowed == true"     HEXAIND-10754 Show Form Login even form_login_allowed is False -->
+      <div class="pb-5">
+        <div class="pb-2">Email</div>
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            placeholder="Enter email address"
+            [(ngModel)]="email"
+            formControlName="email"
+            required
+          />
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')"
+            >Email is required</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <div class="pb-2">
+        <div class="pb-2" fxLayout="row" fxLayoutAlign="space-between center">
+          <div>Password</div>
+          <div class="text-primary fw-bold pointer" (click)="forgotPassword()">
+            Forgot password?
+          </div>
+        </div>
+        <mat-form-field appearance="outline">
+          <input
+            [type]="passwordVisible ? 'text' : 'password'"
+            matInput
+            placeholder="Enter password"
+            [(ngModel)]="password"
+            formControlName="password"
+            required
+          />
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Password is required
+          </mat-error>
+          <button
+            matSuffix
+            mat-icon-button
+            (click)="togglePasswordVisibility()"
+            type="button"
+          >
+            <mat-icon *ngIf="!passwordVisible" class="material-symbols-outlined"
+              >visibility_off</mat-icon
+            >
+            <mat-icon *ngIf="passwordVisible" class="material-symbols-outlined"
+              >visibility_on</mat-icon
+            >
+          </button>
+        </mat-form-field>
+      </div>
+      <div class="mb-4">
+        <mat-checkbox
+          color="primary"
+          [(ngModel)]="rememberMe"
+          formControlName="rememberMe"
+          >Remember me</mat-checkbox
+        >
+      </div>
+      <div>
+        <button
+          mat-flat-button
+          color="primary"
+          class="w-100"
+          (click)="loginUser()"
+          [disabled]="!loginForm.valid"
+        >
+          Sign In
+        </button>
+      </div>
+    </form>
+    <ng-container *ngIf="loginMethod?.sso_login_allowed == true">
+      <div class="seperator">Or Sign In with</div>
+      <div fxLayout="row" fxLayoutGap="16px">
+        <button
+          mat-stroked-button
+          color="primary"
+          class="login-btn"
+          (click)="azurelogin()"
+        >
+          <img src="../../../assets/icon-azure.svg" />
+          Azure
+        </button>
+        <button
+          mat-stroked-button
+          color="primary"
+          class="login-btn"
+          (click)="GCPlogin()"
+        >
+          <img src="../../../assets/icon-gcp.svg" />
+          GCP
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<div *ngIf="showLoader" class="login-loader">
+  <div fxLayout="column" fxLayoutAlign="center center">
+    <mat-spinner diameter="48"></mat-spinner>
+    <div class="text-grey pt-2">Connecting to {{ title }}</div>
+  </div>
+</div>

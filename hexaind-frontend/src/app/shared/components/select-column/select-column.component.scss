@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+.mst-select-column {
+  &__column {
+    display: flex;
+    gap: 4px;
+    &__type {
+      width: 20px;
+      text-align: center;
+      font-weight: lighter;
+      font-size: smaller;
+    }
+    &__name {
+      flex: 1;
+    }
+  }
+}

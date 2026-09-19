@@ -1,0 +1,47 @@
+<div class="dialog-overlay">
+  <div class="dialog">
+    <div fxLayout="column">
+      <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom">
+        <div>
+          <h3>Upload or select files</h3>
+        </div>
+        <div>
+          <button mat-icon-button (click)="onClosePanel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <table mat-table [dataSource]="dataSource" class="bg-transparent">
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>Select</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.selected"></mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>File Name</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.file_name }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef width="44">&nbsp;</th>
+          <td mat-cell *matCellDef="let element">
+
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <button mat-stroked-button color="primary" id="closeButton" (click)="onClosePanel()">
+        Cancel
+      </button>
+      <button mat-flat-button color="primary" (click)="onClickDone()" [disabled]="disableDone()">Done</button>
+    </div>
+  </div>
+</div>

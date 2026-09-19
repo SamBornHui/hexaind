@@ -1,0 +1,189 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <h1 *ngIf="!isDuplicate && !isExport">New Workflow</h1>
+      <h1 *ngIf="isDuplicate">Duplicate Workflow</h1>
+      <h1 *ngIf="isExport">Export Workflow</h1>
+      <button *ngIf="isExport" mat-stroked-button color="primary" (click)="onDownloadWorkflow()">
+        Download
+      </button>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onClosePanel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div>
+      <div
+        fxLayout="row"
+        fxLayoutGap="4px"
+        fxLayoutAlign="start center"
+        class="mb-1"
+      >
+        <div class="fw-bold">Name</div>
+        <div>
+          <mat-icon
+            class="material-symbols-outlined global-info-icon"
+            matTooltip="The name of the workflow."
+            >info</mat-icon
+          >
+        </div>
+      </div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          id="name"
+          name="newWorkflowName"
+          required
+          [(ngModel)]="newWorkflowSessionName"
+          placeholder="Enter name"
+          (ngModelChange)="validate()"
+        />
+        <mat-error *ngIf="workflowSessionNameError">
+          {{ workflowSessionNameError }}
+        </mat-error>
+      </mat-form-field>
+      <mat-error *ngIf="workflowSessionNameExistsError">
+        {{ workflowSessionNameExistsError }}
+      </mat-error>
+    </div>
+    <div *ngIf="isExport">
+      <div
+        fxLayout="row"
+        fxLayoutGap="4px"
+        fxLayoutAlign="start center"
+        class="mb-1"
+      >
+        <div class="fw-bold">Project</div>
+        <div>
+          <mat-icon
+            class="material-symbols-outlined global-info-icon"
+            matTooltip="Select the project to export the workflow."
+            >info</mat-icon
+          >
+        </div>
+      </div>
+      <mat-form-field appearance="outline">
+        <mat-select [(ngModel)]="selectedProject" placeholder="Select Project" required>
+          <mat-option *ngFor="let project of projects" [value]="project">{{ project.project_name }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="!selectedProject">Please select a project for export</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <div
+        fxLayout="row"
+        fxLayoutGap="4px"
+        fxLayoutAlign="start center"
+        class="mb-1"
+      >
+        <div class="fw-bold">Description</div>
+        <div>
+          <mat-icon
+            class="material-symbols-outlined global-info-icon"
+            matTooltip="The description of the workflow."
+            >info</mat-icon
+          >
+        </div>
+      </div>
+      <ng-container *ngIf="workflowSessionOwnerError">
+        <div class="text-red">{{ workflowSessionOwnerError }}</div>
+      </ng-container>
+      <mat-form-field appearance="outline">
+        <textarea
+          matInput
+          rows="5"
+          required
+          [(ngModel)]="newWorkflowSessionDescription"
+          placeholder="Enter description"
+          (ngModelChange)="validate()"
+        ></textarea>
+        <mat-error *ngIf="workflowSessionDescriptionError">
+          {{ workflowSessionDescriptionError }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div *ngIf="isCpwOldWidget">
+      <div
+        fxLayout="row"
+        fxLayoutGap="4px"
+        fxLayoutAlign="start center"
+        class="mb-1"
+      >
+        <section>
+          <mat-checkbox (change)="cpwCheckUpdate($event.checked)">Click on this checkbox to proceed. This workflow contains older versions of CPW widgets; newer versions will be auto-selected. Click if you still want to continue.</mat-checkbox>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 pt-0"
+  >
+    <div>
+      <ng-container *ngIf="isCreatingWorkflowSession">
+        <mat-spinner diameter="24"></mat-spinner>
+      </ng-container>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+      <button
+        mat-stroked-button
+        color="primary"
+        id="closeButton"
+        [disabled]="isCreatingWorkflowSession"
+        (click)="onClosePanel()"
+      >
+        Cancel
+      </button>
+      <button
+        *ngIf="!isDuplicate && !isExport"
+        mat-flat-button
+        color="primary"
+        id="createButton"
+        [disabled]="disableSubmit"
+        (click)="onCreateWorkflowSession()"
+      >
+        Create
+      </button>
+      <button
+        *ngIf="isDuplicate"
+        mat-flat-button
+        color="primary"
+        id="duplicateButton"
+        [disabled]="disableSubmit"
+        (click)="onDuplicateWorkflow()"
+      >
+        Duplicate
+      </button>
+      <button
+        *ngIf="isExport && !isCpwOldWidget"
+        mat-flat-button
+        color="primary"
+        id="exportButton"
+        [disabled]="disableSubmit || !selectedProject || !newWorkflowSessionName || !newWorkflowSessionDescription"
+        (click)="onExportWorkflow()"
+      >
+        Export
+      </button>
+      <button
+        *ngIf="isCpwOldWidget"
+        mat-flat-button
+        color="primary"
+        id="exportButton"
+        [disabled]="disableSubmit || !selectedProject || !newWorkflowSessionName || !newWorkflowSessionDescription || !isCpwCheck"
+        (click)="onExportWorkflow()"
+      >
+        Export
+      </button>
+    </div>
+  </div>
+</div>

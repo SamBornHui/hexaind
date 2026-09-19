@@ -1,0 +1,108 @@
+<div *ngIf="workflowCanvasService.IsViewingRunMode" fxLayout="column" fxLayoutGap="16px" class="p-6">
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <span class="fw-bold text-primary">Widget Name: </span>
+      <span class="label-value">{{ getWidgetName() }}</span>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <span class="fw-bold text-primary">Widget Status: </span>
+      <span *ngIf="getWidgetStatus() === 'FAILED'" class="text-red">{{
+        getWidgetStatus()
+        }}</span>
+      <span class="label-status" *ngIf="getWidgetStatus() !== 'FAILED'">{{
+        getWidgetStatus()
+        }}</span>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <span class="fw-bold text-primary">Workflow Status: </span>
+      <span *ngIf="getWorkflowRunStatus() === 'FAILED'" class="text-red">{{
+        getWorkflowRunStatus()
+        }}</span>
+      <span *ngIf="getWorkflowRunStatus() !== 'FAILED'">{{
+        getWorkflowRunStatus()
+        }}</span>
+    </div>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <!-- Label on the Left -->
+    <div fxFlex="25" class="fw-bold text-primary">
+      Widget Progress:
+    </div>
+  
+    <!-- Progress Bar on the Right -->
+    <div fxFlex="50">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="(getWidgetProgressStatus().current_cell / getWidgetProgressStatus().total_cells) * 100">
+      </mat-progress-bar>
+  
+      <!-- Display Current and Total Cells -->
+      <div class="fw-bold text-center mt-2">
+        Progress: {{ getWidgetProgressStatus().current_cell }} / {{ getWidgetProgressStatus().total_cells }}
+      </div>
+    </div>
+  </div>
+  
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <span class="fw-bold text-primary">Run Results: </span>
+      <span class="label-value">
+        {{ getIndividualWidgetRunResults() }}
+        <a href="javascript:void(0)" *ngIf="isZipPath(getIndividualWidgetRunResults())" matTooltip="Download run results data" (click)="onDownloadZip(getIndividualWidgetRunResults())">
+          <mat-icon *ngIf="!isDownloading" class="material-symbols-outlined">download</mat-icon>
+          <mat-spinner class="spinner-label" diameter="16" *ngIf="isDownloading"></mat-spinner>
+        </a>
+      </span>
+    </div>
+  </div>
+
+  <div fxLayout="row" fxLayoutGap="16px" class="activity-log">
+    <div fxFlex>
+      <span class="fw-bold text-primary">Activity Log:</span>
+      <button (click)="toggleDisplay()" class="arrow-button">
+        <span class="material-icons">
+          {{ isExpanded ? "expand_less" : "expand_more" }}
+        </span>
+      </button>
+    </div>
+  </div>
+  <div *ngIf="isExpanded" class="scrollable-text-field">
+    <!-- Your scrollable content here -->
+    <table mat-table [dataSource]="dataSource">
+      <!-- Time Column -->
+      <ng-container matColumnDef="Time">
+        <th mat-header-cell *matHeaderCellDef>Time</th>
+        <td mat-cell *matCellDef="let row">{{ toFriendlyTime(row.time) }}</td>
+      </ng-container>
+
+      <!-- Log Level Column -->
+      <ng-container matColumnDef="Log Level">
+        <th mat-header-cell *matHeaderCellDef>Log Level</th>
+        <td mat-cell *matCellDef="let row">{{ row.log_level }}</td>
+      </ng-container>
+
+      <!-- Exception Info Column -->
+      <ng-container matColumnDef="exc_info">
+        <th mat-header-cell *matHeaderCellDef>Exception Info</th>
+        <td mat-cell *matCellDef="let row">{{ row.exc_info }}</td>
+      </ng-container>
+
+      <!-- Message Column -->
+      <ng-container matColumnDef="Message">
+        <th mat-header-cell *matHeaderCellDef>Message</th>
+        <td mat-cell *matCellDef="let row">{{ row.message }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+    <button [disabled]="!moreLogs" mat-button color="primary" (click)="loadMoreLogs()">
+      Load more
+    </button>
+  </div>
+</div>

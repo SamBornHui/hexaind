@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  height: 100%;
+  gap: 24px;
+  padding: 24px;
+  background-color: #fff;
+}
+
+.mst-dashboard-editor {
+  &__left {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    &.hidden {
+      display: none;
+    }
+    &__header {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    &__list {
+      flex: 1;
+      min-height: 0;
+    }
+  }
+  &__dashboard {
+    flex: 1;
+    min-width: 0px;
+    &.hidden {
+      display: none;
+    }
+  }
+  &__dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

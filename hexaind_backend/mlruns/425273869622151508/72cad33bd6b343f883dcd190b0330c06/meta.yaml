@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/425273869622151508/72cad33bd6b343f883dcd190b0330c06/artifacts
+end_time: 1752683786278
+entry_point_name: ''
+experiment_id: '425273869622151508'
+lifecycle_stage: active
+run_id: 72cad33bd6b343f883dcd190b0330c06
+run_name: funny-boar-777
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752683778917
+status: 3
+tags: []
+user_id: muhammadumersohailkhan

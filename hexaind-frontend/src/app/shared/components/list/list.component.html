@@ -1,0 +1,44 @@
+<div
+  class="mst-list__container"
+  mstVirtualScroll
+  #virtualScroll
+  [pageTemplate]="page"
+  [items]="items"
+  [hasMore]="hasMore"
+  [emptyMessage]="emptyMessage"
+  (loadMore)="onLoadMore($event)"
+>
+  <ng-template #page let-startIndex="startIndex">
+    <ul class="mst-list__ul">
+      <li
+        *ngFor="
+          let item of items | slice: startIndex : startIndex + 50;
+          let i = index
+        "
+        class="mst-list__li"
+        [attr.data-index]="startIndex + i"
+        (click)="onItemClick(item, startIndex + i)"
+      >
+        <mst-list-item
+          [index]="startIndex + i"
+          [template]="itemTemplate"
+          [item]="item"
+          [style]="item['style'] || ''"
+          [multiSelect]="multiSelect"
+          [selected]="selectedIdSet.has(item.id)"
+          [selectedItemHighlight]="selectedItemHighlight"
+          [draggable]="draggable || item['draggable']"
+          [class]="listItemClassName"
+          [iconNames]="iconNames || item['iconNames']"
+          [rightIconNames]="rightIconNames || item['rightIconNames']"
+          [keepBottomBorder]="keepBottomBorder"
+          [class.last-item]="items.length === startIndex + i + 1"
+          [class.first-item]="startIndex + i === 0"
+          (iconClick)="onIconClick($event)"
+          (itemDragStart)="onItemDragStart($event)"
+          (itemDragEnd)="onItemDragEnd($event)"
+        />
+      </li>
+    </ul>
+  </ng-template>
+</div>

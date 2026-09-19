@@ -1,0 +1,282 @@
+<mat-tab-group mat-stretch-tabs="false" class="w-100 h-100">
+    <mat-tab label="Attributes">
+        <div class="pt-4 h-100 overflow-hidden" fxLayout="column" fxLayoutGap="16px">
+            <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+                <div fxFlex>
+                    <mat-form-field appearance="outline" style="max-width: 300px;">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput placeholder="Search" />
+                    </mat-form-field>
+                </div>
+                <div fxFlex class="text-end">
+                    <button mat-flat-button color="primary" *ngIf="!attributeForm" (click)="addAttribute()">
+                        <mat-icon>add</mat-icon> Add
+                    </button>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" *ngIf="attributeForm">
+                        <div fxFlex>
+                            <mat-form-field appearance="outline">
+                                <input matInput placeholder="Enter key" />
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex>
+                            <mat-form-field appearance="outline">
+                                <input matInput placeholder="Enter value" />
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="none">
+                            <button mat-icon-button (click)="addAttribute()">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </div>
+                        <div fxFlex="none">
+                            <button mat-icon-button>
+                                <mat-icon>check</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div fxFlex fxLayout="row" fxLayoutGap="24px">
+                <div fxFlex fxLayout="column" class="global-list selectable">
+                    <div fxFlex="none" class="header">Name</div>
+                    <div fxFlex class="y-auto">
+                        <div class="row active">Dataset 1.1</div>
+                        <div class="row">Dataset 1.2</div>
+                        <div class="row">Dataset 1.3</div>
+                        <div class="row">Dataset 1.4</div>
+                        <div class="row">Dataset 1.5</div>
+                        <div class="row">Dataset 1.6</div>
+                        <div class="row">Dataset 1.7</div>
+                        <div class="row">Dataset 1.8</div>
+                        <div class="row">Dataset 1.9</div>
+                    </div>
+                </div>
+                <div fxFlex fxLayout="column" class="global-list">
+                    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" class="header">
+                        <div fxFlex>Attribute key</div>
+                        <div fxFlex>Value</div>
+                    </div>
+                    <div fxFlex class="y-auto">
+                        <div class="row" fxLayout="row" fxLayoutGap="8px">
+                            <div fxFlex>Data source</div>
+                            <div fxFlex>Local drive</div>
+                        </div>
+                        <div class="row" fxLayout="row" fxLayoutGap="8px">
+                            <div fxFlex>File format</div>
+                            <div fxFlex>JPG</div>
+                        </div>
+                        <div class="row" fxLayout="row" fxLayoutGap="8px">
+                            <div fxFlex>File size</div>
+                            <div fxFlex>245 KB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center">
+                <button mat-flat-button color="primary">Save</button>
+            </div>
+        </div>
+    </mat-tab>
+    <mat-tab label="Metadata">
+        <div class="pt-4 h-100 overflow-hidden" fxLayout="column" fxLayoutGap="16px">
+            <div fxFlex="none" class="border-bottom pb-4">
+                <div class="fw-bold pb-2">Sample definition</div>
+                <div style="max-width: 300px;">
+                    <mat-form-field appearance="outline" color="primary">
+                        <mat-select value="None" [(value)]="selectedMetadataOption">
+                            <mat-option value="None">None (Default)</mat-option>
+                            <mat-option value="Automatic">Automatic</mat-option>
+                            <mat-option value="Manually">Manually</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div fxFlex>
+                <div fxFlex *ngIf="selectedMetadataOption === 'None'">
+                    <div class="centered-info-message">No sample defined</div>
+                </div>
+                <div fxFlex fxLayout="column" *ngIf="selectedMetadataOption === 'Automatic'">
+                    <div fxFlex="none" class="fw-bold pb-1">Sample list (0)</div>
+                    <div fxFlex fxLayout="column" class="global-list">
+                        <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" class="header">
+                            <div fxFlex>Folder name</div>
+                            <div fxFlex>Sample name</div>
+                        </div>
+                        <div fxFlex class="y-auto">
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.1</div>
+                                <div fxFlex>Dataset 1.1</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.2</div>
+                                <div fxFlex>Dataset 1.2</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.4</div>
+                                <div fxFlex>Dataset 1.4</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.5</div>
+                                <div fxFlex>Dataset 1.5</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.6</div>
+                                <div fxFlex>Dataset 1.6</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.7</div>
+                                <div fxFlex>Dataset 1.7</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.8</div>
+                                <div fxFlex>Dataset 1.8</div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.9</div>
+                                <div fxFlex>Dataset 1.9</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div fxFlex fxLayout="column" *ngIf="selectedMetadataOption === 'Manually'">
+                    <div fxFlex="none" class="fw-bold pb-1">Sample list (0)</div>
+                    <div fxFlex fxLayout="column" class="global-list">
+                        <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" class="header">
+                            <div fxFlex>Folder name</div>
+                            <div fxFlex>Sample name</div>
+                        </div>
+                        <div fxFlex class="y-auto">
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.1</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.2</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.4</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.5</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.6</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.7</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.8</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row" fxLayout="row" fxLayoutGap="8px">
+                                <div fxFlex>Dataset 1.9</div>
+                                <div fxFlex>
+                                    <mat-form-field appearance="outline">
+                                        <input matInput placeholder="Enter value" value="None (Default)"
+                                            [matAutocomplete]="autoSample" />
+                                        <mat-icon matSuffix>search</mat-icon>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center">
+                <button mat-flat-button color="primary">Save</button>
+            </div>
+        </div>
+    </mat-tab>
+    <mat-tab label="History">
+        <div class="pt-4 h-100 overflow-hidden" fxLayout="column">
+            <div fxFlex fxLayout="column" class="global-list">
+                <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" class="header">
+                    <div fxFlex>Action</div>
+                    <div fxFlex>User</div>
+                    <div fxFlex="180px">Date</div>
+                </div>
+                <div fxFlex class="y-auto">
+                    <div class="row" fxLayout="row" fxLayoutGap="8px">
+                        <div fxFlex>Created</div>
+                        <div fxFlex>Srikanth Kasam</div>
+                        <div fxFlex="180px">May 27, 2024 11:00 AM</div>
+                    </div>
+                    <div class="row" fxLayout="row" fxLayoutGap="8px">
+                        <div fxFlex>Details</div>
+                        <div fxFlex>George T</div>
+                        <div fxFlex="180px">Jun 01, 2024 11:00 AM</div>
+                    </div>
+                    <div class="row" fxLayout="row" fxLayoutGap="8px">
+                        <div fxFlex>Cleanup</div>
+                        <div fxFlex>George T</div>
+                        <div fxFlex="180px">Jun 01, 2024 11:00 AM</div>
+                    </div>
+                    <div class="row" fxLayout="row" fxLayoutGap="8px">
+                        <div fxFlex>Segment</div>
+                        <div fxFlex>George T</div>
+                        <div fxFlex="180px">Jun 01, 2024 11:00 AM</div>
+                    </div>
+                    <div class="row" fxLayout="row" fxLayoutGap="8px">
+                        <div fxFlex>Annotate</div>
+                        <div fxFlex>George T</div>
+                        <div fxFlex="180px">Jun 01, 2024 11:00 AM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-tab>
+</mat-tab-group>
+
+<mat-autocomplete #autoSample="matAutocomplete">
+    <mat-option value="Option 1">Option 1</mat-option>
+    <mat-option value="Option 2">Option 2</mat-option>
+    <mat-option value="Option 3">Option 3</mat-option>
+</mat-autocomplete>

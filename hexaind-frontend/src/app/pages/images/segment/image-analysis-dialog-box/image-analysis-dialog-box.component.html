@@ -1,0 +1,24 @@
+<div fxLayout="column">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom"
+    *ngIf="dialogInfo['title'] != ''">
+    <div>
+      <h1>{{ dialogInfo["title"] }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onDismiss()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="p-6" *ngIf="dialogInfo['message'] !== ''">
+    {{ dialogInfo["message"] }}
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6">
+    <button mat-stroked-button color="primary" (click)="onDismiss()">
+      {{ dialogInfo["closeBtn"] }}
+    </button>
+    <button mat-flat-button color="primary" (click)="onConfirm()">
+      {{ dialogInfo["okBtn"] }}
+    </button>
+  </div>
+</div>

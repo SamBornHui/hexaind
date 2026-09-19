@@ -1,0 +1,205 @@
+##### YAML file for Azure DevOps pipeline
+
+pool:
+  name: "Self-hosted on-prem"
+  # demands:
+  #   - Agent.Name -equals self-hosted-on-prem-agent-build
+
+variables:
+  dockerHubRegistry: "docker.io"
+  dockerRegistryServiceConnection: "Databrick Docker Hub Connection"
+  ACRserviceconnection: "ACR - Service Principle"
+  acrRegistry: "hexaind3.azurecr.io"
+  imageName: "databrick/hexaind-frontend"
+  dockerfilePath: "./Dockerfile"
+  fullDate: $[format('{0:MMdd}', pipeline.startTime)]
+  teamsWebhookUrl: $(SECRET_TEAMS_WEBHOOK_URL)
+
+jobs:
+  - job: build_image_on_PR
+    displayName: verifying building images
+    condition: |
+      and(
+        eq(variables['Build.Reason'], 'PullRequest'),
+        eq(variables['System.PullRequest.TargetBranch'], 'develop')
+      )
+
+    steps:
+      - script: |
+          docker build -f $(dockerfilePath) -t $(imageName):test .
+
+  - job: BuildAndPush
+    displayName: Build and push image
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+    steps:
+      # - task: WhiteSource@21
+      #   inputs:
+      #     cwd: '$(System.DefaultWorkingDirectory)'
+      #   continueOnError: true
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: "ACR - Service Principle"
+          command: "login"
+        displayName: ACR Login
+
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo "$(majorVersion).$(fullDate).$commitId" > latest_image_tag.txt
+          echo $commitId
+          docker build -f $(dockerfilePath) -t $(imageName):develop -t $(imageName):$(majorVersion).$(fullDate).$commitId -t $(acrRegistry)/$(imageName):develop .
+          docker push $(imageName):develop
+          docker push $(imageName):$(majorVersion).$(fullDate).$commitId
+          docker push $(acrRegistry)/$(imageName):develop
+        displayName: "Build & Push Docker image to ACR and Docker Hub"
+
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifacts
+        inputs:
+          pathToPublish: "latest_image_tag.txt"
+          artifactName: "drop"
+          publishLocation: "Container"
+
+  # Staging build
+
+  - job: BuildAndPushStaging
+    displayName: Build and push image
+    condition: contains(variables['Build.SourceBranch'], 'refs/heads/release')
+    steps:
+      # - task: WhiteSource@21
+      #   inputs:
+      #     cwd: '$(System.DefaultWorkingDirectory)'
+      #   continueOnError: true
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: "ACR - Service Principle"
+          command: "login"
+        displayName: ACR Login
+
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo "$(majorVersion).$(fullDate).$commitId" > latest_image_tag.txt
+          echo $commitId
+          docker build -f $(dockerfilePath) -t $(imageName):$(majorVersion).$(minorVersion).$(fullDate) -t $(acrRegistry)/$(imageName):$(majorVersion).$(minorVersion).$(fullDate) .
+          docker push $(imageName):$(majorVersion).$(minorVersion).$(fullDate)
+          docker push $(acrRegistry)/$(imageName):$(majorVersion).$(minorVersion).$(fullDate)
+        displayName: "Build & Push Docker image to ACR and Docker Hub"
+
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifacts
+        inputs:
+          pathToPublish: "latest_image_tag.txt"
+          artifactName: "drop"
+          publishLocation: "Container"
+
+  # Production Build
+
+  - job: BuildAndPushProd
+    displayName: Build and push image
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - task: Docker@2
+        inputs:
+          command: build
+          repository: "$(imageName)"
+          Dockerfile: "$(dockerfilePath)"
+          tags: "$(majorVersion).$(minorVersion).$(fullDate)"
+        displayName: Build Docker image
+
+      - task: CmdLine@2
+        displayName: Install Trivy
+        inputs:
+          script: |
+            sudo apt-get install wget apt-transport-https gnupg lsb-release
+            wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+            echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+            sudo apt-get update
+            sudo apt-get install trivy
+            trivy -v
+
+      - task: CmdLine@2
+        displayName: "Run Trivy Scan"
+        inputs:
+          script: |
+            trivy image --severity LOW,MEDIUM,HIGH --format template --template "@contrib/junit.tpl" -o trivy-reports/junit-report-low-med-high.xml $(imageName):release.$(majorVersion).$(minorVersion).$(fullDate)
+            trivy image --severity CRITICAL --format template --template "@contrib/junit.tpl" -o trivy-reports/junit-report-critical.xml $(imageName):release.$(majorVersion).$(minorVersion).$(fullDate)
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: "JUnit"
+          testResultsFiles: "trivy-reports/junit-report-low-med-high.xml"
+          mergeTestResults: true
+          failTaskOnFailedTests: false
+          testRunTitle: "Trivy - Low, medium and high Vulnerabilities"
+        condition: "always()"
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: "JUnit"
+          testResultsFiles: "trivy-reports/junit-report-critical.xml"
+          mergeTestResults: true
+          failTaskOnFailedTests: false
+          testRunTitle: "Trivy - Critical Vulnerabilities"
+        condition: "always()"
+
+      - task: Docker@2
+        displayName: Push Docker image
+        inputs:
+          command: "push"
+          repository: "$(imageName)"
+          tags: "$(majorVersion).$(minorVersion).$(fullDate)"
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+
+      - task: Bash@3
+        inputs:
+          filePath: "contrib/trivy-notification.sh" # Path to your bash script file
+        displayName: "Send Teams Notifications for Critical Vulnerabilities"
+
+  # Micron UAT build
+
+  - job: BuildAndPushUAT
+    displayName: Build and push image
+    condition: contains(variables['Build.SourceBranch'], 'refs/heads/3.0.2421.1017')
+    steps:
+      # - task: WhiteSource@21
+      #   inputs:
+      #     cwd: '$(System.DefaultWorkingDirectory)'
+      #   continueOnError: true
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo "$(majorVersion).$(fullDate).$commitId" > latest_image_tag.txt
+          echo $commitId
+          docker build -f $(dockerfilePath) -t $(imageName):UAT.$(majorVersion).$(minorVersion).$(fullDate) .
+          docker push $(imageName):UAT.$(majorVersion).$(minorVersion).$(fullDate)
+
+        displayName: "Build & Push Docker image"
+
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifacts
+        inputs:
+          pathToPublish: "latest_image_tag.txt"
+          artifactName: "drop"
+          publishLocation: "Container"

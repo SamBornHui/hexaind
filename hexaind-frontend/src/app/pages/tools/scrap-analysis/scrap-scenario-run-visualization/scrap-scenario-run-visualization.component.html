@@ -1,0 +1,75 @@
+<div fxLayout="row" fxLayoutGap="16px" class="p-4 h-100">
+    <div fxFlex="360px" fxLayout="column" fxLayoutGap="24px" class="border-right bg-surface pe-4 h-100">
+        <div fxLayout="column" fxLayoutGap="8px" class="bg-surface rounded-2 p-4">
+            <div fxLayout="row" fxLayoutAlign="start center" class="border-bottom">
+                <div class="text-md fw-semi-bold">{{usecaseDetail.usecase_name}}</div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center" class="border-bottom">
+                <div fxFlex>
+                    <mat-form-field appearance="outline">
+                        <mat-select placeholder="Select demand for plot" [(ngModel)]="selectedDemand">                        
+                            <mat-option *ngFor="let demand of allDemands" [value]="demand" (click)="selectDefaultScenarios()">{{demand}}</mat-option>                    
+                        </mat-select>
+                    </mat-form-field>
+                </div>   
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center"  fxLayoutGap="8px">
+                <button mat-stroked-button color="primary" class="w-50" [disabled]="disablePlot()" (click)="plotVisualization()">Plot</button>
+                <mat-icon style="float: right;"
+                    matTooltip="Save Plot"
+                    class="material-symbols-outlined global-icon-button-grey" 
+                    disable="disableSave()" 
+                    (click)="savePlotConfig()"
+                    [class.disabled-icon]="disableSave()">save</mat-icon>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center" class="border-bottom">
+                <div><mat-checkbox color="primary" [(ngModel)]="baseLineSelect"></mat-checkbox></div>
+                <div class="text-md fw-semi-bold">Baseline</div>
+            </div>
+
+            <div fxLayout="row" fxLayoutAlign="start center" class="border-bottom" *ngFor="let scenario of scenarios">
+                <div><mat-checkbox color="primary" [(ngModel)]="scenario.selected" [disabled]="disableScenarioSelection(scenario)" (change)="onCheckboxChange($event, scenario)"></mat-checkbox></div>
+                <div class="text-md fw-semi-bold">{{scenario.scenario_name}}</div>
+            </div>
+        </div>
+        <div fxLayout="column" fxLayoutGap="8px" class="bg-surface rounded-2 p-4">
+            <div fxLayout="row" fxLayoutAlign="start center" class="border-bottom">
+                <div fxFlex class="text-md fw-semi-bold">Saved plots list</div>
+            </div>
+            <div fxFlex="none" class="y-auto">
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1"
+                    *ngFor="let plot of savedPlots(); let counter=index">
+                    <div fxFlex class="text-ellipse" >{{plot.alloy}}</div>
+                    
+                    <div fxFlex="none">
+                        <mat-icon 
+                            title="Download visualization" 
+                            class="material-symbols-outlined global-icon-button-grey"
+                            (click)="downloadVisualization(plot,false)"
+                        >download</mat-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div fxFlex="none" fxLayout="column" fxLayoutGap="8px" class="margin-top-auto">
+            <button mat-stroked-button color="primary" class="w-100" [disabled]="loadingPlot" (click)="downloadVisualization({},true)">Download All Results</button>
+            <div class="p-relative">
+                <button mat-stroked-button color="primary" class="w-100" [disabled]="disableDownloadAll()" (click)="goToEditScenario()">Add More Scenarios</button>
+            </div>
+        </div>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto">
+        <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="8px" class="loader-alignment" *ngIf="loadingPlot" >
+            <mat-spinner [diameter]="50"></mat-spinner>
+            <span class="seg_img_loader_msg">Loading plots...</span>
+        </div>
+        <div fxLayout="column" fxLayoutGap="8px" class="rounded-2 p-4" *ngIf="plotResults.length>0">            
+            <div fxLayout="row" fxLayoutAlign="start center" class="margin-fifty">
+                <div fxFlex #visualization0 id="visualization0"></div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <div fxFlex #visualization1 id="visualization1"></div>
+            </div>
+        </div>
+    </div>
+</div>

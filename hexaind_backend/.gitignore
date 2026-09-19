@@ -1,0 +1,19 @@
+# Compiled Python bytecode
+*.py[cod]
+
+# Python Egg Files
+*.egg-info/
+
+# Log files
+*.log
+
+#random fodlers
+mongodb/
+tmp-data/
+filebeat_ingest_data/
+airflow/
+
+thermocalc-overrides.env
+.vscode/
+.idea/
+.venv/

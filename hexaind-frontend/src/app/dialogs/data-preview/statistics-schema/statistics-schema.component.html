@@ -1,0 +1,128 @@
+<div fxLayout="column" fxLayoutAlign="center center" flex class="h-100" fxLayoutGap="20px" *ngIf="isLoading">
+  <mat-spinner diameter="24"></mat-spinner>
+  <div style="font-size: large; font-weight: 500;">
+    Processing the dataset for statistics
+  </div>
+</div>
+
+<div class="py-4 h-100 y-auto" fxLayout="column" fxLayoutGap="16px" *ngIf="!isLoading">
+  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center">
+    <div fxLayout="row" fxLayoutGap="8px">
+      <div fxFlex="none" class="bg-surface py-1 px-2 rounded-1">
+        Total columns: <span class="fw-bold">{{totalColumns}}</span>
+      </div>
+      <div fxFlex="none" class="bg-surface py-1 px-2 rounded-1">
+        Total rows: <span class="fw-bold">{{totalRows}}</span>
+      </div>
+    </div>
+    <div div fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="end center">
+      <mat-slide-toggle [(ngModel)]="isScientificNotationEnabled" color="primary" fxFlex="None" style="min-width: 150px;">
+        Scientific Notation
+      </mat-slide-toggle>
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search columns" (input)="applyFilter($event)" />
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="y-auto h-20 error-text" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center" *ngIf="!isNumericalLoading && isNumericalError">
+    Unable to fetch numerical statistics at the moment
+  </div>
+
+  <div fxFlex fxLayout="column" *ngIf="isNumericalLoading || isNumericalError || totalNumericalCols > 0">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="heading"
+      (click)="toggleTable('numerical')">
+      <mat-icon>{{
+        isNumericalExpanded
+        ? "arrow_drop_down"
+        : "arrow_right"
+        }}</mat-icon>
+      <div class="title">Numerical statistics & schema</div>
+      <div class="bg-surface p-1 px-2 rounded-1">
+        Columns: <span class="fw-bold">{{filteredNumericalDataSource.length}}</span>
+      </div>
+      <mat-paginator [length]="totalNumericalCols" [pageSize]="numericalPageSize" [pageIndex]="numericalPage-1" [pageSizeOptions]="[]"
+        (page)="onNumericalPageChange($event)" (click)="$event.stopPropagation()">
+      </mat-paginator>
+      <!-- <div class="bg-surface p-1 px-2 rounded-1">
+        Rows: <span class="fw-bold">{{filteredNumericalDataSource.length}}</span>
+      </div> -->
+    </div>
+    <div class="y-auto py-4 h-20" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center" *ngIf="isNumericalLoading && !isNumericalError">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
+    <div fxFlex class="y-auto">
+      <table *ngIf="!isNumericalLoading && !isNumericalError && filteredNumericalDataSource.length > 0 && isNumericalExpanded" mat-table [dataSource]="filteredNumericalDataSource">
+        <ng-container *ngFor="let column of numericalDisplayedColumns; let i = index" [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef [class.border-right]="i === 0" [class.border-left]="i === 4"> {{column |
+            titlecase}} </th>
+          <ng-container *matCellDef="let element">
+            <td mat-cell [class.border-right]="i === 0" [class.border-left]="i === 4"
+              *ngIf="!excludedColumns.includes(element['Column Name'])">
+              <span *ngIf="column !== 'count' && column !== 'missing'; else noPipe"
+                [innerHTML]="element[column] | scientificNumber:isScientificNotationEnabled"></span>
+              <ng-template #noPipe>
+                <span [innerHTML]="element[column]"></span>
+              </ng-template>
+            </td>
+          </ng-container>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="numericalDisplayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: numericalDisplayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+
+
+  <div class="y-auto h-20 error-text" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center" *ngIf="!isCategoricalLoading && isCategoricalError">
+    Unable to fetch categorical statistics at the moment
+  </div>
+
+  <div fxFlex fxLayout="column" *ngIf="isCategoricalLoading || isCategoricalError || totalCategoricalCols > 0">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="heading"
+      (click)="toggleTable('categorical')">
+      <mat-icon>{{
+        isCategoricalExpanded
+        ? "arrow_drop_down"
+        : "arrow_right"
+        }}</mat-icon>
+      <div class="title">Categorical statistics & schema</div>
+      <div class="bg-surface p-1 px-2 rounded-1">
+        Columns: <span class="fw-bold">{{filteredCategoricalDataSource.length}}</span>
+      </div>
+      <mat-paginator [length]="totalCategoricalCols" [pageSize]="categoricalPageSize" [pageIndex]="categoricalPage-1" [pageSizeOptions]="[]"
+        (page)="onCategoricalPageChange($event)" (click)="$event.stopPropagation()">
+      </mat-paginator>
+      <!-- <div class="bg-surface p-1 px-2 rounded-1">
+        Rows: <span class="fw-bold">{{filteredCategoricalDataSource.length}}</span>
+      </div> -->
+    </div>
+
+    <div class="y-auto py-4 h-20" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center" *ngIf="isCategoricalLoading && !isCategoricalError">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
+
+    <div fxFlex class="y-auto">
+      <table *ngIf="!isCategoricalLoading && !isCategoricalError && filteredCategoricalDataSource.length > 0 && isCategoricalExpanded" mat-table [dataSource]="filteredCategoricalDataSource">
+
+        <ng-container *ngFor="let column of categoricalDisplayedColumns; let i = index" [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef [class.border-right]="i === 0" [class.border-left]="i === 4"> {{column |
+            titlecase}} </th>
+          <ng-container *matCellDef="let element">
+            <!-- <ng-container> -->
+            <td mat-cell [class.border-right]="i === 0" [class.border-left]="i === 4"
+              *ngIf="!excludedColumns.includes(element['Column Name'])">
+              {{ element[column] | scientificNumber }}
+            </td>
+            <!-- </ng-container> -->
+          </ng-container>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="categoricalDisplayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: categoricalDisplayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+</div>

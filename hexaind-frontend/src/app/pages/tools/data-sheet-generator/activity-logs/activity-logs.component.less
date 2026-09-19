@@ -1,0 +1,79 @@
+.ftn-container {
+    height: 100vh;
+    /* Full viewport height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent body scrolling */
+}
+
+.header {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--stroke-lite);
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+
+    .title {
+        font-size: 24px;
+        font-weight: 500;
+    }
+}
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chip-block {
+    display: inline-block;
+    background-color: var(--white);
+    padding: 8px;
+    margin: 4px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.log-details-table {
+    background-color: var(--white);
+    border: 1px solid var(--stroke-lite);
+
+    &.sticky {
+        max-height: 400px;
+        overflow-y: auto;
+        position: relative;
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: var(--white);
+            z-index: 1;
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid var(--stroke-lite);
+        padding: 8px;
+        text-align: left;
+    }
+
+    thead th {
+        font-weight: 500;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: var(--secondary-surface);
+    }
+}

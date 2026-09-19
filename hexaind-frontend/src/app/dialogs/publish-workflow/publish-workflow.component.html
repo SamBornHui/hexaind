@@ -1,0 +1,84 @@
+<div class="dialog-overlay h-100 p-8">
+  <div class="dialog">
+    <div fxLayout="column">
+      <div
+        fxFlex="none"
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        class="border-bottom"
+      >
+        <div>
+          <h1 *ngIf="!isDuplicate">Publish Workflow</h1>
+          <h1 *ngIf="isDuplicate">Duplicate Workflow</h1>
+        </div>
+        <div>
+          <button mat-icon-button (click)="onClosePanel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="pt-7" fxLayout="column" fxLayoutGap="16px">
+      <form #workflowForm="ngForm" class="pt-7" fxLayout="column" fxLayoutGap="16px">
+        <div>
+          <div class="fw-bold mb-1">Name</div>
+          <mat-form-field appearance="outline" class="full-width" [class.error-field]="nameControl.invalid && (nameControl.touched || workflowForm.submitted)">
+            <input
+              matInput
+              id="name"
+              name="name"
+              required
+              [(ngModel)]="name"
+              #nameControl="ngModel"
+              placeholder="Enter name"
+            />
+            <mat-error *ngIf="nameControl.invalid && nameControl.touched">Name is required.</mat-error>
+          </mat-form-field>
+        </div>
+        
+        <!-- Description Field -->
+        <div>
+          <div class="fw-bold mb-1">Description</div>
+          <mat-form-field appearance="outline" class="full-width" [ngClass]="{ 'error-field': descriptionControl.invalid && (descriptionControl.touched || workflowForm.submitted)}">
+            <input
+              matInput
+              id="description"
+              name="description"
+              required
+              [(ngModel)]="description"
+              #descriptionControl="ngModel"
+              placeholder="Enter description"
+            />
+            <mat-error *ngIf="descriptionControl.invalid && descriptionControl.touched">Description is required.</mat-error>
+          </mat-form-field>
+        </div>
+        
+        <!-- Version Field -->
+        <div>
+          <div class="fw-bold mb-1">Version</div>
+          <mat-form-field appearance="outline" class="full-width" [ngClass]="{ 'error-field': versionControl.invalid && (versionControl.touched || workflowForm.submitted) }">
+            <input
+              matInput
+              id="version"
+              name="version"
+              required
+              [(ngModel)]="version"
+              #versionControl="ngModel"
+              placeholder="Enter version"
+            />
+            <mat-error *ngIf="versionControl.invalid && versionControl.touched">Version is required.</mat-error>
+          </mat-form-field>
+        </div>
+      </form>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <button mat-stroked-button color="primary" (click)="onClosePanel()">
+        Cancel
+      </button>
+      <button mat-flat-button color="primary" (click)="onPublishWorkflow(workflowForm)">
+        <span *ngIf="!isDuplicate">Publish</span>
+        <span *ngIf="isDuplicate">Duplicate</span>
+      </button>
+    </div>
+  </div>
+</div>

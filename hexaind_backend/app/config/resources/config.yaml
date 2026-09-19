@@ -1,0 +1,9 @@
+root path: ../
+import path: ../Notebooks/Data import/Input
+localdb path: local_test.db
+base datasheet config: datasheet_default.yaml
+
+datasheet branches:
+  - Production
+  - Testing
+  - Development

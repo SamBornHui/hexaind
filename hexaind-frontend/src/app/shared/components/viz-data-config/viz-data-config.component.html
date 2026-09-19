@@ -1,0 +1,158 @@
+<div class="mst-viz-data-config__header">
+  <div class="mst-viz-data-config__header__fields">
+    <input
+      class="mst-viz-data-config__header__fields__name"
+      label="Name"
+      placeholder="Name"
+      [value]="nameDescription.name"
+      (change)="onNameDescriptionChange($event, 'name')"
+    />
+    <input
+      label="Description"
+      placeholder="Description"
+      [value]="nameDescription.description || ''"
+      (change)="onNameDescriptionChange($event, 'description')"
+    />
+  </div>
+  <mst-input
+    style="width: 200px"
+    type="select"
+    label="Visualization Type"
+    [value]="vizType"
+    [items]="vizItems"
+    (change)="onVizTypeChange($event)"
+  />
+  <mst-button styleName="flat" style="height: 100%" (click)="onApply()"
+    >Apply</mst-button
+  >
+  <mst-button style="height: 100%" (click)="onCancel()">Cancel</mst-button>
+  <mst-button
+    styleName="icon"
+    [iconName]="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+    (click)="onFullscreen()"
+  ></mst-button>
+</div>
+<div class="mst-viz-data-config__body">
+  <div
+    class="mst-viz-data-config__body__item mst-viz-data-config__select-columns"
+  >
+    <div class="mst-viz-data-config__body__item__select-dataset">
+      <div><b>Dataset</b></div>
+      <div
+        class="mst-viz-data-config__body__item__select-dataset__name mst-shared-truncate"
+        [title]="dataset.name"
+      >
+        {{ dataset.name }}
+      </div>
+      <mst-button
+        styleName="icon"
+        iconName="settings"
+        (click)="onSelectDatasetClick()"
+      />
+    </div>
+    <mst-select-column
+      [items]="columnItems"
+      class="mst-viz-data-config__select-columns__column"
+      (itemDragStart)="onItemDragStart('column')"
+      (itemDragEnd)="onItemDragEnd()"
+    />
+    <mst-select-column
+      *ngIf="metricColumnItems.length > 0"
+      [hideSearch]="true"
+      title="Metric Columns"
+      [items]="metricColumnItems"
+      (itemDragStart)="onItemDragStart('metric')"
+      (itemDragEnd)="onItemDragEnd()"
+    />
+  </div>
+  <div class="mst-viz-data-config__body__item mst-viz-data-config__config">
+    <mst-select-label-data-columns
+      *ngIf="['bar', 'line', 'pie', 'boxplot'].includes(vizType)"
+      [droppable]="
+        !dragItemType ||
+        (hasMetrics && dragItemType === 'metric') ||
+        !hasMetrics
+      "
+      [columnItems]="hasMetrics ? metricColumnItems : columnItems"
+      [item]="labelDataColumns"
+      (change)="onLabelDataColumnsChange($event)"
+    />
+    <mst-select-bubble-columns
+      *ngIf="vizType === 'scatter'"
+      [droppable]="
+        !dragItemType ||
+        (hasMetrics && dragItemType === 'metric') ||
+        !hasMetrics
+      "
+      [columnItems]="hasMetrics ? metricColumnItems : columnItems"
+      [items]="labelBubbleColumns"
+      (change)="onLabelBubbleColumnChange($event)"
+    />
+    <mst-select-conditional-cell-styles
+      *ngIf="vizType === 'table'"
+      [droppable]="
+        !dragItemType ||
+        (hasMetrics && dragItemType === 'metric') ||
+        !hasMetrics
+      "
+      [columnItems]="hasMetrics ? metricColumnItems : columnItems"
+      [items]="cellStyleColumns"
+      (change)="onCellStyleColumnChange($event)"
+    />
+    <mst-select-metrics
+      [droppable]="!dragItemType || dragItemType === 'column'"
+      [columnItems]="columnItems"
+      [items]="metrics"
+      [dimensions]="dimensions"
+      (dimensionsChange)="onDimensionsChange($event)"
+      (change)="onMetricsChange($event)"
+    />
+    <mst-select-filter-columns
+      [columnItems]="columnItems.concat(metricColumnItems)"
+      [items]="filters"
+      (change)="onFilterColumnChange($event)"
+    />
+    <mst-select-sort-column
+      [columnItems]="columnItems.concat(metricColumnItems)"
+      [items]="sorts"
+      (change)="onSortColumnChange($event)"
+    />
+    <mst-input
+      label="Row limit"
+      type="select"
+      [value]="rowLimit + ''"
+      [items]="rowLimitItems"
+      (change)="onRowLimitChange($event)"
+    />
+    <div class="mst-viz-data-config__config__actions">
+      <mst-button (click)="onReloadClick()">Reload Visualization</mst-button>
+    </div>
+  </div>
+  <div
+    class="mst-viz-data-config__body__item mst-viz-data-config__visualization"
+  >
+    <mst-viz-panel
+      [config]="config"
+      [data]="data"
+      (load)="onVizDataLoad($event)"
+    />
+  </div>
+</div>
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>Select Dataset</h2>
+  <mat-dialog-content class="mst-shared-dialog__content">
+    <mst-select-dataset
+      [hasMore]="hasMoreDatasets"
+      [sourceItems]="sourceItems"
+      [selectedSourceId]="selectedSourceId"
+      [items]="datasetItems"
+      (sourceChange)="onDataSourceChange($event)"
+      (loadMore)="onDataSourceLoad($event)"
+      (itemClick)="onDatasetItemClick($event)"
+    />
+  </mat-dialog-content>
+  <mat-dialog-actions class="mst-shared-dialog__actions">
+    <mst-button styleName="flat" (click)="onDatasetSelect()">Yes</mst-button>
+    <mst-button mat-dialog-close>No</mst-button>
+  </mat-dialog-actions>
+</ng-template>

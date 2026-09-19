@@ -1,0 +1,13 @@
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>Chart Options</h2>
+  <mat-dialog-content
+    ><mst-chart-options
+      [baseVizType]="baseVizType"
+      [options]="options"
+      (change)="onChange($event)"
+  /></mat-dialog-content>
+  <mat-dialog-actions class="mst-chart-options-dialog__actions">
+    <mst-button styleName="flat" (click)="onDialogAction()">Save</mst-button>
+    <mst-button mat-dialog-close>Cancel</mst-button>
+  </mat-dialog-actions>
+</ng-template>

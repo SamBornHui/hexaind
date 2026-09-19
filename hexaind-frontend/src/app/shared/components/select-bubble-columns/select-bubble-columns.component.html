@@ -1,0 +1,50 @@
+<mst-drop-list
+  [droppable]="droppable"
+  [items]="xItems"
+  name="Point X Columns"
+  placeholder="Drop point x columns here"
+  [rightIconNames]="[]"
+  (drop)="onDrop($event, 'x')"
+/>
+<mst-drop-list
+  [droppable]="droppable"
+  [items]="yItems"
+  name="Point Y Columns"
+  placeholder="Drop point y columns here"
+  [rightIconNames]="[]"
+  (drop)="onDrop($event, 'y')"
+/>
+<section>
+  <header><b>Point Labels</b>(click a label to edit)</header>
+  <div class="mst-select-bubble-columns__labels">
+    <div class="mst-select-bubble-columns__labels__list">
+      <ng-template #labelList let-item="item" let-index="index">
+        <div class="mst-select-bubble-columns__label">
+          <span>{{ index + 1 }}.&nbsp;</span>
+          <input
+            [style.background-color]="'transparent'"
+            [value]="item.id || '-'"
+            (change)="onLabelChange($event, index)"
+            [placeholder]="'Input point ' + (index + 1) + '\'s label'"
+          />
+        </div>
+      </ng-template>
+      <mst-list
+        [items]="labelItems"
+        [itemTemplate]="labelList"
+        [rightIconNames]="['settings', 'delete']"
+        [selectedItemHighlight]="false"
+        [keepBottomBorder]="true"
+        emptyMessage="No labels"
+        (iconClick)="onLabelListIconClick($event)"
+      />
+    </div>
+  </div>
+</section>
+<mst-chart-options-dialog
+  baseVizType="scatter"
+  [open]="optionsDialogOpen"
+  [options]="selectedItemInfo?.item?.options || {}"
+  (save)="onOptionsSave($event)"
+  (close)="onOptionsDialogClose()"
+/>

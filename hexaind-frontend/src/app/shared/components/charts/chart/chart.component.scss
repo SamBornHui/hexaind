@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+
+  .mst-chart-canvas {
+    width: 100% !important; // when the chart is in a flex container, it needs to have a width of 100% to fill the container
+    height: 100% !important;
+  }
+}

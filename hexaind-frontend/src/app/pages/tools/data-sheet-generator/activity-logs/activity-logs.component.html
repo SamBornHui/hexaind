@@ -1,0 +1,304 @@
+<div fxLayout="column" class="ftn-container">
+    <!-- Header -->
+    <div fxFlex="none" *ngIf="showMainHeader" class="header">
+        <app-header></app-header>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+            <div>
+                <button mat-icon-button class="global-back-button" (click)="navigate('data-sheet-generator')">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+            </div>
+            <div class="title">Activity Logs</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="4px">
+            <div class="border-left">
+                <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader($event)">
+                    <mat-icon class="material-symbols-outlined">{{ toggleHeaderButton }}</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div fxFlex fxLayout="column" fxLayoutAlign="start stretch" class="main-content">
+        <mat-accordion class="global-accordion" multi>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Tensile Test Data</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row" fxLayoutGap="16px">
+                    <div fxFlex>
+                        <h3 class="mb-2">Initial Fit</h3>
+                        <div class="bg-surface rounded-2 p-3">
+                            <h4>Tensile Included Files</h4>
+                            <div class="chip-block" *ngFor="let file of originalDataSheetResults.tensile_files">
+                                <span
+                                    *ngIf="!originalDataSheetResults.initial_fit_params.excluded_tensile.includes(file)">
+                                    {{ file }}
+                                </span>
+                            </div>
+                            <h4 class="mt-3">Tensile Excluded Files</h4>
+                            <div class="chip-block"
+                                *ngFor="let file of originalDataSheetResults.initial_fit_params.excluded_tensile">
+                                {{ file }}
+                            </div>
+                        </div>
+                    </div>
+                    <div fxFlex>
+                        <h3 class="mb-2">New Fit</h3>
+                        <div class="bg-surface rounded-2 p-3">
+                            <h4>Tensile Included Files</h4>
+                            <div class="chip-block" *ngFor="let file of originalDataSheetResults.tensile_files">
+                                <span *ngIf="!originalDataSheetResults.new_fit_params.excluded_tensile.includes(file)">
+                                    {{ file }}
+                                </span>
+                            </div>
+                            <h4 class="mt-3">Tensile Excluded Files</h4>
+                            <div class="chip-block"
+                                *ngFor="let file of originalDataSheetResults.new_fit_params.excluded_tensile">
+                                {{ file }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Bulge Test Data</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="row" fxLayoutGap="16px">
+                    <div fxFlex>
+                        <h3 class="mb-2">Initial Fit</h3>
+                        <div class="bg-surface rounded-2 p-3">
+                            <h4>Bulge Included Files</h4>
+                            <div class="chip-block" *ngFor="let file of originalDataSheetResults.bulge_files">
+                                <span
+                                    *ngIf="!originalDataSheetResults.initial_fit_params.excluded_bulge.includes(file)">
+                                    {{ file }}
+                                </span>
+                            </div>
+                            <h4 class="mt-3">Bulge Excluded Files</h4>
+                            <div class="chip-block"
+                                *ngFor="let file of originalDataSheetResults.initial_fit_params.excluded_bulge">
+                                {{ file }}
+                            </div>
+                        </div>
+                    </div>
+                    <div fxFlex>
+                        <h3 class="mb-2">New Fit</h3>
+                        <div class="bg-surface rounded-2 p-3">
+                            <h4>Bulge Included Files</h4>
+                            <div class="chip-block" *ngFor="let file of originalDataSheetResults.bulge_files">
+                                <span *ngIf="!originalDataSheetResults.new_fit_params.excluded_bulge.includes(file)">
+                                    {{ file }}
+                                </span>
+                            </div>
+                            <h4 class="mt-3">Bulge Excluded Files</h4>
+                            <div class="chip-block"
+                                *ngFor="let file of originalDataSheetResults.new_fit_params.excluded_bulge">
+                                {{ file }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Corrected Tensile Data</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div fxLayout="column" fxLayoutGap="16px">
+                    <div fxFlex="none">
+                        <mat-form-field appearance="outline">
+                            <mat-select placeholder="Select file" name="selectedFile" [(ngModel)]="selectedFile"
+                                (selectionChange)="onFileChange($event.value)">
+                                <mat-option *ngFor="let file of correctedTensileFiles" [value]="file">
+                                    {{ file }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="log-details-table sticky" *ngIf="displayedInitialFit || displayedNewFit">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Initial Fit</th>
+                                    <th>New Fit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let key of getKeys(displayedInitialFit || displayedNewFit)"
+                                    [hidden]="key === 'file_name' || key === 'datasheet' || key === 'nominal_age' || key === 'load_direction'">
+                                    <td>{{ key }}</td>
+                                    <td>{{ displayedInitialFit?.[key] || 'N/A' }}</td>
+                                    <td>{{ displayedNewFit?.[key] || 'N/A' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>Adjust Model Parameters</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div>
+                    <h2 class="mb-2">Model Parameters Comparison</h2>
+                    <div fxLayout="row" fxLayoutGap="16px">
+                        <div fxFlex>
+                            <h3 class="mb-2">Initial Fit</h3>
+                            <div class="bg-surface rounded-2 p-3">
+                                <!-- Gradients -->
+                                <h4 class="mb-1">Gradients</h4>
+                                <div class="log-details-table mb-4">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th width="80">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let key of getKeys(originalDataSheetResults.initial_fit_params.gradients)">
+                                                <td>{{ formatKey(key) }}</td>
+                                                <td>{{ originalDataSheetResults.initial_fit_params.gradients[key] }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Weights -->
+                                <h4 class="mb-1">Weights</h4>
+                                <div class="log-details-table mb-4">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th width="80">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let key of getKeys(originalDataSheetResults.initial_fit_params.hss_weights_object)">
+                                                <ng-container *ngIf="key !== 'scaled_residue'">
+                                                    <td>{{ formatKey(key) }}</td>
+                                                    <td>{{
+                                                        originalDataSheetResults.initial_fit_params.hss_weights_object[key]
+                                                        }}</td>
+                                                </ng-container>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Complete Parameters -->
+                                <h4 class="mb-1">Complete Parameters</h4>
+                                <div class="log-details-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Param</th>
+                                                <th
+                                                    *ngFor="let paramKey of getKeys(originalDataSheetResults.initial_fit_params.hss_complete_params.sig_i)">
+                                                    {{ paramKey.replace('param_', '') }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let entityKey of getKeys(originalDataSheetResults.initial_fit_params.hss_complete_params)">
+                                                <td>{{ entityKey }}</td>
+                                                <td
+                                                    *ngFor="let paramKey of getKeys(originalDataSheetResults.initial_fit_params.hss_complete_params.sig_i)">
+                                                    {{
+                                                    originalDataSheetResults.initial_fit_params.hss_complete_params[entityKey][paramKey]
+                                                    }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex>
+                            <h3 class="mb-2">New Fit</h3>
+                            <div class="bg-surface rounded-2 p-3">
+                                <!-- Gradients -->
+                                <h4 class="mb-1">Gradients</h4>
+                                <div class="log-details-table mb-4">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th width="80">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let key of getKeys(originalDataSheetResults.new_fit_params.gradients)">
+                                                <td>{{ formatKey(key) }}</td>
+                                                <td>{{ originalDataSheetResults.new_fit_params.gradients[key] }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Weights -->
+                                <h4 class="mb-1">Weights</h4>
+                                <div class="log-details-table mb-4">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th width="80">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let key of getKeys(originalDataSheetResults.new_fit_params.hss_weights_object)">
+                                                <ng-container *ngIf="key !== 'scaled_residue'">
+                                                    <td>{{ formatKey(key) }}</td>
+                                                    <td>{{
+                                                        originalDataSheetResults.new_fit_params.hss_weights_object[key]
+                                                        }}</td>
+                                                </ng-container>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Complete Parameters -->
+                                <h4 class="mb-1">Complete Parameters</h4>
+                                <div class="log-details-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Param</th>
+                                                <th
+                                                    *ngFor="let paramKey of getKeys(originalDataSheetResults.new_fit_params.hss_complete_params.sig_i)">
+                                                    {{ paramKey.replace('param_', '') }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let entityKey of getKeys(originalDataSheetResults.new_fit_params.hss_complete_params)">
+                                                <td>{{ entityKey }}</td>
+                                                <td
+                                                    *ngFor="let paramKey of getKeys(originalDataSheetResults.new_fit_params.hss_complete_params.sig_i)">
+                                                    {{
+                                                    originalDataSheetResults.new_fit_params.hss_complete_params[entityKey][paramKey]
+                                                    }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>

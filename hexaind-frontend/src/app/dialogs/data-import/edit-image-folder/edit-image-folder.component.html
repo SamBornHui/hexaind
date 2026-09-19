@@ -1,0 +1,94 @@
+<mat-dialog-content class="mat-typography">
+    <div
+      fxLayout="row"
+      fxLayoutGap="8px"
+      fxLayoutAlign="space-between center"
+      class="mb-2 border-bt"
+    >
+      <div class="steps">Edit Image Folder</div>
+      <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+   
+    <div fxLayout="column" fxLayoutGap="16px">
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="text-sm">Name</div>
+        <div>
+          <mat-form-field appearance="outline">
+            <input
+              matInput
+              placeholder="Enter name"
+              [(ngModel)]="name"
+              (ngModelChange)="validate()"
+            />
+          </mat-form-field>
+          <mat-error *ngIf="nameInputErrorMessage">
+            {{nameInputErrorMessage}}
+          </mat-error>
+        </div>
+      </div>
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px" *ngIf="this.data.dataset_type === 'IMAGE_DATASET'">
+        <div class="text-sm">Description</div>
+        <div>
+          <mat-form-field appearance="outline">
+            <textarea
+              matInput
+              placeholder="Enter name"
+              [(ngModel)]="description"
+            ></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign = "start center" *ngIf="data.dataset_type === 'IMAGES_FOLDER' || data.dataset_type === 'IMAGE_DATASET'">
+        <input
+          #fileInputModule
+          type="file"
+          multiple
+          accept=".csv"
+          style="display: none"
+          (change)="uploadImageMetadata($event)"
+        />
+        <button
+          mat-flat-button
+          color="primary"
+          class="upload-button-height"
+          (click)="fileInputModule.click()"
+        >
+          {{metaDataButtonMessage}}
+        </button> 
+        <div fxLayout = "row">
+          <ng-container *ngFor="let element of metaDataFiles">
+            <div class="file-name" style="padding-left: 10px;">
+              {{element.name}}
+            </div>
+            <mat-icon
+              class="clear-icon"
+              (click)="deleteMetaDataFile(element)"
+              style="cursor: pointer; padding-left: 5px;">
+              close
+            </mat-icon>
+          </ng-container>
+        </div>      
+      </div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button
+      mat-stroked-button
+      color="primary"
+      mat-dialog-close
+      (click)="cancelRequest()"
+    >
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="disableSubmit()"
+    >
+      Submit
+    </button>
+  </mat-dialog-actions>
+  

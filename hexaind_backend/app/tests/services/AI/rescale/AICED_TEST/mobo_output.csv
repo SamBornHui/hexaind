@@ -1,0 +1,2 @@
+,dcp_spacer,pp_spacer,ips_pressure,up_pressure,friction_coeff,upper_radius,lower_radius,t_value,lr_opening,catcher_depth,ips_radius,dcr_radius,dcp_radius_1,dcp_radius_2,iter_csv_path
+30,0.18,0.144,94.46726459951093,60.0,0.05,0.115853473924304,0.005101214,0.010755824,1.679,0.08830719365382717,0.6248789977392126,0.2096797043972604,0.2718692269232266,0.7138295668832685,app/tests/services/AI/rescale/AICED_TEST/trial_30/param_values.csv

@@ -1,0 +1,87 @@
+<div>
+    <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px" class="p-6 border-bottom">
+        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <div fxFlex="none">
+                <h1>{{workflow_data?.workflow_name}}</h1>
+            </div>
+        </div>
+        <div fxFlex="none">
+            <button mat-icon-button [mat-dialog-close]="true">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div class="p-6" fxLayout="column" fxLayoutGap="24px">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <div class="fw-bold text-primary">Run Status:</div>
+            <div class="text-green">{{schedule_data?.run?.run_status}}</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <div fxLayoutAlign="start center">
+                <div class="fw-bold text-primary">
+                    Trigger Time
+                </div>
+                <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+                    matTooltip="User's local time">info</mat-icon>:
+                <div>{{convertFromUTC(schedule_data?.run?.created_at) | date: "d-MMM-yyyy h:mm a"}}</div>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <div fxLayoutAlign="start center">
+                <div class="fw-bold text-primary">
+                    Run Time
+                </div>
+                <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+                    matTooltip="User's local time">info</mat-icon>:
+                <div>{{schedule_data?.total_time}}</div>
+            </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <div class="fw-bold text-primary">Workflow Name:</div>
+            <div>{{workflow_data?.workflow_name}}</div>
+        </div>
+        <div fxLayout="column" fxLayoutGap="4px" *ngIf="schedule_data?.run?.run_status == 'FAILED'">
+            <div class="fw-bold text-primary">Execption:</div>
+            <div>
+                <div>{{error_des}}</div>
+            </div>
+        </div>
+        <!-- TODO(Radha) -->
+        <!-- <div fxLayout="column" fxLayoutGap="4px">
+            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="fw-bold text-primary">
+                <div>Activity Log</div>
+                <div><mat-icon>arrow_drop_down</mat-icon></div>
+            </div>
+            <div class="p-3 rounded-2 bg-surface y-auto" style="max-height: 160px;">
+                <div></div>Status: Executing Python script
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+                <div>[07:17:42] [INFO] [dku] running
+                    recipe_from_notebook_admins_Python_notebook_on_job_postings_prepared_NP</div>
+                <div>- DSS startup: jek version:12.4.1</div>
+            </div>
+        </div> -->
+    </div>
+</div>

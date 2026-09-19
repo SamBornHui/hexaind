@@ -1,0 +1,26 @@
+[
+    {
+        "job_id": "tDiqgb",
+        "token": "9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5",
+        "output_file_path": "AICED_CUSTOM/batch_30/trial_30/tDiqgb/PerfMetricsFile.csv",
+        "trial_folder": "AICED_CUSTOM/batch_30/trial_30",
+        "test_mode": true,
+        "run_job": false,
+        "visualize_files": [],
+        "idx": "30",
+        "parameters_file": "AICED_CUSTOM/batch_30/trial_30/param_values.csv",
+        "visual_dir": null
+    },
+    {
+        "job_id": "YQpDV",
+        "token": "9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5",
+        "output_file_path": "AICED_CUSTOM/batch_30/trial_31/YQpDV/PerfMetricsFile.csv",
+        "trial_folder": "AICED_CUSTOM/batch_30/trial_31",
+        "test_mode": true,
+        "run_job": false,
+        "visualize_files": [],
+        "idx": "31",
+        "parameters_file": "AICED_CUSTOM/batch_30/trial_31/param_values.csv",
+        "visual_dir": null
+    }
+]

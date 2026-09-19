@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC2 Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #004d4d;
+            /* Green Bar */
+            color: white;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .menu {
+            display: flex;
+            gap: 40px;
+            position: relative;
+        }
+
+        .menu-item {
+            position: relative;
+            padding: 8px;
+            width: 150px;
+            cursor: pointer;
+            background-color: #006666;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .menu-item:hover {
+            background-color: #008080;
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #006666;
+            color: white;
+            width: 190px;
+            list-style: none;
+            padding: 0;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .submenu li {
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .submenu li:hover {
+            background-color: #008080;
+        }
+
+        .menu-item:hover .submenu,
+        .menu-item.active .submenu {
+            display: block;
+        }
+
+        .highlight {
+            background-color: #478dc5;
+            /* Highlight background */
+            color: #ffffff;
+            /* Change text color to white for better contrast */
+            font-weight: bold;
+            /* Make text bold */
+            /* border: 2px solid #4c82ad; */
+            /* Add a border around the highlighted text */
+            border-radius: 5px;
+            /* Rounded corners for the border */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* .highlight {
+            background-color: #84bdea;
+            font-weight: bold;
+        } */
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="menu">
+            <div style="padding-top: 10px;">Model Fanout: </div>
+            <div style="margin-right: 40px;" class="menu-item" id="fanoutMenu">
+                <span id="selectedFanout">Tables</span>
+                <i class="fas fa-chevron-down"></i>
+                <ul class="submenu">
+                    <li onclick="selectOption('Model Fanout', this)">Tables</li>
+                </ul>
+            </div>
+            <div style="padding-top: 10px;">Model Refresh: </div>
+            <div class="menu-item" id="modelRefreshMenu">
+                <span id="selectedChart">Tables</span>
+                <i class="fas fa-chevron-down"></i>
+                <ul class="submenu">
+                    <li onclick="selectOption('Model Refresh', this)">Tables</li>
+                    <li onclick="selectOption('Model Refresh', this)">CPK Bar Chart</li>
+                    <li onclick="selectOption('Model Refresh', this)">Line Charts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 100vh; width: 100vw; overflow: hidden;">
+        <object id="selectedHtml" style="height: 100%; width: 100%;" data="./ModelFanout/index.html" type="text/html"></object>
+    </div>
+
+    <script>
+        window.addEventListener("message", function(event) {
+            let message = event.data.innerText
+            let elementId = event.data.id  
+            console.log("Inside the outer html", event.data);
+            if(message == 'Model Refresh') {
+                document.getElementById('selectedHtml').data = './ModelRefreshTable/index.html'
+            }
+            if(message == 'CPK Bar Chart') {
+                document.getElementById('selectedHtml').data = './CpkBarChartModelRefresh/index.html'
+            }
+            if(message == 'Line Charts') {
+                document.getElementById('selectedHtml').data = './LineChartModelRefresh/index.html'
+            }
+            if(message == 'Model Fanout') {
+                document.getElementById('selectedHtml').data = './ModelFanout/index.html'
+            }
+            if(message == 'Tables') {
+                if(elementId == 'RefreshTable') {
+                    document.getElementById('selectedHtml').data = './ModelRefreshTable/index.html'
+                }
+                if(elementId == 'FanoutTable') {
+                    document.getElementById('selectedHtml').data = './ModelFanout/index.html'
+                }
+            }           
+        })
+        function selectOption(category, item) {
+            let value = item.textContent;
+            if (category === "Model Fanout") {
+                if (value == 'Tables') document.getElementById('selectedHtml').data = './ModelFanout/index.html'
+                document.getElementById("selectedFanout").textContent = value;
+                document.getElementById("fanoutMenu").classList.remove("active");
+                document.getElementById('selectedHtml').data = './ModelFanout/index.html'
+
+                document.getElementById("fanoutMenu").classList.add("highlight");
+                document.getElementById("modelRefreshMenu").classList.remove("highlight");
+
+            } else if (category === "Model Refresh") {
+                if (value == 'Tables') document.getElementById('selectedHtml').data = './ModelRefreshTable/index.html'
+                else if (value == 'CPK Bar Chart') document.getElementById('selectedHtml').data = './CpkBarChartModelRefresh/index.html'
+                else if (value == 'Line Charts') document.getElementById('selectedHtml').data = './LineChartModelRefresh/index.html'
+                document.getElementById("selectedChart").textContent = value;
+                document.getElementById("modelRefreshMenu").classList.remove("active");
+
+                document.getElementById("fanoutMenu").classList.remove("highlight");
+                document.getElementById("modelRefreshMenu").classList.add("highlight");
+            }
+            closeMenus();
+        }
+
+        function closeMenus() {
+            document.querySelectorAll(".menu-item").forEach(menu => {
+                menu.classList.remove("active");
+            });
+        }
+
+        document.querySelectorAll(".menu-item").forEach(menu => {
+            menu.addEventListener("mouseenter", function () {
+                menu.classList.add("active");
+            });
+            menu.addEventListener("mouseleave", function () {
+                setTimeout(() => {
+                    if (!menu.contains(document.activeElement)) {
+                        menu.classList.remove("active");
+                    }
+                }, 500);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

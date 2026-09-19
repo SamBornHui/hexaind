@@ -1,0 +1,33 @@
+:host {
+  display: inline-block;
+  width: 100%;
+}
+.mst-input {
+  &__type {
+    &--color {
+      cursor: pointer;
+    }
+  }
+  &__dialog {
+    &__title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px 0px 24px;
+    }
+    &__content {
+      padding: 8px 24px 0px 24px !important;
+    }
+    &__actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+  }
+  &__error {
+    color: var(--red);
+    font-size: 12px;
+    padding: 0 16px;
+    line-height: 22px;
+  }
+}

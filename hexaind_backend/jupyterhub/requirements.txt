@@ -1,0 +1,16 @@
+pandas
+pyarrow
+seaborn
+matplotlib
+scikit-learn
+numpy
+dask
+plotly
+ipywidgets
+scikit-image
+lightgbm
+pymongo
+opencv-python
+openpyxl
+dask[dataframe]
+dash

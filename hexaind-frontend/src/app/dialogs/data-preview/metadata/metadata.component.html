@@ -1,0 +1,91 @@
+<div class="py-4 h-100" fxLayout="column" fxLayoutGap="16px">
+    <div class="data-container">
+        <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="heading" (click)="toggleTable('general')">
+            <mat-icon>{{
+                isGeneralInfoExpanded
+                ? "arrow_drop_down"
+                : "arrow_right"
+                }}</mat-icon>
+            <div class="title">General info</div>
+        </div>
+        <div *ngIf="isGeneralInfoExpanded" fxLayout="column" fxLayoutGap="24px" class="mt-4">
+            <div fxLayout="column" fxLayoutGap="8px" *ngIf="generalData">
+                <div class="fw-bold">Name</div>
+                <div class="text-md">{{generalData.name || 'Not Defined'}}</div>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px" *ngIf="generalData">
+                <div class="fw-bold">Data source</div>
+                <div class="text-md">{{generalData.data_source || 'Not Defined'}}</div>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px" *ngIf="generalData">
+                <div class="fw-bold">Description</div>
+                <div class="text-md">{{generalData.description || 'Not Defined'}}</div>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px" *ngIf="generalData">
+                <div class="fw-bold">Dataset ID</div>
+                <div class="text-md">{{generalData.dataset_id || 'Not Defined'}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="data-container">
+        <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="heading"
+            (click)="toggleTable('dataset-history')">
+            <mat-icon>{{
+                isDatasetHistoryExpanded
+                ? "arrow_drop_down"
+                : "arrow_right"
+                }}</mat-icon>
+            <div class="title">Dataset history</div>
+        </div>
+        <div *ngIf="isDatasetHistoryExpanded">
+            <div>
+                <mat-table [dataSource]="datasetHistory">
+                    <ng-container matColumnDef="user">
+                        <mat-header-cell *matHeaderCellDef fxFlex>
+                            User
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row"> {{ row.user }} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="action">
+                        <mat-header-cell *matHeaderCellDef fxFlex>
+                            Action
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            {{ row.action }}
+                        </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="date">
+                        <mat-header-cell *matHeaderCellDef fxFlex>
+                            Date
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row"> {{ row.date }} </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="datasetHistorycolumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: datasetHistorycolumns"></mat-row>
+                </mat-table>
+            </div>
+            <div>
+                <div *ngIf="!datasetHistory || datasetHistory.length === 0" class="global-nodata">
+                    This feature is currently under development and will be available soon
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="data-container">
+        <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="heading"
+            (click)="toggleTable('curation-history')">
+            <mat-icon>{{
+                isCurationHistoryExpanded
+                ? "arrow_drop_down"
+                : "arrow_right"
+                }}</mat-icon>
+            <div class="title">Curation history</div>
+        </div>
+        <div *ngIf="isCurationHistoryExpanded" fxLayout="column" fxLayoutGap="24px" class="mt-4">
+            <div class="global-nodata">You have no curation history</div>
+        </div>
+    </div>
+</div>

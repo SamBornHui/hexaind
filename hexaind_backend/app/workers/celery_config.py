@@ -1,0 +1,7 @@
+from app.config.env_vars import celery_environment
+
+# Set up the Celery broker URL
+celery_broker_url = str(celery_environment.celery_broker_url)
+broker_connection_retry = celery_environment.broker_connection_retry
+broker_connection_max_retries = celery_environment.broker_connection_max_retries
+broker_connection_retry_delay = celery_environment.broker_connection_retry_delay

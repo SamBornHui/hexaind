@@ -1,0 +1,392 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 1</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 2</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output2" [(ngModel)]="widgetOutput2"
+                  (ngModelChange)="widgetOutput2 = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 3</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output3" [(ngModel)]="widgetOutput3"
+                  (ngModelChange)="widgetOutput3 = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="100" fxFlex.lt-lg="100">
+              <app-features-list-common (changeMade)="changeMade = $event" [numericalDataSource]="numericalDataSource"
+                [categoricalDataSource]="categoricalDataSource" [configCache]="configCache">
+              </app-features-list-common>
+              <div class="p-4">
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Evaluation metrics</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Evaluation metrics">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <mat-radio-group [(ngModel)]="selectedEvaluationMetric" (change)="storeSelectedMetric($event)">
+                      <mat-radio-button color="primary" *ngFor="let metric of evaluationMetric" [value]="metric">{{
+                        metric | replaceAndCapitalize }}</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Input scaling</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Input scaling">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <mat-radio-group [(ngModel)]="selectedScalling" (change)="storeSelectedInputScalling($event)">
+                      <mat-radio-button color="primary" *ngFor="let scaling of scalingMethods" [value]="scaling">
+                        {{ scaling }}</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Optimization method</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Optimization method">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <mat-radio-group [(ngModel)]="selectedOptimization" (change)="storeSelectedOptimization($event)">
+                      <mat-radio-button color="primary" *ngFor="let optimization of optimizationMethod"
+                        [value]="optimization">
+                        {{ optimization }}</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+
+
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Split ratio</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Split ratio">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="50px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getSplitRatio()}}" (keyup.enter)="setSplitRatio($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex>
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="100" [min]="1" [step]="1"
+                          [discrete]="true" (change)="setSplitRatio($event)">
+                          <input matSliderThumb [ngModel]="getSplitRatio()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Number of trials</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Number of trials">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="50px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getNumberOfTrials()}}" (keyup.enter)="setNumberOfTrials($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex>
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="100" [min]="1" [step]="1"
+                          [discrete]="true" (change)="setNumberOfTrials($event)">
+                          <input matSliderThumb [ngModel]="getNumberOfTrials()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">CV</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="CV">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="CV" [ngModel]="getCv()"
+                          (ngModelChange)="setCv($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Random state</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Random state">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Random state" [ngModel]="getRandomState()"
+                          (ngModelChange)="setRandomState($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2"
+                  *ngIf="isRandomSearch()">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">No of iteration</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="No of iteration">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="No of iteration" [ngModel]="getNoIteration()"
+                          (ngModelChange)="setNoIteration($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Min depth</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Min depth">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Min depth" [ngModel]="getMinDepth()"
+                          (ngModelChange)="setMinDepth($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Max depth</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Max depth">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Max depth" [ngModel]="getMaxDepth()"
+                          (ngModelChange)="setMaxDepth($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Sample number of depth</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Sample no. depth">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Sample number of depth"
+                          [ngModel]="getSampleNoDepth()" (ngModelChange)="setSampleNoDepth($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Min number of leaves</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Min number of leaves">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Min number of leaves" [ngModel]="getMinNumLeaves()"
+                          (ngModelChange)="setMinNumLeaves($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Max number of leaves</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Max number of leaves">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Max number of leaves" [ngModel]="getMaxNumLeaves()"
+                          (ngModelChange)="setMaxNumLeaves($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Sample number of leaves</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Sample no. leaves">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Sample number of leaves"
+                          [ngModel]="getSampleNoLeaves()" (ngModelChange)="setSampleNoLeaves($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Min child samples</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Min child samples">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Min child samples" [ngModel]="getMinChildSamples()"
+                          (ngModelChange)="setMinChildSamples($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Max child samples</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Max child samples">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="Max child samples" [ngModel]="getMaxChildSamples()"
+                          (ngModelChange)="setMaxChildSamples($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">SampleNo child samples</div>
+                    <!-- <mat-icon class="material-symbols-outlined text-grey" matTooltip="Sample no child samples">info</mat-icon> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <mat-form-field appearance="outline">
+                        <input matInput type="number" placeholder="SampleNo child samples"
+                          [ngModel]="getSampleNoChildSamples()" (ngModelChange)="setSampleNoChildSamples($event)" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="LGBM ML Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"
+  (callParentFunction)="openModelPreveiwDialog($event)"></app-config-action-bar>

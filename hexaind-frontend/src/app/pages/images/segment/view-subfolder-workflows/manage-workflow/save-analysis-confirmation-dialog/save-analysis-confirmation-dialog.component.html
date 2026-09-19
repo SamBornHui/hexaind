@@ -1,0 +1,73 @@
+<div fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Save this Workflow</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="dialogRef.close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div>
+      <mat-checkbox color="primary" [(ngModel)]="analysis">
+        Apply analysis to all images using this workflow
+      </mat-checkbox>
+    </div>
+    <div>
+      <ul style="text-align: left; margin-top: 15px; margin-left: 24px">
+        <ng-container
+          *ngIf="
+            data['analyisData']['pillar-pattern-analysis']['data'].length > 0
+          "
+        >
+          <li style="list-style-type: unset">Pillar pattern analysis</li>
+        </ng-container>
+        <ng-container
+          *ngIf="
+            data['analyisData']['feature-profile-analysis']['data'].length > 0
+          "
+        >
+          <li style="list-style-type: unset">Feature profile analysis</li>
+        </ng-container>
+        <ng-container
+          *ngIf="data['analyisData']['tier-analysis']['data'].length > 0"
+        >
+          <li style="list-style-type: unset">Tier analysis</li>
+        </ng-container>
+        <ng-container
+          *ngIf="
+            data['analyisData']['metal-recess-analysis']['data'].length > 0
+          "
+        >
+          <li style="list-style-type: unset">Metal recess analysis</li>
+        </ng-container>
+        <ng-container
+          *ngIf="data['analyisData']['bubble-analysis']['data'].length > 0"
+        >
+          <li style="list-style-type: unset">Bubble analysis</li>
+        </ng-container>
+      </ul>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="dialogRef.close()">
+      Cancel
+    </button>
+    <button mat-flat-button color="primary" (click)="closeDialog(true)">
+      Save
+    </button>
+  </div>
+</div>

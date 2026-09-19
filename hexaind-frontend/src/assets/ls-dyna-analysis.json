@@ -1,0 +1,76 @@
+[
+    {
+      "name": "AI Can End LSDYNA",
+      "test_mode": false,
+      "run_job": true,
+      "apply_post_process":true,
+      "software": {
+        "analysis": {
+          "code": "ls_dyna",
+          "version": "12.0.0"
+        },
+        "command": "ls-dyna -i _ShellBuckle_V2.3.1.k -p single -s 1",
+        "hardware": {
+          "coreType": "starlite_max",
+          "coresPerSlot": 1,
+          "slots": 1,
+          "type": "compute",
+          "walltime": 96
+        },
+        "envVars": {
+          "LSTC_LICENSE_SERVER": "31010@novelis"
+        },
+        "onDemandLicenseSeller": null,
+        "output_file": "abstat"
+      }
+    },
+    {
+      "name": "AI Can End LSDYNA - Test",
+      "test_mode": true,
+      "run_job": true,
+      "apply_post_process":true,
+      "software": {
+        "analysis": {
+          "code": "ls_dyna",
+          "version": "12.0.0"
+        },
+        "command": "ls-dyna -i tire-compression.k -p single -s 1",
+        "hardware": {
+          "coreType": "starlite_max",
+          "coresPerSlot": 1,
+          "slots": 1,
+          "type": "compute",
+          "walltime": 96
+        },
+        "envVars": {
+          "LSTC_LICENSE_SERVER": "31010@novelis"
+        },
+        "onDemandLicenseSeller": null,
+        "output_file": "abstat"
+      }
+    },
+    {
+      "name": "AI Can End LSDYNA - Test - short",
+      "test_mode": true,
+      "run_job": false,
+      "apply_post_process":true,
+      "software": {
+        "analysis": {
+          "code": "ls_dyna",
+          "version": "12.0.0"
+        },
+        "hardware": {
+          "coreType": "starlite_max",
+          "coresPerSlot": 1,
+          "slots": 1,
+          "type": "compute",
+          "walltime": 96
+        },
+        "command": "ls-dyna -i _ShellBuckle_V2.3.1.k -p single -s 1",
+        "output_file": "abstat",
+        "envVars": {
+          "LSTC_LICENSE_SERVER": "31010@novelis"
+        }
+      }
+    }
+  ]

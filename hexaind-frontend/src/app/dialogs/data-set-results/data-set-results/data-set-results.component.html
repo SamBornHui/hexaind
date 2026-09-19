@@ -1,0 +1,64 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <h1>{{'Workflow Dataset Results'}}</h1>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayoutAlign="center center" class="p-6" *ngIf="loading">
+    <mat-spinner diameter="24"></mat-spinner>
+    <span>Loading...</span>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6" *ngIf="!loading">
+    <div fxFlex="none">
+      <mat-form-field appearance="outline">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search" (input)="filterNodes($event)" />
+      </mat-form-field>
+    </div>
+    <div fxFlex="none" style="height: 70%; overflow-y: auto !important">
+      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+        <!-- Leaf node template -->
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [class.selected]="isFileSelected(node)"
+          (click)="toggleFileSelection(node);$event.stopPropagation()">
+          <button mat-icon-button disabled></button>
+          <mat-icon class="material-symbols-outlined">{{node.type === 'file' ? 'insert_drive_file' :
+            'folder'}}</mat-icon>
+          {{node.name}}
+          <div class="check" *ngIf="isFileSelected(node)"><mat-icon>check</mat-icon></div>
+        </mat-tree-node>
+        <!-- Expandable node template -->
+        <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+          [class.selected]="isFileSelected(node)" (click)="toggleFileSelection(node);$event.stopPropagation()">
+          <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.name">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
+              </mat-icon>
+            </button>
+            <mat-icon class="material-symbols-outlined">{{node.type === 'file' ? 'insert_drive_file' :
+              'folder'}}</mat-icon>
+            <div>{{node.name}}</div>
+          </div>
+          <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" class="my-0">
+            <ng-container matTreeNodeOutlet></ng-container>
+          </ul>
+        </mat-nested-tree-node>
+      </mat-tree>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6">
+    <button mat-stroked-button color="primary" mat-dialog-close>Close</button>
+    <button [disabled]="selectionPreview.isEmpty()" *ngIf="nodeType != 'file'" mat-flat-button color="primary"
+      (click)="onPreviewSelectedResult()">Preview</button>
+    <button [disabled]="selection.isEmpty()" *ngIf="nodeType == 'file'" mat-flat-button color="primary"
+      (click)="onPreviewSelectedResult()">Preview</button>
+    <button [disabled]="selection.isEmpty()" mat-flat-button color="primary"
+      (click)="onDownloadSelectedResult()">Download</button>
+  </div>
+</div>

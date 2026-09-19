@@ -1,0 +1,30 @@
+<div fxLayout="column" class="ftn-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-back-button" (click)="navigate('data-sheet-generator')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">Datasheets Explorer</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader($event)">
+          <mat-icon class="material-symbols-outlined">{{
+            toggleHeaderButton
+            }}</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div fxFlex class="p-6 h-100 y-auto">
+    <app-file-tree-node *ngFor="let child of initialFolders" [path]="child" [level]="0" [children]="childrenData[child]"
+      [isExpanded]="expandedNodes[child]" [isLocked]="isDatasheetLocked(child)" (toggle)="onToggle($event)"
+      (delete)="onDelete($event)" (download)="onDownload($event)" (upload)="onUpload($event)"
+      [expandedNodes]="expandedNodes" [childrenData]="childrenData"
+      [isFilePath]="isFilePath.bind(this)"></app-file-tree-node>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<mat-dialog-content class="mat-typography">
+  <div
+    fxLayout="row"
+    fxLayoutGap="8px"
+    fxLayoutAlign="space-between center"
+    class="mb-2 border-bt"
+  >
+    <div class="steps">Add metadata</div>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+      <mat-icon class="close-icon">close</mat-icon>
+    </button>
+  </div>
+
+  <div fxLayout="column" fxLayoutGap="16px">
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div class="text-sm">Name</div>
+      <div>
+        <mat-form-field appearance="outline">
+          <input matInput placeholder="Enter module name" [(ngModel)]="name" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div class="text-sm">Description</div>
+      <div>
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            placeholder="Enter module description"
+            [(ngModel)]="description"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    [disabled]="disabledSubmit()"
+    (click)="onSubmit()"
+  >
+    Submit
+  </button>
+</mat-dialog-actions>

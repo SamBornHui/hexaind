@@ -1,0 +1,112 @@
+.image-cleanup-container {
+    height: 100%;
+    // height: calc(100% - 60px);
+    // margin-bottom: 16px;
+
+    .custom-input {
+        width: 100%;
+        font-size: 14px;
+        padding: 4px 2px;
+        background-color: var(--secondary-surface);
+        border: 1px solid var(--stroke-lite);
+        border-radius: 4px;
+        outline: none;
+        text-align: right;
+    }
+
+    .mat-icon {
+        top: 2px;
+    }
+}
+
+.material-metadata-table {
+    width: 100%;
+    border-spacing: 0;
+
+    th {
+        text-align: left;
+        border-bottom: 1px solid var(--stroke-lite);
+        background-color: var(--secondary-surface);
+        padding: 4px;
+    }
+
+    td {
+        border-bottom: 1px solid var(--stroke-lite);
+        padding: 4px;
+    }
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* For Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.image-block {
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.images-preview-container {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .thumbnail {
+        width: 160px;
+        height: 160px;
+        cursor: pointer;
+        border: 4px solid var(--stroke-lite);
+
+        &:hover {
+            border-color: var(--primary);
+        }
+    }
+}
+
+.readscale-image {
+    position: absolute;
+    z-index: -1;
+    max-width: 100%;
+    max-height: 100%;
+    visibility: hidden;
+}
+
+.zoom-controls {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    background-color: var(--white);
+    padding: 8px;
+    border-radius: 20px;
+    border: 1px solid var(--stroke-lite);
+}
+
+.disabled-image-operation {
+    pointer-events: none;
+    opacity: 0.5;
+}
+  
+
+.thumbnail {
+    width: 100%; /* or your desired size */
+    height: auto;
+    position: relative; /* so the tooltip can be absolutely positioned inside */
+  }
+  
+  .image-container {
+    position: relative; /* to allow tooltip to be placed inside */
+    display: inline-block;
+  }
+  
+  

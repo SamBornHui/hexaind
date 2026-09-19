@@ -1,0 +1,117 @@
+<section
+  class="mst-dashboard-editor__left"
+  [class.hidden]="showVizEditor || showGlobalFilterEditor"
+>
+  <mst-global-filter
+    *ngIf="selectedDashboard"
+    [dashboard]="selectedDashboard"
+    (edit)="onEditFilter()"
+    (change)="onFilterApply($event)"
+  />
+  <ng-container *ngIf="!editable">
+    <div class="mst-dashboard-editor__left__header">
+      <b>Dashboards</b
+      ><mst-button
+        styleName="icon"
+        iconName="add"
+        (click)="onCreate()"
+      ></mst-button>
+    </div>
+    <div class="mst-dashboard-editor__left__list">
+      <mst-list
+        [hasMore]="hasMoreDashboards"
+        [items]="dashboards || []"
+        [selectedIds]="selectedDashboard ? [selectedDashboard.id] : []"
+        emptyMessage="Create a dashboard"
+        (itemClick)="onSelect($event)"
+        (loadMore)="onDashboardsLoad($event)"
+      />
+    </div>
+  </ng-container>
+  <ng-container *ngIf="editable">
+    <div class="mst-dashboard-editor__left__list">
+      <mst-select-dataset
+        [hasMore]="hasMoreDatasets"
+        [sourceItems]="datasetSources"
+        [selectedSourceId]="selectedDatasetSourceId"
+        [items]="datasetDatas[selectedDatasetSourceIndex]"
+        [draggable]="true"
+        [selectedItemHighlight]="false"
+        (sourceChange)="onDatasetSourceChange($event)"
+        (loadMore)="onDataSourceLoad($event)"
+      />
+    </div>
+    <div *ngIf="fileUpload">
+      <mst-file-upload (filesSelected)="onFilesSelected($event)" />
+    </div>
+  </ng-container>
+</section>
+<section
+  [class.hidden]="showVizEditor || showGlobalFilterEditor"
+  class="mst-dashboard-editor__dashboard"
+>
+  <mst-dashboard
+    *ngIf="selectedDashboard"
+    [editable]="editable"
+    [showEditButton]="showEditButton"
+    [config]="selectedDashboard"
+    [datas]="datas"
+    [isFullscreen]="isFullscreen"
+    (vizEdit)="onVizEdit($event)"
+    (vizDelete)="onVizDelete($event)"
+    (vizDataLoad)="onVizDataLoad($event)"
+    (itemDrop)="onItemDrop($event)"
+    (update)="onUpdate($event)"
+    (delete)="onDelete()"
+    (cancel)="onCancel()"
+    (edit)="onEdit()"
+    (fullscreen)="onFullscreen($event)"
+    (vizResize)="onVizResize($event)"
+  />
+  <mst-empty *ngIf="!selectedDashboard" message=""
+    ><mst-button (click)="onCreate()">Create a dashboard</mst-button></mst-empty
+  >
+</section>
+<mst-viz-data-config
+  *ngIf="showVizEditor"
+  [rowIndex]="selectedVizInfo.rowIndex"
+  [cellIndex]="selectedVizInfo.cellIndex"
+  [config]="selectedVizInfo.viz"
+  [data]="configVizData"
+  [isFullscreen]="isFullscreen"
+  [hasMoreDatasets]="hasMoreDatasets"
+  [sourceItems]="datasetSources"
+  [selectedSourceId]="selectedDatasetSourceId"
+  [datasetItems]="datasetDatas[selectedDatasetSourceIndex]"
+  (dataSourceChange)="onDatasetSourceChange($event)"
+  (dataSourceLoad)="onDataSourceLoad($event)"
+  (change)="onVizChange($event)"
+  (vizDataLoad)="onConfigVizDataLoad($event)"
+  (cancel)="onVizCancel()"
+  (fullscreen)="onFullscreen($event)"
+  (datasetChange)="onVizDatasetChange($event)"
+/>
+<mst-select-global-filter-columns
+  *ngIf="showGlobalFilterEditor"
+  [dashboard]="selectedDashboard"
+  [selectedSourceId]="selectedDatasetSourceId"
+  [sourceItems]="datasetSources"
+  [datasetItems]="datasetDatas[selectedDatasetSourceIndex]"
+  [data]="globalFilterDatasetData!"
+  [hasMoreDatasets]="hasMoreDatasets"
+  (load)="onGlobalFilterDatasetDataLoad($event)"
+  (change)="onFilterApply($event)"
+  (cancel)="onFilterCancel()"
+  (dataSourceChange)="onDatasetSourceChange($event)"
+  (dataSourceLoad)="onDataSourceLoad($event)"
+/>
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>{{ selectedDashboard?.name }}</h2>
+  <mat-dialog-content>
+    {{ dialogData.message }}
+  </mat-dialog-content>
+  <mat-dialog-actions class="mst-dashboard-editor__dialog__actions">
+    <mst-button styleName="flat" (click)="onDialogAction()">Yes</mst-button>
+    <mst-button mat-dialog-close>No</mst-button>
+  </mat-dialog-actions>
+</ng-template>

@@ -1,0 +1,174 @@
+<div class="p-relative h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Input</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select input widget</mat-label>
+                  <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" [ngModel]="getSelectedInputWidget()"
+                    (ngModelChange)="setSelectedInputWidget($event)" name="inputWidgetSelector">
+                    <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                      {{ getWidgetOutputName(inputWidget) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Output</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input matInput type="string" placeholder="Select output" [(ngModel)]="outputName"
+                    (ngModelChange)="outputName = $event" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div class="fe-container" fxLayout="column" fxLayoutGap="24px">
+            <div fxFlex fxLayout="column">
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="24px" fxLayoutAlign=" center" class="fe-row fw-bold">
+                <div fxFlex="40px">
+                  <mat-checkbox [disabled]="workflowCanvasService.IsViewingRunMode" color="primary"
+                    [(ngModel)]="selectAll" (change)="toggleCheckAll()"></mat-checkbox>
+                </div>
+                <div fxFlex="160px">Feature</div>
+                <div fxFlex="100px">Type</div>
+                <div fxFlex="150px">Replace NULL</div>
+                <div fxFlex>Transformations</div>
+                <div fxFlex>Selected Transformations</div>
+              </div>
+              <div fxFlex class="y-auto">
+                <div fxLayout="row" fxLayoutGap="24px" class="fe-row"
+                  *ngFor="let element of arrayElement; let i = index" [ngClass]="{ selected: element['checked'] }">
+                  <div fxFlex="40px">
+                    <div class="text-column">
+                      <mat-checkbox [disabled]="workflowCanvasService.IsViewingRunMode" color="primary"
+                        [(ngModel)]="element.checked"></mat-checkbox>
+                    </div>
+                  </div>
+                  <div fxFlex="160px">
+                    <div class="text-column">
+                      {{ element.feature }}
+                    </div>
+                  </div>
+                  <div fxFlex="100px">
+                    <div class="text-column">
+                      {{ element.type }}
+                    </div>
+                  </div>
+                  <div fxFlex="150px">
+                    <mat-form-field appearance="outline">
+                      <mat-select [disabled]="workflowCanvasService.IsViewingRunMode"
+                        (selectionChange)="onReplaceNullDropdownChanged()" placeholder="Mean"
+                        [(ngModel)]="element.selectedOption">
+                        <mat-option *ngFor="
+                        let option of getDropdownOptions(element['type']);
+                        let i = index
+                      " [value]="option">{{ option }}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center"
+                      *ngFor="let dropdown of element.dropdowns; let key = index">
+                      <div fxFlex>
+                        <mat-form-field appearance="outline">
+                          <mat-select [disabled]="workflowCanvasService.IsViewingRunMode"
+                            (selectionChange)="onTransformationDropdownChanged()" placeholder="None"
+                            [(ngModel)]="element.dropdowns[key]">
+                            <mat-option *ngFor="
+                            let option of getTransformationDropdown(
+                              element['type']
+                            )
+                          " [value]="option">
+                              {{ option }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="64px" fxLayout="row" fxLayoutGap="8px">
+                        <div fxFlex *ngIf="shouldShowIcons(element.dropdowns[key], key)">
+                          <mat-icon class="material-symbols-outlined global-icon-button-sm"
+                            (click)="addDropdown(element, key)">
+                            add
+                          </mat-icon>
+                        </div>
+                        <div fxFlex *ngIf="shouldShowIcons(element.dropdowns[key], key)">
+                          <mat-icon class="material-symbols-outlined global-icon-button-sm red"
+                            (click)="removeDropdown(element, key)" *ngIf="key > 0">
+                            delete
+                          </mat-icon>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div fxFlex>
+                    <div class="text-column">
+                      {{ element.std }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+              <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="16px">
+                <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                  <div>Sampled Data Percentage:</div>
+                  <div fxFlex="100px">
+                    <mat-form-field appearance="outline">
+                      <mat-select value="3" [disabled]="workflowCanvasService.IsViewingRunMode">
+                        <mat-option value="1">10%</mat-option>
+                        <mat-option value="2">20%</mat-option>
+                        <mat-option value="3">30%</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="selected-rows">
+                  Selected Rows: <span class="fw-bold"> 8 / 30</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+  <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+    Cancel
+  </button>
+  <button [disabled]="!changeMade" mat-flat-button color="primary" (click)="onSave()" id="createBeutton">
+    Save
+  </button>
+</div>
+<app-config-action-bar widgetName="Feature Engineering" widgetUrn="{{ getWidgetUrn() }}"
+  siteId="1"></app-config-action-bar>

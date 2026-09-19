@@ -1,0 +1,46 @@
+<header *ngIf="config.name" class="mst-viz-panel__header">
+  <div class="mst-viz-panel__title">
+    <h3>{{ config.name }}</h3>
+    &nbsp; ({{ data?.rows?.length || "0" }} rows)
+    <div *ngIf="config.description" class="mst-viz-panel__description">
+      {{ config.description }}
+    </div>
+  </div>
+  <div class="mst-viz-panel__header__tools">
+    <ng-container *ngIf="data && editable">
+      <mst-button styleName="icon" (click)="onEdit()" iconName="settings" />
+      <mst-button styleName="icon" (click)="onDelete()" iconName="delete"
+    /></ng-container>
+    <mst-button
+      styleName="icon"
+      [iconName]="isFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+      (click)="onFullscreen()"
+    ></mst-button>
+  </div>
+</header>
+<div *ngIf="data" class="mst-viz-panel__body" #vizContainer>
+  <div class="mst-viz-panel__body__table" *ngIf="vizType === 'table'">
+    <ng-template #barColumnTemplate let-column="column" let-item="item">
+      <div
+        class="mst-viz-panel__body__table__cell-bar"
+        [style.borderColor]="column.data?.options?.borderColor || ''"
+      >
+        <div
+          class="mst-viz-panel__body__table__cell-bar__bar"
+          [style.width]="item[column.field] + '%'"
+          [style.backgroundColor]="column.data?.options?.backgroundColor || ''"
+        ></div>
+        <div class="mst-viz-panel__body__table__cell-bar__value">
+          {{ item[column.field] }}
+        </div>
+      </div>
+    </ng-template>
+    <mst-table [columns]="columns" [items]="data.rows" />
+  </div>
+  <div class="mst-viz-panel__body__chart" *ngIf="vizType !== 'table'">
+    <mst-chart [config]="chartConfig" />
+  </div>
+</div>
+<mst-resizer *ngIf="editable && data" (resize)="onResize($event)" />
+<mst-empty *ngIf="!loading && !data" message="Drop data here!!" />
+<mst-loader *ngIf="loading" />

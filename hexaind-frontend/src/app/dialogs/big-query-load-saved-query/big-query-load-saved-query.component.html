@@ -1,0 +1,73 @@
+<div *ngIf="load">
+    <div class="dialog-header">
+        <h2 mat-dialog-title class="dialog-title">Load Saved Query</h2>
+        <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+            <mat-icon class="close-icon">close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content class="dialog-content">
+        <div class="dialog-section">
+            <div class="dialog-section-label">Select Project</div>
+            <mat-form-field class="full-width" appearance="outline">
+                <mat-select placeholder="Select project">
+                    <mat-option *ngFor="let project of projects" [value]="project._id" (click)="getProjectQueries(project._id)">
+                        {{ project.project_name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="dialog-section">
+            <div class="dialog-section-label">Select Query</div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-select placeholder="Select query">
+                    <mat-option *ngFor="let query of getQueries" [value]="query._id" (click)="getDisplayQueries(query)">
+                        {{ query.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="dialog-section">
+            <div class="dialog-section-label">Query Preview</div>
+            <mat-form-field appearance="outline" class="full-width">
+                <textarea matInput rows="6" readonly>
+                    {{ displayQuery }}
+                </textarea>
+            </mat-form-field>
+        </div>
+    </div>
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+        <button mat-flat-button color="primary" (click)="onLoad()">Load</button>
+    </mat-dialog-actions>
+</div>
+
+
+<div *ngIf="load == false">
+    <div class="dialog-header">
+        <h2 mat-dialog-title class="dialog-title">{{title}}</h2>
+        <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+            <mat-icon class="close-icon">close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content class="dialog-content">
+        <div class="dialog-section">
+            <div class="dialog-section-label">Select Parameter</div>
+            <mat-form-field class="full-width" appearance="outline">
+                <mat-select placeholder="Select Parameter">
+                    <mat-option (click)="lastRunOption()">
+                    {{lastRunParameter}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="dialog-section">
+            <div class="dialog-section-label">Parameter Query Preview</div>
+            <mat-form-field appearance="outline" class="full-width" fxLayoutGap="8px"
+            class="bg-surface rounded-2 p-4">
+                <textarea matInput rows="6" readonly >
+                    {{runQuery}}
+                </textarea>
+            </mat-form-field>
+        </div>
+    </div>
+</div>

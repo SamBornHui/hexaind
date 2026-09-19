@@ -1,0 +1,159 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex class="y-auto">
+      <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+        <mat-tab label="Information">
+            <div class="global-widget-area">
+              <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+            </div>
+        </mat-tab>
+        <mat-tab label="Inputs">
+            <div class="global-widget-area">
+              <div fxLayout="row">
+                <!-- <div fxFlex="50" fxFlex.lt-lg="100">
+                  <div class="fw-bold pb-1">Select Input</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                      name="inputWidgetSelector" placeholder="Select input">
+                      <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                        {{ getWidgetOutputName(inputWidget) }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div> -->
+              </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Outputs">
+            <div class="global-widget-area">
+              <div fxLayout="row">
+                <div fxFlex="50" fxFlex.lt-lg="100">
+                  <div class="fw-bold pb-1">Select Output</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                      (ngModelChange)="widgetOutput = $event" />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+            <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+              <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+                (click)="onOutputCancel()">
+                Cancel
+              </button>
+              <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+                (click)="onOutputSave()">
+                Save
+              </button>
+            </div>
+        </mat-tab>
+        <mat-tab label="Parameters">
+          <div class="global-widget-area">
+            <div fxLayout="row">
+              <div fxFlex="50" fxFlex.lt-lg="100" fxLayout="column" fxLayoutGap="16px">
+                <div>
+                  <div class="fw-bold pb-1">Image Type</div>
+                  <mat-radio-group [(ngModel)]="selectedImageType">
+                      <mat-radio-button color="primary" *ngFor="let type of imagesTypes" [value]="type" (click)="storeSelectedImageType(type)">
+                        {{ type | replaceAndCapitalize }}
+                      </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div>
+                  <div class="fw-bold pb-1">Image datasets</div>
+                </div>
+
+                <div
+                  fxLayout="row"
+                  fxLayoutGap="24px"
+                  fxLayoutAlign="start center"
+                  *ngFor="let dataset of getFilteredDatasets(); let counter = index"
+                >
+                  <div fxFlex="180px">
+                    <div
+                      fxLayout="row"
+                      fxLayoutGap="4px"
+                      fxLayoutAlign="start center"
+                    >
+                    <mat-checkbox 
+                      [checked]="isSelectedDataset(dataset.dataset_id)"
+                      (change)="onCheckboxChange($event, dataset.dataset_id)">
+                      {{ dataset.dataset_name }}
+                    </mat-checkbox>
+                    </div>
+                    
+                  </div>
+                  <div fxFlex>
+                    <div
+                      fxLayout="row"
+                      fxLayoutGap="8px"
+                      fxLayoutAlign="start center"
+                    >
+                      <div>
+                        <input
+                          type="file"
+                          #fileInput
+                          accept=".csv,"
+                          multiple
+                          (change)="
+                            onFilesSelected($event, dataset)
+                          "
+                          style="display: none"
+                        />
+                        <button
+                          mat-flat-button
+                          color="primary"
+                          [disabled]="!isSelectedDataset(dataset.dataset_id)"
+                          (click)="fileInput.click()"
+                        >
+                          Upload 
+                        </button>
+                        <span
+                          class="text-green"
+                        >
+                          {{ getFilename(dataset) }}
+                        </span>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+    
+              </div>
+            </div>
+          </div>
+          <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+            <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+              Cancel
+            </button>
+            <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+              Save
+            </button>
+          </div>
+        </mat-tab>  
+    
+        <mat-tab label="Settings">
+            <div class="global-widget-area">
+              <app-settings (notifyParent)="onAppSettingsUpdated()" />
+            </div>
+            <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+              <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+                (click)="onCancelSetting()">
+                Cancel
+              </button>
+              <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+                (click)="onSaveSetting()">
+                Save
+              </button>
+            </div>
+        </mat-tab>
+        <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+            <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+</div>
+<!-- <app-config-action-bar 
+widgetName="Image Dataset Widget" 
+widgetUrn="{{ getWidgetUrn() }}" 
+siteId="1">
+</app-config-action-bar> -->

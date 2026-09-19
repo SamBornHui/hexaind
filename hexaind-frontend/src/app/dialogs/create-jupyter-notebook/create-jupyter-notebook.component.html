@@ -1,0 +1,48 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+        <div>
+            <h1>Create Jupyter Notebook</h1>
+        </div>
+        <div>
+            <button mat-icon-button (click)="onClosePanel()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="16px" class="p-6">
+        <div>
+            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="mb-1">
+                <div class="fw-bold">Name</div>
+                <div>
+                    <mat-icon class="material-symbols-outlined global-info-icon"
+                        matTooltip="The name of the Jupyter notebook">info</mat-icon>
+                </div>
+            </div>
+            <mat-form-field appearance="outline">
+                <input matInput required [(ngModel)]="JNB_name"
+                    placeholder="Enter Jupyter notebook name">
+            </mat-form-field>
+        </div>
+        <div *ngIf="data.type === 'create'">
+            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="mb-1">
+                <div class="fw-bold">Description</div>
+                <div>
+                    <mat-icon class="material-symbols-outlined global-info-icon"
+                        matTooltip="The description of the Jupyter notebook">info</mat-icon>
+                </div>
+            </div>
+            <mat-form-field appearance="outline">
+                <input matInput required [(ngModel)]="JNB_description"
+                    placeholder="Enter Jupyter notebook description">
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6 pt-0">
+        <button mat-stroked-button color="primary" (click)="onClosePanel()">
+            Cancel
+        </button>
+        <button mat-flat-button color="primary" (click)="createJupyterNotebook()">
+            Save
+        </button>
+    </div>
+</div>

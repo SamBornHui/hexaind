@@ -1,0 +1,53 @@
+<div fxLayout="column" fxLayoutGap="16px">
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <div class="fw-bold pb-1">Custom name of widget</div>
+      <div>
+        <mat-form-field appearance="outline">
+          <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput placeholder="Widget Name" type="string"
+            [(ngModel)]="Name" (ngModelChange)="Name = $event" />
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <div class="fw-bold pb-1">Custom tags</div>
+      <div>
+        <mat-form-field appearance="outline">
+          <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput placeholder="Enter Dataset ID"
+            type="string" [(ngModel)]="Description" (ngModelChange)="Description = $event" />
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+  <!--
+    TODO: This does not work yet.
+    <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex>
+      <div class="fw-bold pb-1">Color of widget</div>
+      <div>
+        <input class="input-styles" [(colorPicker)]="color1" [style.background]="widgetColor"
+          [style.color]="widgetColor" (colorPickerOpen)="onEventLog($event)" (colorPickerClose)="onEventLog($event)"
+          (cpInputChange)="onEventLog($event)" (cpSliderDragStart)="onEventLog($event)"
+          (cpSliderDragEnd)="onEventLog($event)" [cpPosition]="'bottom'" [(ngModel)]="widgetColor"
+          (ngModelChange)="widgetColor = $event" value="" />
+        <span>{{widgetColor}}</span>
+      </div>
+    </div>
+  </div> -->
+  <!--
+    TODO: THIS IS NOT SUPPORTED YET 
+    <div fxLayout="column" class="margin-left">
+    <mat-checkbox
+      color="primary"
+      [(ngModel)]="GPU"
+      (ngModelChange)="GPU = $event"
+    >
+      Execute on GPU
+    </mat-checkbox>
+    <mat-checkbox color="primary">
+      Allow business users to modify parameters
+    </mat-checkbox>
+  </div> -->
+</div>

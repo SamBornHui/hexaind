@@ -1,0 +1,40 @@
+.checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+  /* Allows checkboxes to wrap to the next row */
+  // gap: 16px; /* Space between checkboxes */
+}
+
+.checkbox-item {
+  flex: 0 0 24%;
+  /* Ensures two items per row (adjust width as needed) */
+}
+
+.spatial-container {
+  .img-thumbnail {
+    &.selected {
+      border: 4px solid var(--primary);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      aspect-ratio: 1/1;
+      cursor: pointer;
+    }
+  }
+}
+.plots-height{
+  height: 400px;
+}
+.phase-item:hover {
+  background-color: var(--blue-lite) !important;
+}
+
+.selected-phase {
+  background-color: var(--blue-lite) !important;
+}
+.plots-dimentions{
+  width: 100%!important;
+  height: 100%!important;
+}

@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  align-items: center;
+}
+.mst-tree-item {
+  &__icon {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    line-height: normal;
+    &__button {
+      transition: transform 0.3s ease;
+      &.expanded {
+        transform: rotate(90deg);
+      }
+    }
+    &__type-icon {
+      margin-right: 4px;
+    }
+  }
+}

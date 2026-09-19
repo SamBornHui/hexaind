@@ -1,0 +1,32 @@
+<div class="mst-list-item__icon" *ngIf="multiSelect">
+  <mst-input type="checkbox" [value]="selected" (click)="onIconClick($event)" />
+</div>
+<div class="mst-list-item__icon" *ngIf="iconNames && iconNames.length">
+  <mst-icon
+    *ngFor="let iconName of iconNames"
+    [iconName]="iconName"
+    (click)="onIconClick($event, iconName)"
+  />
+</div>
+<div
+  class="mst-list-item__body mst-shared-truncate"
+  [title]="item.name || item.title"
+>
+  <ng-container *ngIf="template">
+    <ng-container
+      *ngTemplateOutlet="template; context: { item, index }"
+    ></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!template">{{ item.name || item.title }}</ng-container>
+</div>
+<div
+  class="mst-list-item__icon mst-list-item__icon-right"
+  *ngIf="rightIconNames && rightIconNames.length"
+>
+  <mst-button
+    styleName="icon"
+    *ngFor="let iconName of rightIconNames"
+    [iconName]="iconName"
+    (click)="onIconClick($event, iconName)"
+  />
+</div>

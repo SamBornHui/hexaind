@@ -1,0 +1,26 @@
+<mst-input
+  type="color"
+  label="Border Color"
+  [value]="options.borderColor"
+  (change)="onChange($event, 'borderColor')"
+/>
+<mst-input
+  type="color"
+  label="Background Color"
+  [value]="options.backgroundColor"
+  (change)="onChange($event, 'backgroundColor')"
+/>
+<mst-input
+  type="select"
+  label="Point Style"
+  [value]="options.pointStyle"
+  [items]="pointStyleItems"
+  (change)="onChange($event, 'pointStyle')"
+/>
+<mst-input
+  type="select"
+  label="Chart Type"
+  [value]="options.type"
+  [items]="chartTypeItems"
+  (change)="onChange($event, 'type')"
+/>

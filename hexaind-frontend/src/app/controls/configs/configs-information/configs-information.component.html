@@ -1,0 +1,223 @@
+<div fxLayout="column" fxLayoutGap="16px">
+
+
+    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+        <div class="fw-bold text-primary">Widget Type:</div><span class="fw-normal">{{widgetType()}}</span>
+    </div>
+    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+        <div class="fw-bold text-primary">Version:</div><span class="fw-normal">{{widgetData['version']}}</span>
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="4px" *ngIf="!isCustomCodeWidget()">
+        <div class="fw-bold text-primary">Widget Type Description:</div>
+        <div class="fw-normal">
+            {{ widgetData['description'] }}
+        </div>
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="4px" *ngIf="isCustomCodeWidget()">
+        <div class="fw-bold text-primary">Widget Name:</div>
+        <div class="fw-normal">
+            {{ widgetConfig['name'] }}
+        </div>
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="4px" *ngIf="isCustomCodeWidget()">
+        <div class="fw-bold text-primary">Widget Description:</div>
+        <div class="fw-normal">
+            {{ widgetConfig['description'] }}
+        </div>
+    </div>
+
+    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+        <div class="fw-bold text-primary">
+            More Info
+        </div>
+    </div>
+    <div *ngIf="widgetData['kernals_information']">
+        <div class="fw-bold pb-2">Covariance function (kernel) descriptions:</div>
+        <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFLex="30px" class="fw-bold mt-4">1.</div>
+                <div fxFlex>
+                    <p><strong>Spectral mixture kernel</strong>. The covariance of the spectral mixture kernel is given
+                        by:</p>
+                    <div><img src="assets/cf-img-spectral.png" alt="Spectral mixture kernel" class="img-fluid"></div>
+                    <p>where q indexes the number of Gaussians in the mixture, p indexes the input features, w_q are the
+                        weights for each mixture component, tau_p is the pth component of the vector x - x', mu_q is the
+                        qth component of the mean vector, and v_q is the qth component of covariance matrix diagonal. It
+                        is not recommended to use the spectral mixture kernel in conjuction with other covariance
+                        kernels, and doing so is disabled for the GPR widget.</p>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFLex="30px" class="fw-bold mt-4">2.</div>
+                <div fxFlex>
+                    <p><strong>RBF kernel</strong>. The covariance of the RBF kernel is given by:</p>
+                    <div><img src="assets/cf-img-rbf.png" alt="Spectral mixture kernel" class="img-fluid"></div>
+                    <p>where theta is a length scale parameter. The RBF kernel is suitable for modeling smooth,
+                        continuous, signals, since it is infinitely differentiable. It is a popular choice for modeling
+                        the responses of computer experiments for this reason.</p>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFLex="30px" class="fw-bold mt-4">3.</div>
+                <div fxFlex>
+                    <p><strong>Matern kernel</strong>. The covariance of the Matern kernel is given by:</p>
+                    <p>Computes a covariance matrix based on the Matern kernel between inputs x<sub>1</sub> and
+                        x<sub>2</sub>:</p>
+                    <div><img src="assets/cf-img-matern1.png" alt="Spectral mixture kernel" class="img-fluid"></div>
+                    <p>where</p>
+                    <div><img src="assets/cf-img-matern2.png" alt="Spectral mixture kernel" class="img-fluid"></div>
+                    <p>is the distance between x<sub>1</sub> and x<sub>2</sub> scaled by the lengthscale parameter ∅.
+                    </p>
+                    <p><i>v</i> is a smoothness parameter (takes values 1/2, 3/2, or 5/2). Smaller values are less
+                        smooth.</p>
+                    <p>K<sub>v</sub> is a modified Bessel function.</p>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFLex="30px" class="fw-bold mt-4">4.</div>
+                <div fxFlex>
+                    <p><strong>Linear kernel</strong>. The covariance of the linear kernel is given by:</p>
+                    <p>Computes a covariance matrix based on the Linear kernel between inputs X<sub>1</sub> and
+                        X<sub>2</sub>:</p>
+                    <div><img src="assets/cf-img-linear.png" alt="Spectral mixture kernel" class="img-fluid"></div>
+                    <p>where</p>
+                    <p><i>v</i> is a variance parameter.</p>
+                </div>
+            </div>
+        </div>
+        <p>Linear kernels are used to capture linear trends within output responses.</p>
+        <p>For the ARD kernels (ARD RBF and ARD Matern), a length scale parameter is assigned to each input feature.
+            Using an ARD kernel allows for the model to capture the response sensitivity to each input feature, often
+            improving model performance. However, ARD kernels require more hyperparameters to be optimized, which may
+            make obtaining a good model fit more difficult.</p>
+        <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+            <div class="fw-normal text-primary">
+                Referral Documentation
+            </div>
+        </div>
+    </div>
+    <div *ngIf="widgetData['xgboost_information']">
+        <p>XGBoost (eXtreme Gradient Boosting) is a powerful and widely used machine learning algorithm, primarily
+            designed for structured/tabular data. It is based on the concept of gradient boosting, which combines
+            multiple weak models (decision trees) to form a strong model. Successive rounds of boosting are built by
+            minimizing the errors of the previous models, allowing each new model to correct the mistakes made by the
+            earlier ones. The parameters in the Parameters tab enable you to customize various aspects of the model
+            construction process.</p>
+        <h3>Train/test split:</h3>
+        <p>The data will be split into training and testing sets, with the user selecting the test set ratio (𝛼). For a
+            "Random Split," the data is randomly divided between training and testing sets, and a specific random state
+            (e.g., 42) can be set in the 'Advanced parameters' for reproducibility. By default, no random state is
+            defined, resulting in different splits each time. For a "Sequential Split," the first (1-𝛼) fraction of the
+            data is used for training, and the remaining 𝛼 is used for testing, useful when data order matters or is
+            already shuffled.</p>
+        <h3>Input feature scaling:</h3>
+        <p> The user can choose from three type of scaling, Standard (mean-centered wihg standard deviation), MinMax
+            (rescale to [0,1] range), and Robust (scale to interquartile range IQR=Q3-Q1 and median-centered), or no
+            scaling. The scaler is fitted on the training data only, and then applied to both training and testing sets
+            to prevent bias from the testing set.</p>
+        <p>Note that for XGBoost, input scaling isn't strictly necessary as trees are not sensitive to the scale of the
+            features.</p>
+        <h3>Building the model:</h3>
+        <p>XGBoost builds the model through successive rounds of boosting, where each boosting round optimizes a
+            decision tree of a specified maximum depth to minimize the overall error. The learning rate controls how
+            much influence each new tree has on correcting the errors from previous rounds. Fine-tuning the number of
+            estimators, maximum depth, and learning rate can significantly improve model performance: increasing the
+            number of estimators generally leads to better accuracy but can cause overfitting; adjusting the maximum
+            depth helps control model complexity; and selecting an appropriate learning rate balances convergence speed
+            and stability.</p>
+        <h3>Advanced Parameters:</h3>
+        <p>Other parameters can be used to fine-tune the model, especially to avoid overfitting and improve model
+            robustness. For example, 'subsample' controls the fraction of the training data used in each boosting
+            iteration to introduce randomness, while 'colsample_bytree', 'colsample_bylevel', and 'colsample_bynode'
+            control the fraction of features used at different stages of tree construction to further reduce overfitting
+            and enhance model diversity.</p>
+        <h3>Boosted or standalone Random Forest:</h3>
+        <p>XGBoost can also implement parallel trees to create a Random Forest-like model. In this approach, multiple
+            trees are built independently in parallel to reduce variance and improve robustness. When the number of
+            estimators is set to 1, XGBoost functions as a standalone Random Forest, leveraging ensemble techniques
+            without boosting.</p>
+    </div>
+    <div *ngIf="widgetData['mpr_information']">
+        <p>MultiPolynomial Regression (MPR) is an advanced regression technique used to model relationships between
+            multiple independent variables (inputs Xi​) and a dependent variable (output Y), leveraging polynomial
+            features to capture non-linear patterns.</p>
+
+        <div><img src="assets/mpr_information.png" alt="Spectral mixture kernel" class="img-fluid"></div>
+
+        <p>where βij are the coefficients, n is the number of independent variables, d is the degree of the polynomial,
+            and ϵ is the error term.</p>
+
+
+        <p><strong class="highlight">Note:</strong> The equation is missing the combination between independent
+            variables (X1​X2, X1​2X2, etc.) but the goal here is not to provide the perfect mathematical expression.</p>
+
+        <h3>Train/test split:</h3>
+        <p>The data will be split into training and testing sets, with the user selecting the test set ratio (𝛼). For a
+            "Random Split," the data is randomly divided between training and testing sets, and a specific random state
+            (e.g., 42) can be set in the 'Advanced parameters' for reproducibility. By default, no random state is
+            defined, resulting in different splits each time. For a "Sequential Split," the first (1-𝛼) fraction of the
+            data is used for training, and the remaining 𝛼 is used for testing, useful when data order matters or is
+            already shuffled.</p>
+
+        <h3>Input feature scaling:</h3>
+        <p>The user can choose from three types of scaling: Standard (mean-centered with standard deviation), MinMax
+            (rescale to [0,1] range), and Robust (scale to interquartile range IQR=Q3-Q1 and median-centered), or no
+            scaling. The scaler is fitted on the training data only and then applied to both training and testing sets
+            to prevent bias from the testing set.</p>
+
+        <h3>Building the model:</h3>
+        <p>The model is built based on the user-defined polynomial degree. The higher the polynomial degree, the more
+            complex the model becomes, allowing it to capture complex relationships within the data. However, increasing
+            the polynomial degree can lead to overfitting, and the model will fit the noise in the data and not the main
+            pattern.</p>
+
+        <p>The widget allows for separate control of the polynomial degree of each feature, providing greater
+            flexibility in model tuning, especially when features exhibit different levels of complexity.</p>
+    </div>
+
+    <div *ngIf="widgetData['region_properties_information']">
+         <ul>
+            <li><strong>Inputs:</strong> Binary segmentation masks from preprocessing workflows.</li>
+            <li>
+                <strong>Outputs:</strong> Tabular datasets in CSV, Parquet, or JSON formats containing region properties such as: <br>
+                <ul>
+                    <li><strong>Geometric:</strong> Area, perimeter, centroid, bounding box, etc..</li>
+                    <li><strong>Intensity:</strong> Mean, maximum, minimum, and standard deviation.</li>
+                </ul>
+            </li>
+
+            <li>
+                <strong>Key Features:</strong> <br>
+                <ul>
+                    <li>Supports multi-region property extraction for complex segmentations.</li>
+                    <li>Fully compatible with feature-based ML models and statistical analysis tools.</li>
+                </ul>
+            </li>
+         </ul>
+    </div>
+    <div *ngIf="widgetData['image_dataset_selection_information']">
+        <ul>
+           <li><strong>Inputs:</strong> Image datasets with associated metadata, including defect types, annotations, and user-defined tags</li>
+           <li><strong>Outputs:</strong> Filtered image datasets for downstream processing in workflows.</li>
+            <strong>Key Features:</strong><br> 
+            <ul>
+                <li>Metadata-based query capabilities using indexed search.</li>
+                <li>Integration with segmentation, annotation, and ML workflows.</li>
+            </ul>
+        </ul>
+   </div>
+   <div *ngIf="widgetData['spatial_statistics_information']">
+    <ul>
+       <li><strong>Inputs:</strong> Defect centroid coordinates and metadata from Region Props or segmentation outputs.</li>
+       <li>
+           <strong>Outputs:</strong> 
+           <ul>
+               <li><strong>Numerical metrics:</strong> Nearest neighbor distances, clustering indices, pair correlation functions.</li>
+               <li><strong>Visualizations:</strong> Spatial distribution plots and clustering heatmaps.</li>
+           </ul>
+       </li>
+    </ul>
+</div>

@@ -1,0 +1,146 @@
+.dc-container {
+  height: 100%;
+  font-size: 12px !important;
+
+  .header {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--stroke-lite);
+
+    .title {
+      font-size: 24px;
+      font-weight: 500;
+    }
+  }
+}
+
+.spinner-container {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .percentage {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+  }
+}
+
+.multiple-select-container {
+  position: relative;
+  height: 44px;
+
+  .mat-mdc-form-field {
+    position: absolute;
+  }
+}
+
+.table-multiselect .dropdown-list {
+  position: absolute;
+  /* Change to absolute */
+  z-index: 9999;
+  background-color: white;
+  width: auto !important;
+  max-height: 200px;
+  /* Optional: limit dropdown height and enable scrolling */
+  overflow-y: auto;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+:host ::ng-deep {
+  .table-multiselect {
+    .dropdown-btn {
+      height: 40px !important;
+      margin-bottom: 20px !important;
+      border: 1px solid lightgrey !important;
+
+      .selected-item-container .selected-item {
+        background: #fff !important;
+        color: black !important;
+        border: #fff !important;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 50px) !important;
+
+        &:hover {
+          box-shadow: 1px 1px #fff !important;
+        }
+
+      }
+    }
+
+    .dropdown-list {
+      width: auto !important;
+
+      .multiselect-item-checkbox input[type=checkbox]:checked+div:before {
+        background: #006064 !important;
+        border: 2px solid #006064 !important;
+      }
+
+      .multiselect-item-checkbox input[type=checkbox]+div:before {
+        border: 2px solid #006064 !important;
+      }
+    }
+  }
+}
+
+.start-date-column .mat-form-field {
+  margin-bottom: 20px;
+}
+
+.table-multiselect,
+.date-range-input {
+  padding: 0;
+  margin: 0;
+}
+
+.table-multiselect,
+.date-range-input {
+  width: 100%;
+}
+
+
+table {
+  overflow: visible;
+  /* Ensure overflow is visible */
+}
+
+th {
+  overflow: visible;
+  /* Ensure overflow is visible */
+}
+
+.row-select:hover {
+  cursor: pointer;
+}
+
+.multiselect-dropdown .dropdown-btn {
+  height: 40px !important;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.input-add-new {
+  border: 2px solid #006064 !important;
+  /* Border for input box when adding a new item */
+  border-radius: 4px;
+  padding: 4px;
+  width: 100%;
+  margin-right: 8px;
+  outline: none;
+}
+
+.input-add-new:focus {
+  border-color: #006064;
+  /* Change border color when the input is focused */
+}
+
+.custom-btn {
+  height: 36px !important;
+}

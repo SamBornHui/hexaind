@@ -1,0 +1,10 @@
+<mst-input
+  *ngFor="let item of items; let i = index"
+  type="select"
+  [label]="item.name || ''"
+  [value]="
+    selectedIds.length ? selectedIds[i] || undefined : item['defaultValue']
+  "
+  [items]="datas[i] || []"
+  (change)="onItemChange($event, item, i)"
+/>

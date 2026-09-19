@@ -1,0 +1,143 @@
+.label-value {
+  margin-left: 10px;
+  color: black;
+  /* Sets the text color of the second label to #007C80 */
+  font-weight: 400;
+}
+
+.label-result {
+  margin-left: 10px;
+  color: green;
+  font-weight: 700;
+}
+
+.label-status {
+  margin-left: 10px;
+  color: green;
+  font-weight: 700;
+}
+
+.label {
+  margin-left: 10px;
+  font-weight: 500;
+  color: #329da0;
+}
+
+.scrollable-text-field textarea {
+  width: 70%;
+  /* Adjust width as needed */
+  height: 200px;
+  /* Adjust height as needed */
+  overflow-y: scroll;
+  /* Adds vertical scrolling */
+}
+
+.arrow-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  /* This ensures the button's contents are centered vertically */
+  padding: 0;
+  /* Adjust padding as needed */
+}
+
+.material-icons {
+  font-size: 24px;
+  /* Adjust based on your preference */
+  vertical-align: middle;
+  /* Adjusts the vertical alignment - you can also try 'bottom' */
+  margin-bottom: 0px;
+  /* Adjust this value to lower the icon */
+}
+
+.arrow-up,
+.arrow-down {
+  display: inline-block;
+  width: 10px;
+  /* Adjust size as needed */
+  height: 10px;
+  /* Adjust size as needed */
+  background: url("/path-to-your-arrow-icon.png") no-repeat center center;
+  /* Replace with your arrow icons */
+}
+
+.arrow-down {
+  transform: rotate(0deg);
+  /* Arrow pointing down */
+}
+
+.arrow-up {
+  transform: rotate(180deg);
+  /* Arrow pointing up */
+}
+
+.scrollable-text-field textarea {
+  width: 70%;
+  /* Adjust width as needed */
+  height: 200px;
+  /* Adjust height as needed */
+  overflow-y: scroll;
+  /* Adds vertical scrolling */
+  background-color: #f0f0f0;
+  /* Light gray background */
+  border: none;
+  /* Removes the border */
+  padding: 10px;
+  /* Adds some padding inside the text area */
+  box-sizing: border-box;
+  /* Ensures padding does not affect the overall dimensions */
+}
+
+.spinner-container {
+  display: flex;
+  /* This will align the children (spinner and label) in a row */
+  align-items: center;
+  /* This will align the spinner and label vertically in the center */
+  gap: 10px;
+  /* Adjusts the space between the spinner and the label */
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  /* Light gray border */
+  border-top: 4px solid #007bff;
+  /* Blue part of the spinner */
+  border-radius: 50%;
+  /* Makes the spinner round */
+  width: 20px;
+  /* Diameter of the spinner */
+  height: 20px;
+  /* Diameter of the spinner */
+  animation: spin 2s linear infinite;
+  /* Spinning animation */
+}
+
+.test-class {
+  background-color: red;
+  /* To make it visibly distinct */
+  height: 100px;
+  /* Arbitrary height for testing */
+}
+
+.spinner-label {
+  display: inline-block;
+  /* Ensures the label is aligned correctly with the spinner */
+  vertical-align: middle;
+  /* Aligns the text vertically to the middle */
+  font-size: 16px;
+  /* Size of the text, adjust as needed */
+  color: #000;
+  /* Color of the text, adjust as needed */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+

@@ -1,0 +1,22 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom p-6">
+        <h1 fxFlex>Visualization Preview</h1>
+        <button mat-icon-button [mat-dialog-close]="true">
+            <mat-icon class="close-icon">close</mat-icon>
+        </button>
+    </div>
+
+    <div fxFlex *ngIf="showSpinner" fxLayout="column" fxLayoutAlign="center center" class="spinner-container">
+        <div class="spinner"></div>
+        <span>Loading...</span>
+    </div>
+
+    <div fxFlex *ngIf="!showSpinner && data.fileExtension === 'png'" fxLayout="column" fxLayoutAlign="center center">
+        <img [src]="previewURL" alt="Preview Image" class="preview-image">
+    </div>
+
+    <div fxFlex *ngIf="!showSpinner && data.fileExtension === 'mp4'" fxLayout="column" fxLayoutAlign="center center">
+        <video [src]="previewURL" controls width="600">
+          </video>
+    </div>
+</div>

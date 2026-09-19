@@ -1,0 +1,183 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom p-6">
+    <div>
+      <h1>
+        Import Data:
+        <span class="fw-normal">{{
+          showFileTypeInDialog()
+          }}</span>
+      </h1>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div fxFlex="none">
+      <div class="fw-bold pb-1">Choose Origin</div>
+      <mat-radio-group color="primary" [(ngModel)]="selectedOption">
+        <mat-radio-button value="mounted" (click)="fetchMountedData()">Mounted Drive</mat-radio-button>
+        <mat-radio-button value="local" *ngIf="!isLocalFileUplaodFeatureDisabled()">Local Drive</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <div fxFlex="none" *ngIf="selectedOption === 'mounted'">
+      <div class="fw-bold mb-1">Choose Source</div>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Search source file" (input)="filterNodes($event)" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+    <div fxFlex class="y-auto">
+
+      <ng-container *ngIf="selectedOption === 'mounted'">
+        <div fxFlex *ngIf="mountedLoader" fxLayout="column" fxLayoutAlign="center center" style="align-items: center">
+          <mat-spinner diameter="48"></mat-spinner>
+        </div>
+        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+          <!-- Leaf node template -->
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [class.selected]="isFileSelected(node)"
+            (click)="toggleFileSelection(node); $event.stopPropagation()">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <div fxFlex="none">
+                <button mat-icon-button disabled></button>
+              </div>
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined text-grey">{{
+                  node.type === "file" ? "insert_drive_file" : "folder"
+                  }}</mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">{{ node.name }}</div>
+              <div fxFlex="none" class="check" *ngIf="isFileSelected(node)">
+                <mat-icon>check</mat-icon>
+              </div>
+            </div>
+          </mat-tree-node>
+          <!-- Expandable node template -->
+          <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+            [class.selected]="isFileSelected(node) && (data.type === 'save' || (data.file_type === 'Image Folder' || data.file_type === 'images'))"
+            (click)="toggleFileSelection(node); $event.stopPropagation()">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <div fxFlex="none">
+                <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.name"
+                  (click)="onNodeToggle(node, $event)">
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{
+                    treeControl.isExpanded(node)
+                    ? "arrow_drop_down"
+                    : "arrow_right"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined text-grey">{{
+                  node.type === "file" ? "insert_drive_file" : "folder"
+                  }}</mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">{{ node.name }}</div>
+            </div>
+            <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" class="my-0">
+              <ng-container matTreeNodeOutlet></ng-container>
+            </ul>
+          </mat-nested-tree-node>
+        </mat-tree>
+      </ng-container>
+      <ng-container *ngIf="selectedOption === 'local'">
+        <div fxFlex="none">
+          <div class="fw-bold mb-1" style="padding-bottom: 10px;">Choose File(s)</div>
+          <input #fileInputModule type="file" multiple [accept]="permittedExtensions" style="display: none"
+            (change)="uploadFile($event)" />
+          <input #imageInputModule type="file" multiple webkitdirectory directory [accept]="permittedExtensions"
+            style="display: none" (change)="uploadImageData($event, true)" />
+          <button mat-flat-button color="primary" class="upload-button-height" *ngIf="!isLoading"
+            (click)="(data.file_type === 'Image Folder') ? imageInputModule.click() : fileInputModule.click()">
+            Upload
+          </button>
+          <mat-spinner diameter="30" *ngIf="isLoading"></mat-spinner>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center" class="p-6 pt-0"
+    *ngIf="data.file_type !== 'Image Folder' && data.file_type!='images'">
+    <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+    <button mat-flat-button color="primary" [disabled]="selectedOption == 'local'" (click)="onImport()" *ngIf="!isLoading">Import</button>
+    <mat-spinner diameter="30" *ngIf="isLoading"></mat-spinner>
+  </div>
+</div>
+
+<!-- <mat-dialog-content class="mat-typography" style="height: calc(91vh - 98px);">
+  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center" class="mb-2 border-bt">
+    <div class="steps">Import data
+      {{(!data.file_type || data.file_type === '') ? '' :'('+data.file_type.toLocaleUpperCase()+')'}}
+    </div>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+      <mat-icon class="close-icon">close</mat-icon>
+    </button>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px">
+    <div fxFlex>
+      <strong>Choose Origin</strong><br> 
+    </div>
+
+    <div fxFlex>
+      <mat-radio-group      
+        color="primary"
+        class="radio-group"
+        [(ngModel)]="selectedOption"
+      >
+        <mat-radio-button value="mounted">Mounted Drive</mat-radio-button>
+        <mat-radio-button value="local" (click)="fileInputModule.click()">
+          <input #fileInputModule type="file" multiple [accept]="permittedExtensions"
+          style="display: none" (change)="uploadFile($event)" />Local Drive
+        </mat-radio-button>
+      </mat-radio-group>  
+    </div>
+    <div fxFlex *ngIf="selectedOption === 'mounted'">
+      <div fxLayout="column" fxLayoutGap="16px">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput placeholder="Search" (input)="filterNodes($event)" />
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+            <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [class.selected]="isFileSelected(node)"
+              (click)="toggleFileSelection(node);$event.stopPropagation()">
+              <button mat-icon-button disabled></button>
+              <mat-icon class="material-symbols-outlined">{{node.type === 'file' ? 'insert_drive_file' :
+                'folder'}}</mat-icon>
+              {{node.name}}
+              <div class="check" *ngIf="isFileSelected(node)"><mat-icon>check</mat-icon></div>
+            </mat-tree-node>
+            <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+              [class.selected]="isFileSelected(node) && data.type==='save'"
+              (click)="toggleFileSelection(node);$event.stopPropagation()">
+              <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+                <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.name">
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right'}}
+                  </mat-icon>
+                </button>
+                <mat-icon class="material-symbols-outlined">{{node.type === 'file' ? 'insert_drive_file' :
+                  'folder'}}</mat-icon>
+                <div>{{node.name}}</div>
+              </div>
+              <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" class="my-0">
+                <ng-container matTreeNodeOutlet></ng-container>
+              </ul>
+            </mat-nested-tree-node>
+          </mat-tree>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+  <button mat-flat-button color="primary" (click)="onImport()">Import</button>
+</mat-dialog-actions> -->

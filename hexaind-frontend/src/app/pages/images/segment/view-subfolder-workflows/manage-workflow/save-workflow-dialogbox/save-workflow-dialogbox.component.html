@@ -1,0 +1,87 @@
+<div fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Save This Workflow</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="closeDialog(false)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div>Do you want to save changes made to this workflow?</div>
+    <div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          type="text"
+          placeholder="Workflow Name"
+          #workflowName
+          [value]="data.name"
+          (keyup.enter)="submitName(workflowName.value)"
+        />
+      </mat-form-field>
+    </div>
+    <!-- <div *ngIf="currentUser['role']['title'] =='Admin'">
+    <mat-checkbox color="primary" [(ngModel)]="defaultWorkflow">
+      Default Workflow
+    </mat-checkbox>
+  </div> -->
+    <div>
+      <mat-checkbox color="primary" [(ngModel)]="applyToAllImages">
+        Assign to all images in this folder
+      </mat-checkbox>
+    </div>
+    <div *ngIf="data['manual']">
+      <mat-checkbox
+        color="primary"
+        [(ngModel)]="manual"
+        [disabled]="disableCheckbox()"
+      >
+        Carry over image masking
+      </mat-checkbox>
+    </div>
+    <div *ngIf="data['checkanalysis']">
+      <mat-checkbox color="primary" [(ngModel)]="analysis">
+        Apply analysis to all images using this workflow
+      </mat-checkbox>
+    </div>
+    <!-- <div>
+    <mat-checkbox color="primary" [(ngModel)]="wf_for_incomingimages">
+      Apply this workflow to incoming images for batch processing
+    </mat-checkbox>
+  </div> -->
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="closeDialog(false)">
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="closeDialog(true)"
+      *ngIf="data['action'] == 'save&close'"
+    >
+      Don't Save
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="submitName(workflowName.value)"
+    >
+      Save
+    </button>
+  </div>
+</div>

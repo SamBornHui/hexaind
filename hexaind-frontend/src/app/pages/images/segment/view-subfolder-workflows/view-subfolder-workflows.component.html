@@ -1,0 +1,32 @@
+<ng-container *ngIf="selectedWorkflowTab == 0" >
+  <view-images-and-workflows 
+    [selectedWorkflowTab]="selectedWorkflowTab" 
+    [datasetId]="datasetId"
+    [foldersList]="foldersList"
+    [datasetName]="datasetName" 
+    [apiCall]="apiCall" 
+    [segmentationworkflow]="segmentationworkflow"
+    [selectedFolderId]="selectedFolderId" 
+    [selectedFolderName]="selectedFolderName" 
+    [allWorkFlows]="allWorkFlows"
+    [isBatchProcessingStarted]="isBatchProcessingStarted" 
+    (activiateApiCallEvent)="activiateApiCall($event)"
+    (changeFavoriteEvent)="changeFavorite($event)" 
+    (changeOutputDirectoryEvent)="changeOutputDirectory($event)"
+    (updateSegementationEvent)="updateSegementation($event)"
+    (invokeAllWorkflowsFuncEvent)="invokeAllWorkflowsFunc($event)" 
+    (editWorkflowEvent)="editWorkflowEvent($event)"
+    (batchProcessingEvent)="startBatchProcessing($event)"
+    (applyWorkflowToastIdEvent)="changeApplyWorkflowToastId($event)"
+    (navigateBackToSubfolder)="onNavigateBackToSubfolder()"
+    [workflowProgress]="workflowProgress"></view-images-and-workflows>
+</ng-container>
+<ng-container *ngIf="selectedWorkflowTab == 1">
+  <manage-workflow [editWorkflowData]="editWorkflowData" [datasetId]="datasetId" [datasetName]="datasetName"
+    [apiCall]="apiCall" [segmentationworkflow]="segmentationworkflow" [selectedFolderId]="selectedFolderId"
+    [selectedFolderName]="selectedFolderName" [allWorkFlows]="allWorkFlows" [closeType]="closeType"
+    [saveWorkflowBtn]="saveWorkflowBtn" (saveWorkflowBtnEvent)="saveWorkflowBtnEvent($event)"
+    (activiateApiCallEvent)="activiateApiCall($event)" (updateSegementationEvent)="updateSegementation($event)"
+    (invokeAllWorkflowsFuncEvent)="invokeAllWorkflowsFunc($event)" (selectedFirstTab)="selectedFirstTabEvent($event)">
+  </manage-workflow>
+</ng-container>

@@ -1,0 +1,34 @@
+<header>
+  <b>{{ name }}</b>
+</header>
+<div
+  class="mst-drop-list__list"
+  [class.dragover--error]="!droppable"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <div>
+    <mst-list
+      [itemTemplate]="itemTemplate"
+      [items]="items"
+      [rightIconNames]="rightIconNames"
+      [selectedItemHighlight]="false"
+      [keepBottomBorder]="keepBottomBorder"
+      (iconClick)="onIconClick($event)"
+    />
+  </div>
+  <div
+    class="mst-drop-list__list__placeholder"
+    [class.empty]="items.length === 0"
+  >
+    {{ placeholder }}
+  </div>
+</div>
+<ng-template #dialogTemplate>
+  <mat-dialog-content> Do you want to delete this item? </mat-dialog-content>
+  <mat-dialog-actions class="mst-drop-list__dialog__actions">
+    <mst-button styleName="flat" (click)="onDialogAction()">Yes</mst-button>
+    <mst-button mat-dialog-close>No</mst-button>
+  </mat-dialog-actions>
+</ng-template>

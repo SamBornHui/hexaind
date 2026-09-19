@@ -1,0 +1,118 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="column" fxLayoutGap="4px">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <div class="fw-bold">Prediction Model</div>
+                <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Choose Model">
+                  info
+                </mat-icon>
+              </div>
+              <div fxLayout="row">
+                <div>
+                  <button mat-flat-button color="primary" (click)="openModelSelectionDialog()">
+                    Choose Model
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="column" fxLayoutGap="8px" *ngIf="getModelId() && show">
+              <div class="bg-surface p-4 rounded-1">
+                Model Name: {{ getModelName() }}
+              </div>
+              <div class="bg-surface p-4 rounded-1">
+                Model ID: {{ getModelId() }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="Prediction Widget" widgetUrn="{{ getWidgetUrn() }}"
+  siteId="1"></app-config-action-bar>

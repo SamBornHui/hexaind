@@ -1,0 +1,93 @@
+metadata:
+    client_name: Client Name
+    internal_name: Internal Name
+    valid_from: 2021-05-13
+    valid_to: 2022-05-13
+    branch: Production
+
+
+model_fitting:
+    30 days:
+        voce:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.75
+
+        swift:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.1
+
+        hocket_sherby:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.5
+
+        hocket_sherby_swift:
+            tensile_weight: 5
+            bulge_weight: 1
+            scaled_residue: True
+
+            considere_weight: 0.5
+    90 days:
+        voce:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 1
+
+        swift:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.1
+
+        hocket_sherby:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.5
+
+        hocket_sherby_swift:
+            tensile_weight: 5
+            bulge_weight: 1
+            scaled_residue: True
+
+            considere_weight: 0.5
+    180 days:
+        voce:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 1
+
+        swift:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.1
+
+        hocket_sherby:
+            tensile_weight: 5
+            bulge_weight: 0
+            scaled_residue: True
+
+            considere_weight: 0.5
+
+        hocket_sherby_swift:
+            tensile_weight: 5
+            bulge_weight: 1
+            scaled_residue: True
+
+            considere_weight: 0.5

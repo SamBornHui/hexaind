@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.mst-table {
+  &__container {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background-color: #fff;
+      .mst-table__row {
+        border-top: 0;
+        padding-top: 1px;
+      }
+    }
+  }
+  &__row {
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid var(--stroke-lite);
+    height: var(--mst-table-row-height, 64px);
+  }
+  &__cell {
+    position: relative;
+  }
+}

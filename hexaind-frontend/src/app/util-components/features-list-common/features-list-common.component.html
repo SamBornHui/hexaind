@@ -1,0 +1,152 @@
+<ng-container>
+  <mat-accordion class="global-accordion">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Features List</mat-panel-title>
+      </mat-expansion-panel-header>
+      <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom pb-1">
+        <div fxFlex class="fw-bold py-3">NUMERICAL</div>
+        <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center">
+          <mat-slide-toggle [(ngModel)]="isScientificNotationEnabled" color="primary">
+            Scientific Notation
+          </mat-slide-toggle>
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix>search</mat-icon>
+              <input matInput [(ngModel)]="searchTerm" placeholder="Search columns"
+                (input)="searchFeatureList($event)" />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="global-nodata" *ngIf="numericalDataSource.length === 0">
+        No numerical features exists.
+      </div>
+      <div class="mb-2" *ngIf="numericalDataSource.length > 0">
+        <div class="data-table">
+          <!-- Table Header -->
+          <div class="table-header">
+            <div class="cell">Feature name</div>
+            <div class="cell">
+              <mat-checkbox [(ngModel)]="allInputChecked" (change)="toggleAllCheckbox($event)" matTooltip="Select All">
+                <span class="fw-semi-bold">Input</span>
+              </mat-checkbox>
+            </div>
+            <div class="cell">Output</div>
+            <div class="cell">Count</div>
+            <div class="cell">Std</div>
+            <div class="cell">Mean</div>
+            <div class="cell">Min</div>
+            <div class="cell">Max</div>
+          </div>
+          <cdk-virtual-scroll-viewport [itemSize]="50" [minBufferPx]="300" [maxBufferPx]="1000" [ngStyle]="{'height': numericalTableHeight}"  class="virtual-scroll">
+            <!-- Table Rows (Virtual Scroll) -->
+            <div *cdkVirtualFor="let elementData of numericalDataSource | featureNameSearch:numFeatureSearch"
+              class="table-row">
+              <div class="cell">{{ elementData.name }}</div>
+              <div class="cell">
+                <mat-checkbox [(ngModel)]="elementData.inputChecked"
+                  (change)="toggleCheckbox($event, elementData, 'input')">
+                </mat-checkbox>
+              </div>
+              <div class="cell">
+                <mat-checkbox [disabled]="configCache?.problem_type !='regression'"
+                  [(ngModel)]="elementData.outputChecked" (change)="toggleCheckbox($event, elementData, 'output')">
+                </mat-checkbox>
+              </div>
+              <div class="cell">{{ elementData.count }}</div>
+              <div class="cell">
+                <span [innerHTML]="elementData.std | scientificNumber:isScientificNotationEnabled"></span>
+              </div>
+              <div class="cell">
+                <span [innerHTML]="elementData.mean | scientificNumber:isScientificNotationEnabled"></span>
+              </div>
+              <div class="cell">
+                <span [innerHTML]="elementData.min | scientificNumber:isScientificNotationEnabled"></span>
+              </div>
+              <div class="cell">
+                <span [innerHTML]="elementData.max | scientificNumber:isScientificNotationEnabled"></span>
+              </div>
+            </div>
+          </cdk-virtual-scroll-viewport>
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom pb-1">
+        <div fxFlex class="fw-bold py-3">CATEGORICAL</div>
+      </div>
+
+      <div class="global-nodata" *ngIf="categoricalDataSource.length === 0">
+        No categorical features exists.
+      </div>
+      <div *ngIf="categoricalDataSource.length > 0">
+        <div class="data-table">
+          <!-- Table Header -->
+          <div class="table-header">
+            <div class="cell">Feature name</div>
+            <div class="cell">
+              <mat-checkbox [(ngModel)]="allCatInputChecked" (change)="toggleAllCheckboxCategorical($event)"
+                matTooltip="Select All">
+                <span class="fw-semi-bold">Input</span>
+              </mat-checkbox>
+            </div>
+            <div class="cell">Output</div>
+            <div class="cell">Count</div>
+            <div class="cell">Unique</div>
+            <div class="cell">Top</div>
+            <div class="cell">Freq</div>
+            <div class="cell">Missing</div>
+          </div>
+
+          <cdk-virtual-scroll-viewport [itemSize]="50"  [minBufferPx]="300" [maxBufferPx]="1000" [ngStyle]="{'height': catergoricalTableHeight}" class="virtual-scroll">
+
+            <!-- Table Rows (Virtual Scroll) -->
+            <div *cdkVirtualFor="let elementData of categoricalDataSource | featureNameSearch:catFeatureSearch"
+              class="table-row">
+              <div class="cell">{{ elementData.name }}</div>
+              <div class="cell">
+                <mat-checkbox [(ngModel)]="elementData.inputChecked"
+                  (change)="toggleCheckbox($event, elementData, 'input')">
+                </mat-checkbox>
+              </div>
+              <div class="cell">
+                <mat-checkbox [disabled]="configCache?.problem_type != 'classification'"
+                  [(ngModel)]="elementData.outputChecked" (change)="toggleCheckbox($event, elementData, 'output')">
+                </mat-checkbox>
+              </div>
+              <div class="cell">{{ elementData.count }}</div>
+              <div class="cell">{{ elementData.unique }}</div>
+              <div class="cell" matTooltip="{{ elementData.top }}">{{ elementData.top }}</div>
+              <div class="cell">{{ elementData.freq }}</div>
+              <div class="cell">{{ elementData.missing }}</div>
+            </div>
+          </cdk-virtual-scroll-viewport>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <div fxLayout="column" fxLayoutGap="8px" class="bg-surface rounded-1 p-4 mt-4">
+    <div class="fw-bold">Selected Features</div>
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+      <div fxFlex="100px">Inputs ({{configCache?.input_cols?.length}}):</div>
+      <div fxFlex fxLayout="row wrap" fxLayoutGap="4px grid" class="text-sm">
+        <div fxFlex="none" *ngFor="let input of configCache?.input_cols?.slice(0,30)">
+          <div class="global-type-chip primary">{{input}}</div>
+        </div>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+      <div fxFlex="100px">Output ({{configCache?.output_col ? 1 : (configCache?.output_cols?.length || 0)}}):</div>
+      <div fxFlex fxLayout="row wrap" fxLayoutGap="4px grid" class="text-sm">
+        <div fxFlex="none" *ngIf="configCache?.output_col">
+          <div class="global-type-chip primary">{{configCache?.output_col}}</div>
+        </div>
+        <ng-container *ngIf="configCache?.output_cols">
+          <div fxFlex="none" *ngFor="let output_col of configCache?.output_cols">
+            <div class="global-type-chip primary">{{output_col}}</div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-container>

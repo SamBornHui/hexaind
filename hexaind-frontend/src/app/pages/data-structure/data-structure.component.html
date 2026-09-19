@@ -1,0 +1,464 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px" (click)="deleteConfirmation = false">
+  <div fxFlex="none">
+    <h1 class="global-main-title">
+      {{ pageTitle }}
+      <mat-icon class="material-symbols-outlined global-info-icon"
+        matTooltip="This page is the repository for datasets and will serve as a central hub for project members to import, discover, manage, and collaborate on datasets.">
+        info
+      </mat-icon>
+    </h1>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="fixed-header">
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="220px" fxFlex.lt-md="150px">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="searchText" (input)="onSearchTextChange($event)" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center">
+      <div fxLayout="row" fxLayoutGap="16px" *ngIf="assets.create == true || assets == 'server_admin'">
+        <button mat-flat-button color="primary" (click)="openCreateFolderDialog()"
+          *ngIf="!(isCurrentParentDataSetImage() && folderView)">
+          <mat-icon class="material-symbols-outlined">add</mat-icon>
+          Create Folder
+        </button>
+        <button mat-flat-button color="primary" [matMenuTriggerFor]="importMenu">
+          <mat-icon class="material-symbols-outlined">upload</mat-icon>
+          Import Data
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex class="y-auto" *ngIf="!folderView">
+    <div *ngIf="filteredDataStructure.length === 0 && isDataSetLoaded" class="centered-info-message">
+      No datasets are present for this project
+    </div>
+    <div fxFlex *ngIf="!isDataSetLoaded" fxLayout="column" fxLayoutAlign="center center" style="align-items: center">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+    <p-treeTable *ngIf="filteredDataStructure.length > 0 && isDataSetLoaded" class="global-treetable dataset-table"
+      [value]="treeTableData" [scrollable]="true" [tableStyle]="{ 'min-width': '50rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [ttSortableColumn]="'name'">
+            Name
+            <p-treeTableSortIcon [field]="'name'"></p-treeTableSortIcon>
+          </th>
+          <th [ttSortableColumn]="'dataset_type'">
+            Type
+            <p-treeTableSortIcon [field]="'dataset_type'"></p-treeTableSortIcon>
+          </th>
+          <th [ttSortableColumn]="'size'">
+            Size
+            <p-treeTableSortIcon [field]="'size'"></p-treeTableSortIcon>
+          </th>
+          <th [ttSortableColumn]="'created_by'">
+            Owner
+            <p-treeTableSortIcon [field]="'created_by'"></p-treeTableSortIcon>
+          </th>
+          <th [ttSortableColumn]="'created_at'">
+            <div fxLayoutAlign="start center">
+              <div>
+                Date Created
+              </div>
+              <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1" style="margin-top: -3px;"
+                matTooltip="User's local time">info</mat-icon>
+              <p-treeTableSortIcon [field]="'created_at'"></p-treeTableSortIcon>
+            </div>
+          </th>
+          <th [ttSortableColumn]="'last_modified_at'">
+            <div fxLayoutAlign="start center">
+              <div>
+                Last Modified
+              </div>
+              <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1" style="margin-top: -3px;"
+                matTooltip="User's local time">info</mat-icon>
+              <p-treeTableSortIcon [field]="'last_modified_at'"></p-treeTableSortIcon>
+            </div>
+          </th>
+          <th>&nbsp;</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+
+
+        <tr *ngIf="rowData.isNoData">
+          <td colspan="7" class="global-nodata">
+            No data found
+          </td>
+        </tr>
+
+        <tr *ngIf="!(rowData.dataset_type === 'IMAGES_FOLDER' && nfolder.includes(rowData.name)) && !rowData.isNoData"
+          [ttRow]="rowNode">
+          <td>
+            <div fxLayout="row" fxLayoutAlign="start center" (dblclick)="switchToBreadCrumbView(rowNode)">
+              <div fxFlex="none">
+                <ng-container *ngIf="rowData.dataset_type === 'IMAGE_DATASET'; else defaultToggler">
+                  <span (click)="toggleRow(rowNode)" class="expand-icon">
+                    <mat-icon class="material-symbols-outlined icon-28">
+                      {{ rowNode.node.expanded ? 'expand_more' : 'chevron_right' }}
+                    </mat-icon>
+                  </span>
+                </ng-container>
+                <ng-template #defaultToggler>
+                  <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                </ng-template>
+              </div>
+              <div fxFlex="none" class="text-grey me-2">
+                <svg viewBox="0 0 24 24" class="svg-icon" *ngIf="rowData.type === 'file' && !isZipFile(rowData)">
+                  <use *ngIf="isCsvFile(rowData)" xlink:href="#icon-csv"></use>
+                  <use *ngIf="isTextFile(rowData)" xlink:href="#icon-txt"></use>
+                  <use *ngIf="isJsonFile(rowData)" xlink:href="#icon-json"></use>
+                  <use *ngIf="isParquetFile(rowData)" xlink:href="#icon-parquet"></use>
+                  <use *ngIf="isPythonFile(rowData)" xlink:href="#icon-python"></use>
+                  <use *ngIf="isImageFile(rowData)" xlink:href="#icon-image"></use>
+                  <use *ngIf="isPDFFile(rowData)" xlink:href="#icon-pdf"></use>
+                  <use *ngIf="isExcelFile(rowData)" xlink:href="#icon-excel"></use>
+                </svg>
+                <mat-icon *ngIf="rowData.type === 'folder'">folder_open</mat-icon>
+                <mat-icon class="material-symbols-outlined" *ngIf="isZipFile(rowData)">folder_zip</mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse" matTooltip="{{ rowData.name }}">
+                {{ rowData.name }}
+                <mat-icon *ngIf="rowData.is_corrputed !== undefined && rowData.is_corrputed === true"
+                  class="material-symbols-outlined text-orange icon-16" matTooltip="Dataset Corrupted" style="top: 3px">
+                  warning
+                </mat-icon>
+              </div>
+            </div>
+          </td>
+          <td><span class="global-type-chip">{{ rowData.dataset_type }}</span></td>
+          <td>{{ fileSizeConveter(rowData.size) }}</td>
+          <td>
+            <div class="text-ellipse">{{ rowData.created_by }}</div>
+          </td>
+          <td>
+            <span *ngIf="rowData.created_at !== ''">
+              {{ lastAccessedDate(rowData.created_at) | date:'d-MMM-yyyy h:mm a' }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="rowData.last_modified_at !== ''">
+              {{ lastAccessedDate(rowData.last_modified_at) | date:'d-MMM-yyyy h:mm a' }}
+            </span>
+          </td>
+          <td>
+            <mat-icon
+              [matMenuTriggerFor]="rowData.dataset_type !== 'IMAGES_FOLDER' && rowData.dataset_type !== 'IMAGE' && !rowData.item_path ? rootMenu : imageFolderEdit"
+              [matMenuTriggerData]="{ element: rowData }" #menuTrigger="matMenuTrigger"
+              (click)="deleteConfirmation = false; $event.stopPropagation()" style="cursor: pointer">
+              more_vert
+            </mat-icon>
+          </td>
+        </tr>
+
+        <tr *ngIf="!rowData.isNoData && rowData.loading">
+          <td colspan="7" class="text-center p-6">
+            <mat-spinner diameter="24" style="margin:0 auto"></mat-spinner>
+          </td>
+        </tr>
+
+      </ng-template>
+
+    </p-treeTable>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="folderView && !dataLoader">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="mt-3">
+      <div fxFlex="none">
+        <mat-icon (click)="backToTreeView()" style="cursor: pointer; top: 2px">keyboard_arrow_left</mat-icon>
+      </div>
+      <div fxFlex>
+        <ng-container *ngIf="breadcrumbItems.length > 0">
+          <div class="global-breadcrumb">
+            <div class="item" *ngFor="let item of breadcrumbItems; let counter = index">
+              <div *ngIf="counter == 0" class="link" (click)="backToTreeView()">
+                {{ item.label }}
+              </div>
+              <div *ngIf="counter > 0" class="link" (click)="viewFolderResult(item)">
+                {{ item.label }}
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <div fxFlex class="global-data-grid-view y-auto">
+      <div fxLayout="row wrap" fxLayoutGap="24px grid" *ngIf="folderDisplayType == 'grid'">
+        <div fxFlex="none" *ngFor="let element of currentFolderView">
+          <div *ngIf="element.data.isNoData; else normalTile" class="global-nodata">
+            {{ element.data.name }}
+          </div>
+          <ng-template #normalTile>
+            <div class="tile"
+              *ngIf="!(element.data.dataset_type === 'IMAGES_FOLDER' && nfolder.includes(element.data.name))">
+              <mat-icon *ngIf="element.data.dataset_type !== 'IMAGE' &&
+                            element.data.dataset_type !== 'IMAGES_FOLDER' &&
+                            !element.data.item_path" class="action-menu" [matMenuTriggerFor]="rootMenu"
+                [matMenuTriggerData]="{ element: element.data }" #menuTrigger="matMenuTrigger"
+                (click)="deleteConfirmation = false; $event.stopPropagation()">
+                more_vert
+              </mat-icon>
+
+              <ng-container *ngIf="element.data.type == 'file'">
+                <div class="icon" *ngIf="!imageDatasetThumbnails[element.data.full_path]">
+                  <svg viewBox="0 0 25 25" class="svg-icon">
+                    <use *ngIf="isCsvFile(element.data)" xlink:href="#icon-csv"></use>
+                    <use *ngIf="isTextFile(element.data)" xlink:href="#icon-txt"></use>
+                    <use *ngIf="isJsonFile(element.data)" xlink:href="#icon-json"></use>
+                    <use *ngIf="isParquetFile(element.data)" xlink:href="#icon-parquet"></use>
+                    <use *ngIf="isPythonFile(element.data)" xlink:href="#icon-python"></use>
+                    <use *ngIf="element.data.dataset_type == 'IMAGE'" xlink:href="#icon-image"></use>
+                    <use *ngIf="isExcelFile(element.data)" xlink:href="#icon-excel"></use>
+                  </svg>
+                </div>
+                <div *ngIf="element.data.dataset_type === 'IMAGE'">
+                  <img [src]="imageDatasetThumbnails[element.data.full_path]"
+                    *ngIf="imageDatasetThumbnails[element.data.full_path]" class="image-thumbnail" />
+                </div>
+                <div class="title" matTooltip="{{ element.data.name }}">
+                  {{ element.data.name }}
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="element.data.type == 'folder'">
+                <div (dblclick)="expandFolder(element)" class="icon folder">
+                  <mat-icon>folder_open</mat-icon>
+                </div>
+                <div class="title" matTooltip="{{ element.data.name }}">
+                  {{ element.data.name }}
+                </div>
+              </ng-container>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<mat-menu #rootMenu="matMenu" [overlapTrigger]="false" class="global-menu">
+  <ng-template matMenuContent let-element="element">
+    <div *ngIf="!deleteConfirmation">
+      <button mat-menu-item [matMenuTriggerFor]="imageFeatureMenu" [matMenuTriggerData]="{ element: element }"
+        *ngIf="element.dataset_type == 'IMAGE_DATASET'">
+        <mat-icon class="material-symbols-outlined">image</mat-icon>
+        <span>Image features</span>
+      </button>
+      <!-- && element.dataset_type !== 'PYTHON' -->
+      <button mat-menu-item (click)="openDataPreviewDialog(element)"
+        *ngIf="(assets.read || assets === 'server_admin') && element.type == 'file'">
+        <mat-icon class="material-symbols-outlined">preview</mat-icon>
+        <span>Preview</span>
+      </button>
+      <button mat-menu-item *ngIf="element.dataset_type === 'IMAGE_DATASET'" (click)="editImageFolderData(element)">
+        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="openMoveDatasetDialog(element)">
+        <mat-icon class="material-symbols-outlined">move_item</mat-icon>
+        <span>Move</span>
+      </button>
+      <button mat-menu-item *ngIf="
+          assets.update == true ||
+          (assets == 'server_admin' && element.dataset_type != 'IMAGE_DATASET')
+        " (click)="openDatasetRenameDialog(element)">
+        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <span>Rename</span>
+      </button>
+      <button mat-menu-item *ngIf="isParquetFile(element)" (click)="ConvertToCsv(element)">
+        <mat-icon class="material-symbols-outlined">move_group</mat-icon>
+        <span>Convert To CSV</span>
+      </button>
+      <button mat-menu-item *ngIf="assets.update == true || assets == 'server_admin'" (click)="downloadData(element)">
+        <mat-icon class="material-symbols-outlined">download</mat-icon>
+        <span>Download</span>
+      </button>
+      <button mat-menu-item (click)="openDuplicateDatasetDialog(element)" *ngIf="
+          (assets.update == true || assets == 'server_admin') &&
+          element.type == 'file'
+        ">
+        <mat-icon class="material-symbols-outlined">content_copy</mat-icon>
+        <span>Duplicate</span>
+      </button>
+      <button mat-menu-item (click)="deleteConfirmation = true; $event.stopPropagation()" *ngIf="
+          (assets.delete == true || assets == 'server_admin') &&
+          (element.type == 'file' || element.dataset_type == 'IMAGE_DATASET')
+        ">
+        <mat-icon class="material-symbols-outlined">delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </div>
+    <div *ngIf="deleteConfirmation">
+      <div mat-menu-item class="header">Are You Sure?</div>
+      <button mat-menu-item (click)="deleteAsset(element)">
+        <mat-icon>check</mat-icon> Yes
+      </button>
+      <button mat-menu-item (click)="deleteConfirmation = false; $event.stopPropagation()">
+        <mat-icon>close</mat-icon> No
+      </button>
+    </div>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #importMenu="matMenu" yPosition="below" class="global-menu">
+  <ng-container *ngIf="!folderView">
+    <button mat-menu-item (click)="importDataDialog('python')">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-python"></use>
+      </svg>
+      <span>Python</span>
+    </button>
+    <button mat-menu-item (click)="importDataDialog('csv')">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-csv"></use>
+      </svg>
+      <span>CSV</span>
+    </button>
+    <button mat-menu-item (click)="importDataDialog('parquet')">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-parquet"></use>
+      </svg>
+      <span>Parquet</span>
+    </button>
+    <button mat-menu-item (click)="importDataDialog('json')">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-json"></use>
+      </svg>
+      <span>JSON</span>
+    </button>
+    <button mat-menu-item (click)="importDataDialog('text')">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-txt"></use>
+      </svg>
+      <span>Text</span>
+    </button>
+    <button mat-menu-item (click)="importDataDialog('excel')">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-excel"></use>
+      </svg>
+      <span>Excel</span>
+    </button>
+    <button mat-menu-item [matMenuTriggerFor]="filesMenu">
+      <svg viewBox="0 0 24 24" class="svg-icon">
+        <use xlink:href="#icon-image"></use>
+      </svg>
+      <span>Image</span>
+    </button>
+    <button mat-menu-item (click)="importDataDialog('module')">
+      <mat-icon style="padding: 0px 24px 0px 6px;" class="material-symbols-outlined">folder_zip</mat-icon>
+      <span>Zip</span>
+    </button>
+  </ng-container>
+  <ng-container *ngIf="folderView">
+    <ng-container *ngIf="isImportIntoExistingDatasetEnabled()">
+      <button mat-menu-item (click)="importDataDialog('python')">
+        <svg viewBox="0 0 24 24" class="svg-icon">
+          <use xlink:href="#icon-python"></use>
+        </svg>
+        <span>Python</span>
+      </button>
+      <button mat-menu-item (click)="importDataDialog('csv')">
+        <svg viewBox="0 0 24 24" class="svg-icon">
+          <use xlink:href="#icon-csv"></use>
+        </svg>
+        <span>CSV</span>
+      </button>
+      <button mat-menu-item (click)="importDataDialog('parquet')">
+        <svg viewBox="0 0 24 24" class="svg-icon">
+          <use xlink:href="#icon-parquet"></use>
+        </svg>
+        <span>Parquet</span>
+      </button>
+      <button mat-menu-item (click)="importDataDialog('json')">
+        <svg viewBox="0 0 24 24" class="svg-icon">
+          <use xlink:href="#icon-json"></use>
+        </svg>
+        <span>JSON</span>
+      </button>
+      <button mat-menu-item (click)="importDataDialog('text')">
+        <svg viewBox="0 0 24 24" class="svg-icon">
+          <use xlink:href="#icon-txt"></use>
+        </svg>
+        <span>Text</span>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="isCurrentParentDataSetImage()">
+      <button mat-menu-item [matMenuTriggerFor]="filesMenu" style="width: 120px">
+        <svg viewBox="0 0 24 24" class="svg-icon">
+          <use xlink:href="#icon-image"></use>
+        </svg>
+        <span>Image</span>
+      </button>
+    </ng-container>
+  </ng-container>
+  <!-- <button mat-menu-item (click)="importDataDialog('folder')">
+    <svg viewBox="0 0 24 24" class="svg-icon">
+      <use xlink:href="#icon-folder"></use>
+    </svg>
+    <span>Folder</span>
+  </button> -->
+</mat-menu>
+
+<mat-menu #filesMenu="matMenu" class="global-menu">
+  <button mat-menu-item (click)="importDataDialog('images')">
+    <svg viewBox="0 0 24 24" style="padding-right: 4px" class="svg-icon">
+      <use xlink:href="#icon-image"></use>
+    </svg>
+    <span>File</span>
+  </button>
+  <button mat-menu-item (click)="importDataDialog('Image Folder')">
+    <svg viewBox="0 0 24 24" style="padding-right: 4px" class="svg-icon">
+      <use xlink:href="#icon-folder"></use>
+    </svg>
+    <span>Folder</span>
+  </button>
+</mat-menu>
+
+<mat-menu #imageFolderEdit="matMenu" class="global-menu">
+  <ng-template matMenuContent let-element="element">
+    <ng-container *ngIf="!deleteConfirmation">
+      <button mat-menu-item (click)="editImageFolderData(element)">
+        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button mat-menu-item (click)="deleteConfirmation = true; $event.stopPropagation()"
+        *ngIf="assets.delete == true || assets == 'server_admin'">
+        <mat-icon class="material-symbols-outlined">delete</mat-icon>
+        <span>Delete</span>
+      </button>
+    </ng-container>
+    <div *ngIf="deleteConfirmation">
+      <div mat-menu-item class="header">Are You Sure?</div>
+      <button mat-menu-item (click)="deleteImageDatasetEntity(element)">
+        <mat-icon>check</mat-icon> Yes
+      </button>
+      <button mat-menu-item (click)="deleteConfirmation = false; $event.stopPropagation()">
+        <mat-icon>close</mat-icon> No
+      </button>
+    </div>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #imageFeatureMenu="matMenu" class="global-menu">
+  <ng-template matMenuContent let-element="element">
+    <!-- <button mat-menu-item (click)="imageFeature(element,'details')">
+      <mat-icon class="material-symbols-outlined">description</mat-icon>
+      <span>Details</span>
+    </button> -->
+    <button mat-menu-item (click)="imageFeature(element, 'cleanup')">
+      <mat-icon class="material-symbols-outlined">photo_size_select_small</mat-icon>
+      <span>Cleanup</span>
+    </button>
+    <button mat-menu-item (click)="imageFeature(element, 'segment')">
+      <mat-icon class="material-symbols-outlined">add_photo_alternate</mat-icon>
+      <span>Segment</span>
+    </button>
+    <button mat-menu-item (click)="imageFeature(element, 'annotate')">
+      <mat-icon class="material-symbols-outlined">edit_location_alt</mat-icon>
+      <span>Annotate</span>
+    </button>
+  </ng-template>
+</mat-menu>

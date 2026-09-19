@@ -1,0 +1,233 @@
+<!-- left-nav.component.html -->
+<div class="left-nav" [ngClass]="{ collapsed: navService.isNavCollapsed }">
+  <div class="collapser" (click)="navService.toggleNav()"
+    matTooltip="{{ navService.isNavCollapsed ? 'Expand' : 'Collapse' }}">
+    <mat-icon>{{
+      navService.isNavCollapsed ? "chevron_right" : "chevron_left"
+      }}</mat-icon>
+  </div>
+  <div fxLayout="column" class="h-100">
+    <div class="scroller" fxFlex>
+      <ul class="nav-items">
+        <li>
+          <!-- Check if assets is null -->
+          <ng-container *ngIf="isEmptyObject(assets)">
+            <!-- Display all sections -->
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('data-structure', 'dataset')">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined">data_table</mat-icon>
+              </div>
+              <div fxFlex>Datasets</div>
+            </div>
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('models', 'models')">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined">network_node</mat-icon>
+              </div>
+              <div fxFlex>Models</div>
+            </div>
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('workflows', 'workflows')">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined">account_tree</mat-icon>
+              </div>
+              <div fxFlex>Workflows</div>
+            </div>
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('custom-python-recipe', 'custom-python-recipe')">
+              <div fxFlex="none">
+                <svg class="svg-icon">
+                  <use xlink:href="#icon-python"></use>
+                </svg>
+              </div>
+              <div fxFlex>Custom Widgets</div>
+            </div>
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('jupyter-hub', 'jupyter-hub')">
+              <div fxFlex="none">
+                <svg class="svg-icon">
+                  <use xlink:href="#icon-jupyter"></use>
+                </svg>
+              </div>
+              <div fxFlex>Jupyter Hub</div>
+            </div>
+<!-- 
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('train-predictions', 'train-predictions')">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined">troubleshoot</mat-icon>
+              </div>
+              <div fxFlex>Train Predictions</div>
+            </div> -->
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('connectors', 'connectors')">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined">hub</mat-icon>
+              </div>
+              <div fxFlex>Connectors</div>
+            </div>
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('tools', 'tools')">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined">terminal</mat-icon>
+              </div>
+              <div fxFlex>Apps</div>
+            </div>
+            <div>
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('manage-access', 'manage-access')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">group</mat-icon>
+                </div>
+                <div fxFlex>Project Members</div>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Check if assets is not null and display sections based on conditions -->
+          <ng-container *ngIf="!isEmptyObject(assets)">
+            <div *ngIf="
+                assets.datasets.read ||
+                assets.datasets.create ||
+                assets.datasets.update ||
+                assets.datasets.delete ||
+                assets.datasets.execute
+              ">
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('data-structure', 'dataset')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">data_table</mat-icon>
+                </div>
+                <div fxFlex>Datasets</div>
+              </div>
+            </div>
+
+            <div *ngIf="
+                assets.ml_models.read ||
+                assets.ml_models.create ||
+                assets.ml_models.update ||
+                assets.ml_models.delete ||
+                assets.ml_models.execute
+              ">
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('models', 'models')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">network_node</mat-icon>
+                </div>
+                <div fxFlex>Models</div>
+              </div>
+            </div>
+
+            <div *ngIf="
+                assets.workflows.read ||
+                assets.workflows.create ||
+                assets.workflows.update ||
+                assets.workflows.delete ||
+                assets.workflows.execute
+              ">
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('workflows', 'workflows')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">account_tree</mat-icon>
+                </div>
+                <div fxFlex>Workflows</div>
+              </div>
+            </div>
+
+            <div *ngIf="
+                assets.recipes.read ||
+                assets.recipes.create ||
+                assets.recipes.update ||
+                assets.recipes.delete ||
+                assets.recipes.execute
+              ">
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4" (click)="
+                  navigate('custom-python-recipe', 'custom-python-recipe')
+                ">
+                <div fxFlex="none">
+                  <svg class="svg-icon">
+                    <use xlink:href="#icon-python"></use>
+                  </svg>
+                </div>
+                <div fxFlex>Custom Widgets</div>
+              </div>
+            </div>
+
+            <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+              (click)="navigate('jupyter-hub', 'jupyter-hub')">
+              <div fxFlex="none">
+                <svg class="svg-icon">
+                  <use xlink:href="#icon-jupyter"></use>
+                </svg>
+              </div>
+              <div fxFlex>Jupyter Hub</div>
+            </div>
+
+            <div *ngIf="
+                assets.connectors.read ||
+                assets.recipes.create ||
+                assets.recipes.update ||
+                assets.recipes.delete ||
+                assets.recipes.execute
+              ">
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('connectors', 'connectors')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">hub</mat-icon>
+                </div>
+                <div fxFlex>Connectors</div>
+              </div>
+            </div>
+
+            <div *ngIf="tools.dsg_tool.execute">
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('tools', 'tools')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">terminal</mat-icon>
+                </div>
+                <div fxFlex>Apps</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="nav-link" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4"
+                (click)="navigate('manage-access', 'manage-access')">
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined">group</mat-icon>
+                </div>
+
+                <div fxFlex>Project Members</div>
+              </div>
+            </div>     
+
+
+          </ng-container>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="show" class="notification-bar" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+  <div fxFlex="none">
+    <mat-icon class="material-symbols-outlined text-grey">notifications</mat-icon>
+  </div>
+  <div fxFlex class="fw-bold">{{ notificationCount > 0 ? 'You have ' + notificationCount + ' new notifications' : 'You
+    have no new notifications' }}</div>
+  <div fxFlex="none">
+    <button mat-button color="primary" (click)="dismiss()">Dismiss</button>
+  </div>
+  <div fxFlex="none">
+    <button mat-flat-button color="primary" (click)="navigate('notifications')">
+      View notifications
+    </button>
+  </div>
+</div>

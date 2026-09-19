@@ -1,0 +1,46 @@
+image: feeni/node-chrome:latest
+
+pipelines:
+  default:
+    - step: &build-test-sonarcloud
+        name: 'Build, test and analyze on SonarCloud'
+        size: 4x
+        caches:
+          - node
+          - sonar
+        script:
+          - pipe: sonarsource/sonarcloud-scan:2.0.0
+            variables:
+              SONAR_TOKEN: ${SONAR_TOKEN}
+              #EXTRA_ARGS: '-Dsonar.pullrequest.key=$BITBUCKET_PR_ID -Dsonar.pullrequest.branch=$BITBUCKET_BRANCH -Dsonar.pullrequest.base=$BITBUCKET_PR_DESTINATION_BRANCH'  
+
+  branches:
+    sonarscan:
+      - *build-test-sonarcloud
+
+  custom: 
+    releasebranchcreation:
+      - step:
+          name: 'Branch-Creation'
+          image: atlassian/default-image:2
+          script:
+            - echo "Branch-Creation script"
+            - export FULL_DATE=$(date +'%m%d')
+            - |
+              git checkout -b release.$MAJOR_VERSION.$MINOR_VERSION.$FULL_DATE
+              git push origin release.$MAJOR_VERSION.$MINOR_VERSION.$FULL_DATE
+              git branch
+
+definitions:
+  services:
+    docker:
+      memory: 4096
+  caches:
+    sonar: ~/.sonar/cache  # Caching SonarCloud artifacts will speed up your build
+
+clone:
+  depth: full  # SonarCloud scanner needs the full history to assign issues properly
+
+pull-requests:
+  '**':
+    - *build-test-sonarcloud

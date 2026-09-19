@@ -1,0 +1,38 @@
+<div fxLayout="row" fxLayoutGap="16px" class="h-100">
+  <ng-container *ngIf="loadDataFromDataset || showSpinner == true">
+    <mat-spinner [diameter]="40"></mat-spinner>
+  </ng-container>
+  <ng-container *ngIf="!loadDataFromDataset"> </ng-container>
+  <div fxFlex="none" class="pe-4 border-right">
+    <app-image-left-nav
+      *ngIf="foldersList.length > 0"
+      [foldersList]="foldersList"
+      [featureName]="featureName"
+      (headerClicked)="leftmenuFolderSelection($event)"
+      (contentClicked)="leftmenuImageSelection($event)"
+      class="h-100"
+    ></app-image-left-nav>
+  </div>
+  <div fxFlex>
+    <view-subfolder-workflows
+      *ngIf="checkSelectedFolder()"
+      [datasetId]="datasetId"
+      [datasetName]="datasetName"
+      [foldersList]="foldersList"
+      [selectedFolderDetails]="selectedFolderDetails"
+      (backButtonFunction)="changePageView($event)"
+      (navigateBackSegment)="onNavigateBackSegment()"
+      (refreshOnBack)="refreshOnBack($event)"
+    >
+    </view-subfolder-workflows>
+  </div>
+  <!-- <div fxFlex>
+        Image Area
+    </div>
+    <div fxFlex="280px" fxFlex.gt-md="320px" fxFlex.gt-lg="360px" class="ps-4 border-left">
+        Features
+    </div> -->
+</div>
+<!-- <div fxLayout="row" fxLayoutAlign="end center">
+    <button mat-flat-button color="primary">Save</button>
+</div> -->

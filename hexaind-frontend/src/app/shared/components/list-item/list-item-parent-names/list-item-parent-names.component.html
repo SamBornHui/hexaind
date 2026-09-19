@@ -1,0 +1,21 @@
+<div class="mst-list-item-parent-names__parents">
+  <ng-container *ngFor="let name of item['parentNames'] || []; let last = last">
+    <div
+      class="mst-list-item-parent-names__parents__parent-name mst-shared-truncate"
+    >
+      {{ name }}
+    </div>
+    <div
+      class="mst-list-item-parent-names__parents__parent-separator"
+      *ngIf="!last"
+    >
+      &nbsp;{{ separator }}&nbsp;
+    </div>
+  </ng-container>
+</div>
+<div
+  class="mst-list-item-parent-names__name mst-shared-truncate"
+  [title]="(item['parentNames'] || []).concat(item.name).join('/')"
+>
+  {{ item.name }}
+</div>

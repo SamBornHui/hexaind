@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=60"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hexaind"
+authors = []
+description = "HEXAIND Service"
+version = "3.0.0"
+readme = "README.md"
+license = { "file" = "LICENSE" }
+requires-python = "~=3.10"
+keywords = ["hexaind"]
+classifiers = ["Programming Language :: Python :: 3"]
+dynamic = ["optional-dependencies"]
+
+[project.scripts]
+hexaind = "app.__main__:main"
+
+[tool.setuptools.dynamic.optional-dependencies]
+prod = { file = ["requirements.txt"] }
+prod_ml = { file = ["ml_requirements.txt"] }
+dev = { file = ["dev-requirements.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["app*", "tests*", "integration_tests*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+app = [
+    "**/*.txt",
+    "**/*.csv",
+    "**/*.json",
+    "**/*.parquet",
+    "**/*.html",
+    "**/*.css",
+    "**/*.js",
+    "**/*.ttf",
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.ipynb",
+    "**/*.joblib",
+    "**/*.jinja2",
+    "**/*.yaml",
+    "**/*.zip",
+]
+tests = ["**/*.json"]
+integration_tests = ["**/*.csv", "**/*.json", "**/*.pkl"]
+
+[tool.pytest.ini_options]
+addopts = "--verbose"
+
+
+[tool.ruff]
+line-length = 88
+

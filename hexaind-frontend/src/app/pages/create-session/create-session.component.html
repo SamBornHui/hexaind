@@ -1,0 +1,82 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <h1>Create Session</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onClose()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="p-6 y-auto">
+    <!-- <mat-tab-group class="h-100"> -->
+      <!-- <mat-tab label="Existing">
+        <div fxLayout="column" fxLayoutGap="16px" class="pt-4 h-100" style="overflow: hidden;">
+          <div fxFlex class="y-auto">
+            <table mat-table [dataSource]="dataSource">
+
+              
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef width="56">&nbsp;</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-checkbox color="primary" (change)="selectRow(element)" [checked]="isChecked(element)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
+
+              
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+              </ng-container>
+
+              
+              <ng-container matColumnDef="desc">
+                <th mat-header-cell *matHeaderCellDef>Description</th>
+                <td mat-cell *matCellDef="let element">{{ element.desc }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+          <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+            <button mat-stroked-button color="primary" (click)="reset()">Reset</button>
+            <button mat-flat-button color="primary" (click)="submit()">Submit</button>
+          </div>
+        </div>
+      </mat-tab> -->
+      <!-- <mat-tab label="New"> -->
+        <form (ngSubmit)="saveNewEntry(newEntryForm)" #newEntryForm="ngForm" class="h-100" style="overflow: hidden;">
+          <div fxLayout="column" fxLayoutGap="16px" class="pt-4 h-100">
+            <div fxFlex="none">
+              <div class="fw-bold pb-1">Name</div>
+              <mat-form-field appearance="outline">
+                <input matInput [(ngModel)]="newName" name="name" #nameField="ngModel"
+                  [ngClass]="{'invalid': nameField.invalid && (nameField.dirty || nameField.touched)}" />
+                <mat-error *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)">
+                  Name is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold pb-1">Description</div>
+              <mat-form-field appearance="outline">
+                <textarea matInput [(ngModel)]="newDesc" name="description" rows="4" #descField="ngModel"
+                  [ngClass]="{'invalid': descField.invalid && (descField.dirty || descField.touched)}"></textarea>
+                <mat-error *ngIf="descField.invalid && (descField.dirty || descField.touched)">
+                  Description is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+              <button mat-stroked-button color="primary" (click)="clearNewEntry(newEntryForm)">Cancel</button>
+              <button mat-flat-button color="primary" (click)="submit()">Save</button>
+            </div>
+          </div>
+        </form>
+      <!-- </mat-tab> -->
+    <!-- </mat-tab-group> -->
+  </div>
+</div>

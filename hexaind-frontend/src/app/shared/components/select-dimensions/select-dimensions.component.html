@@ -1,0 +1,9 @@
+<mst-drop-list
+  [droppable]="droppable"
+  [items]="dimensionItems"
+  name="Dimensions"
+  placeholder="Drop columns here"
+  [rightIconNames]="['delete']"
+  (drop)="onDrop($event)"
+  (iconClick)="onListIconClick($event)"
+/>

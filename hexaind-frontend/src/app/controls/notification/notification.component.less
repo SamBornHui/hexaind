@@ -1,0 +1,76 @@
+.notification {
+  width: auto;
+  /* Allow the bar to size to the width of its content */
+  position: fixed;
+  top: 0;
+  /* At the top of the viewport */
+  left: 20%;
+  /* Place the left boundary of the notification at the middle of the viewport */
+  right: 20%;
+  transform: translateX(-50%) translateY(-100%);
+  /* Center horizontally and move it up to hide initially */
+  z-index: 1000;
+  /* Ensure it's on top of other elements */
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  background-color: #007bff;
+  /* Blue for informational notification */
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  opacity: 0;
+  animation:
+    slideIn 0.5s ease-in-out,
+    stayOnScreen 3s linear 0.5s,
+    slideOut 0.5s ease-in-out 4.5s;
+  animation-fill-mode: forwards, none, forwards;
+  text-align: center;
+
+  &.success {
+    background-color: green;
+    /* Green for success notifications */
+  }
+
+  &.error {
+    background-color: #f44336;
+    /* Red for error notifications */
+  }
+
+  &.warning {
+    background-color: #ff9800;
+    /* Orange for warning notifications */
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes stayOnScreen {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}

@@ -1,0 +1,118 @@
+:root {
+  // size
+  --mst-height: 44px;
+  --mst-title-font-size: 28px;
+  --mst-input-height: var(--mst-height); // 28 + 8 * 2(padding)
+  --mst-button-height: var(--mst-height);
+  --mst-list-item-height: 48px; // Material Design List Item height
+  --mst-table-row-height: 52px; // Meridian Table Row height
+  --mst-dialog-min-width: 320px;
+  // semantic color
+  --mst-background-color: var(--white);
+  --mst-input-border-color: var(--stroke-dark);
+  // override mdc-theme
+  --mdc-filled-text-field-container-color: var(--white);
+}
+
+mst-input {
+  .mat-mdc-form-field {
+    background-color: transparent;
+    .mdc-text-field--outlined {
+      border-radius: 4px;
+      background-color: var(--white);
+    }
+  }
+  // no hint and error
+  &.no-subscript {
+    .mat-mdc-form-field-bottom-align::before {
+      display: none;
+    }
+  }
+  &.no-underline {
+    div[matformfieldlineripple] {
+      display: none;
+    }
+    .mdc-text-field--filled {
+      background: none;
+    }
+  }
+}
+
+.mst-shared {
+  &-truncate {
+    white-space: nowrap; /* Prevents text from wrapping */
+    overflow: hidden; /* Hides any overflowing content */
+    text-overflow: ellipsis; /* Adds the ellipsis */
+  }
+  &-fullscreen {
+    position: fixed !important;
+    inset: 0;
+    z-index: 9999;
+  }
+  &-dialog {
+    &__content {
+      min-width: var(--mst-dialog-min-width);
+    }
+    &__actions {
+      display: flex;
+      justify-content: flex-end !important;
+      gap: 8px;
+    }
+  }
+}
+
+mst-button {
+  &.mst-button--icon {
+    .mat-mdc-button-touch-target {
+      // default touch target size is 48px for the ux, but if it is bigger than the container and the container(list-item) needs to be dragged, it displays the upper and bottom item's border.
+      height: 32px !important; /* Example: Be careful with small values */
+      min-height: 32px !important; /* Ensure this matches the height */
+      width: 40px;
+    }
+  }
+}
+
+mst-editor {
+  &.hide-line-numbers {
+    .cm-gutters {
+      display: none;
+    }
+  }
+}
+
+mst-hint {
+  .mdc-tooltip__surface {
+    // Target the tooltip's surface (container)
+    position: fixed; // Use fixed positioning for the tooltip itself
+    z-index: 1000; // Ensure it's on top of other elements
+  }
+}
+
+// .mst-shimmer {
+//   position: relative;
+//   &::before {
+//     content: "";
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     background: linear-gradient(
+//       90deg,
+//       rgba(200, 200, 200, 0) 25%,
+//       rgba(200, 200, 200, 0.5) 50%,
+//       rgba(200, 200, 200, 0) 75%
+//     );
+//     background-size: 200% 100%;
+//     animation: mst-shimmer 1.5s infinite linear; /* Adjust duration and timing as needed */
+//   }
+// }
+
+// @keyframes mst-shimmer {
+//   0% {
+//     background-position: -200% 0;
+//   }
+//   100% {
+//     background-position: 200% 0;
+//   }
+// }

@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/460229939257327309/268accfd6cdf439994b14149374dc7ab/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '460229939257327309'
+lifecycle_stage: active
+run_id: 268accfd6cdf439994b14149374dc7ab
+run_name: luminous-goat-361
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752680812798
+status: 1
+tags: []
+user_id: muhammadumersohailkhan

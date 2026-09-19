@@ -1,0 +1,32 @@
+<div class="h-100 p-7" fxLayout="column" fxLayoutGap="24px">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+    <div>
+      <h1>Notifications</h1>
+    </div>
+    <div><div class="link" [ngClass]="{ 'disabled': getUnreadNotificationCount() === 0 }" (click)="markAllNotifucationAsread()">Mark all as read</div></div>
+  </div>
+  <div class="y-auto" fxFlex>
+    <div fxLayout="row" fxLayoutGap="4px" class="row" *ngFor="let notification of notifications">
+      <div fxFlex="none">
+        <mat-icon *ngIf="notification.notification_type == 'SUCCESS'"
+          class="material-symbols-outlined text-green">check_circle</mat-icon>
+        <mat-icon *ngIf="notification.notification_type == 'ERROR' || notification.notification_type == 'SYSTEM'"
+          class="material-symbols-outlined text-red">error</mat-icon>
+        <mat-icon *ngIf="notification.notification_type == 'INFO'"
+          class="material-symbols-outlined text-grey">info</mat-icon>
+        <mat-icon *ngIf="notification.notification_type == 'WARNING'"
+          class="material-symbols-outlined text-orange">warning</mat-icon>
+      </div>
+      <div fxFlex fxLayout="column" fxLayoutGap="16px">
+        <div class="text-md">
+          {{notification.message}}
+        </div>
+        <div fxFlex="none" class="text-grey">{{notification.created_at | TimeAgo}}</div>
+        <br />
+      </div>
+    </div>
+  </div>
+  <div fxFlex="none">
+    <button class="w-100" mat-flat-button color="primary" (click)="navigate('notifications')">See all notifications</button>
+  </div>
+</div>

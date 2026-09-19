@@ -1,0 +1,13 @@
+<mst-input
+  [label]="toggleLabel"
+  type="toggle"
+  [value]="global"
+  (change)="onChange($event, 'global')"
+/>
+<mst-list
+  *ngIf="!global && items.length > 0"
+  [multiSelect]="true"
+  [items]="items"
+  [selectedIds]="selectedIds"
+  (selectedIdsChange)="onChange($event, 'selectedIds')"
+/>

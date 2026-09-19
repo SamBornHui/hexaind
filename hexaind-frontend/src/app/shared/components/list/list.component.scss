@@ -1,0 +1,18 @@
+:host {
+  display: block;
+  position: relative; // for the loader
+  height: 100%;
+  border-radius: 0.375rem;
+}
+.mst-list {
+  &__container {
+    height: 100%;
+    overflow: auto;
+  }
+  &__ul,
+  &__li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+}

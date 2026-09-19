@@ -1,0 +1,239 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <div>Project Level</div>
+      <h1>{{ access_view ? "Update Access" : "Grant Access" }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-6 y-auto">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div
+        fxFlex
+        fxLayout="row"
+        fxLayoutAlign="center"
+        fxLayoutGap="4px"
+        class="pb-1"
+      >
+        <div class="fw-bold">Project Member</div>
+        <mat-icon
+          class="material-symbols-outlined global-info-icon"
+          matTooltip="Project Member"
+          >info</mat-icon
+        >
+      </div>
+      <div
+        fxFlex
+        fxLayout="row"
+        fxLayoutAlign="center"
+        fxLayoutGap="4px"
+        class="pb-1"
+      >
+        <div class="fw-bold">Project Access</div>
+        <mat-icon
+          class="material-symbols-outlined global-info-icon"
+          matTooltip="Project Access"
+          >info</mat-icon
+        >
+      </div>
+      <div fxFlex="64px">&nbsp;</div>
+    </div>
+    <div fxLayout="column">
+      <ng-container *ngIf="access_view; else displayRows">
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="16px">
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <input
+                matInput
+                required
+                id="name"
+                name="name"
+                [(ngModel)]="rowUser.user_name"
+                placeholder="Enter name"
+                disabled
+              />
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-select
+                placeholder="Select Role"
+                [(ngModel)]="rowUser.role_id"
+                (ngModelChange)="trackLastAdded(rowUser.user, rowUser.role, 0)"
+              >
+                <mat-option
+                  *ngFor="let role of getUpdatedFilteredRoles(rowUser.user_id)"
+                  [value]="role.id"
+                  >{{ role.name }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #displayRows>
+        <div
+          *ngFor="let row of rows; let i = index"
+          fxLayout="row"
+          fxLayoutAlign="start start"
+          fxLayoutGap="16px"
+        >
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-label>Select User</mat-label>
+              <mat-select
+                [(ngModel)]="row.user"
+                (ngModelChange)="trackLastAdded(row.user, row.role, i)"
+              >
+                <mat-option
+                  *ngFor="let user of getFilteredUsers(i)"
+                  [value]="user.id"
+                >
+                  {{ user.name
+                  }}{{ user.server_role_value === 2 ? " (P)" : "" }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-select
+                placeholder="Select Role"
+                [(ngModel)]="row.role"
+                (ngModelChange)="trackLastAdded(row.user, row.role, i)"
+              >
+                <mat-option
+                  *ngFor="let role of getFilteredRoles(row.user)"
+                  [value]="role.id"
+                  >{{ role.name }}</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex="64px" fxLayout="row" fxLayoutGap="8px">
+            <div
+              class="global-icon-button-sm mt-2"
+              *ngIf="rows.length > 1"
+              (click)="removeRow(row)"
+            >
+              <mat-icon>remove</mat-icon>
+            </div>
+          </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="8px">
+          <div
+            class="global-icon-button-sm mt-2"
+            *ngIf="getUsersRole && getUsersRole.length > 1"
+            (click)="addRow()"
+          >
+            <mat-icon>add</mat-icon>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="close()">Cancel</button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="access_view ? updateData(rowUser) : saveData()"
+    >
+      {{ access_view ? "Update" : "Save" }}
+    </button>
+  </div>
+</div>
+
+<!-- 
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <div>Project Level</div>
+      <h1>{{ access_view ? 'Update Access' : 'Grant Access' }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-6 y-auto">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div fxFlex fxLayout="row" fxLayoutAlign="center" fxLayoutGap="4px" class="pb-1">
+        <div class="fw-bold">Project Member</div>
+        <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Project Member">info</mat-icon>
+      </div>
+      <div fxFlex fxLayout="row" fxLayoutAlign="center" fxLayoutGap="4px" class="pb-1">
+        <div class="fw-bold">Project Access</div>
+        <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Project Access">info</mat-icon>
+      </div>
+      <div fxFlex="64px">&nbsp;</div>
+    </div>
+    <div fxLayout="column">
+      <ng-container *ngIf="access_view; else displayRows">
+        <div fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="16px">
+          <div fxFlex>
+
+            <mat-form-field appearance="outline">
+              <input matInput required id="name" name="name" [(ngModel)]="rowUser.user_name"
+                #newProjectNameModel="ngModel" placeholder="Enter name" disabled=""/>
+            </mat-form-field>
+            
+          </div>
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select Role" [(ngModel)]="rowUser.role_id" (ngModelChange)="trackLastAdded(rowUser.user, rowUser.role, 0)">
+                <mat-option *ngFor="let role of getRoles" [value]="role.id">{{ role.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #displayRows>
+        
+        <div *ngFor="let row of rows; let i = index" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="16px">
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-label>Select User</mat-label>
+              <mat-select [(ngModel)]="row.user" (ngModelChange)="trackLastAdded(row.user, row.role, i)">
+                <mat-option *ngFor="let user of getUsersRole" [value]="user.id">{{ user.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select Role" [(ngModel)]="row.role_id" (ngModelChange)="trackLastAdded(row.user, row.role, i)">
+                <mat-option *ngFor="let role of getRoles" [value]="role.id">{{ role.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex="64px" fxLayout="row" fxLayoutGap="8px">
+            <div class="global-icon-button-sm mt-2" *ngIf="rows.length > 1" (click)="removeRow(row)"><mat-icon>remove</mat-icon></div>
+          </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="end" fxLayoutGap="8px">
+          <div class="global-icon-button-sm mt-2" *ngIf="getUsersRole.length > 1" (click)="addRow()"><mat-icon>add</mat-icon></div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6">
+    <button mat-stroked-button color="primary" (click)="close()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="access_view ? updateData(rowUser) : saveData()">{{ access_view ? 'Update' : 'Save' }}</button>
+  </div>
+</div> -->

@@ -1,0 +1,42 @@
+<ng-template #itemTemplate let-item="item" let-index="index">
+  <div class="mst-select-sort-column__item">
+    <span
+      class="mst-select-sort-column__item__field mst-shared-truncate"
+      [title]="item.data.field"
+      >{{ item.data.field }}</span
+    ><span>{{ item.data.direction.toUpperCase() }}</span>
+  </div>
+</ng-template>
+<mst-drop-list
+  [items]="sortItems"
+  [itemTemplate]="itemTemplate"
+  [rightIconNames]="['settings', 'delete']"
+  name="Sorts"
+  placeholder="Drop columns here"
+  (iconClick)="onSortListIconClick($event)"
+  (drop)="onDrop($event)"
+/>
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>Edit Sorts</h2>
+  <mat-dialog-content>
+    <div class="mst-select-sort-column__fields">
+      <mst-input
+        type="select"
+        label="Column"
+        [value]="item.sort.field"
+        [items]="columnItems"
+        (change)="onSortChange($event, 'field')"
+      /><mst-input
+        type="select"
+        label="Direction"
+        [value]="item.sort.direction"
+        [items]="sortDirectionList"
+        (change)="onSortChange($event, 'direction')"
+      />
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions class="mst-select-sort-column__dialog__actions">
+    <mst-button styleName="flat" (click)="onDialogAction()">Save</mst-button>
+    <mst-button mat-dialog-close>Close</mst-button>
+  </mat-dialog-actions>
+</ng-template>

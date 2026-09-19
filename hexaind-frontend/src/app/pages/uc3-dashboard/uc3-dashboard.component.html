@@ -1,0 +1,203 @@
+<div fxLayout="column" class="rslt-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-back-button" (click)="navigate('tools')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">UC3 Visualtization</div>
+      <div fxFlex="none">
+        <div style="margin-left: 20vw" class="custom-btn-toggle">
+          <div class="link" (click)="changeViewerFanout('Run')"
+            [ngClass]="{ 'active': selectedPreviewType === 'Run', 'disabled': isRunPlotDisabled }">Features Importance</div>
+          <div class="link disabled" (click)="changeViewerFanout('Top Features')"
+            [ngClass]="{ 'active': selectedPreviewType === 'Top Features', 'disabled': isTopFeatureDataDisabled }">Feature Analysis</div>
+          <div class="link disabled" (click)="changeViewerFanout('Step Names')"
+            [ngClass]="{ 'active': selectedPreviewType === 'Step Names', 'disabled': isStepNameDataDisabled }">Tool - Recipe</div>
+        </div>
+
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader()">
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex class="p-4 pt-1">
+    <div class="h-100">
+      <div fxLayout="row" fxLayoutGap="16px" class="h-100 pt-4 overflow-hidden">
+        <div [fxFlex]="flexValue" fxLayout="column">
+          <div fxFlex *ngIf="!isDataLoaded">
+            <div class="centered-info-message">
+              Please select the parameters to get the required data
+            </div>
+          </div>
+          <div fxFlex fxLayout="column" fxLayoutGap="8px" *ngIf="isDataLoaded">
+
+
+
+            <div fxFlex fxLayout="column">
+              <div fxFlex *ngIf="selectedPreviewType === 'Run'" class="y-auto">
+                <div fxFlex="none" class="graph-container bg-white border-all" *ngIf="runsPlotData">
+                  <div class="h-100" fxLayoutAlign="center center" *ngIf="!runsPlotData.isLoaded">
+                    <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                  </div>
+                  <div class="h-100" [ngStyle]="{visibility: !runsPlotData.isLoaded ? 'hidden' : 'visible'}">
+                    <object [data]="runsPlotData.completeUrl" (load)="onRunPlotDataLoad()"
+                      (error)="plotLoadingFailed(runsPlotData)" class="custom-graph-fit"></object>
+                    <div *ngIf="runsPlotData.isError" class="error-message">
+                      Plot is not present.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div fxFlex fxLayout="row" fxLayoutGap="5px" *ngIf="selectedPreviewType === 'Top Features'"
+                class="y-auto">
+                <div fxFlex="none" style="width: 50%" class="graph-container bg-white border-all"
+                  *ngFor="let path of topFeatureData">
+                  <div class="h-100" fxLayoutAlign="center center" *ngIf="!path.isLoaded">
+                    <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                  </div>
+                  <div class="h-100" [ngStyle]="{visibility: !path.isLoaded ? 'hidden' : 'visible'}">
+                    <object [data]="path.completeUrl" (load)="onTopFeatureDataLoad(path)"
+                      (error)="plotLoadingFailed(path)" class="custom-graph-fit"></object>
+                    <div *ngIf="path.isError" class="error-message">
+                      Plot is not present.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="5px" *ngIf="selectedPreviewType === 'Step Names'"
+                class="y-auto">
+
+                <div class="h-100" fxLayoutAlign="center center" *ngIf="isFetchingStepPlots">
+                  <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                </div>
+
+                <ng-container *ngIf="!isFetchingStepPlots">
+                  <div fxFlex="none" fxLayout="row" style="height: 70%;" *ngIf="stepNameData[0] && stepNameData[1]">
+                    <div fxFlex="none" class="graph-container bg-white border-all w-50 h-100">
+                      <div class="h-100" fxLayoutAlign="center center" *ngIf="!stepNameData[0].isLoaded">
+                        <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                      </div>
+                      <div class="h-100" [ngStyle]="{visibility: !stepNameData[0].isLoaded ? 'hidden' : 'visible'}">
+                        <object [data]="stepNameData[0].completeUrl" (load)="onStepNameDataLoad(stepNameData[0])"
+                          (error)="plotLoadingFailed(stepNameData[0])" class="custom-graph-fit"></object>
+                        <div *ngIf="stepNameData[0].isError" class="error-message">
+                          Plot is not present.
+                        </div>
+                      </div>
+                    </div>
+                    <div fxFlex="none" class="graph-container bg-white border-all w-50 h-100">
+                      <div class="h-100" fxLayoutAlign="center center" *ngIf="!stepNameData[1].isLoaded">
+                        <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                      </div>
+                      <div class="h-100" [ngStyle]="{visibility: !stepNameData[1].isLoaded ? 'hidden' : 'visible'}">
+                        <object [data]="stepNameData[1].completeUrl" (load)="onStepNameDataLoad(stepNameData[1])"
+                          (error)="plotLoadingFailed(stepNameData[1])" class="custom-graph-fit"></object>
+                        <div *ngIf="stepNameData[1].isError" class="error-message">
+                          Plot is not present.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div fxFlex="none" style="height: 60%;" class="graph-container bg-white border-all"
+                    *ngIf="stepNameData[2]">
+                    <div class="h-100" fxLayoutAlign="center center" *ngIf="!stepNameData[2].isLoaded">
+                      <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                    </div>
+                    <div class="h-100" [ngStyle]="{visibility: !stepNameData[2].isLoaded ? 'hidden' : 'visible'}">
+                      <object [data]="stepNameData[2].completeUrl" (load)="onStepNameDataLoad(stepNameData[2])"
+                        (error)="plotLoadingFailed(stepNameData[2])" class="custom-graph-fit"></object>
+                      <div *ngIf="stepNameData[2].isError" class="error-message">
+                        Plot is not present.
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div fxFlex="auto" fxLayout="row" class="border-all p-3 bg-white">
+          <div fxFlex="none" *ngIf="rgtNavToggle">
+            <mat-icon class="material-symbols-outlined global-icon-button-grey"
+              (click)="toggleRgtNav()">right_panel_open</mat-icon>
+          </div>
+          <div fxFlex="280px" fxLayout="column" fxLayoutGap="16px" [ngClass]="{'hidden': rgtNavToggle}">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+              <div fxFlex class="fw-bold text-lg">Parameters</div>
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                  (click)="toggleRgtNav()">right_panel_close</mat-icon>
+              </div>
+            </div>
+            <div fxFlex fxLayout="column" fxLayoutGap="8px" class="y-auto">
+              <div fxFlex="none">
+                <div class="fw-bold pb-2">Workflow Name</div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select Workflow</mat-label>
+                  <input type="text" matInput [(ngModel)]="workflowFilter" [matAutocomplete]="auto">
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onWorkflowChange($event)" placeholder="Select Workflow">
+                    <mat-option *ngFor="let workflow of workFlowList | filteredItems: workflowFilter : true" [value]="workflow.value">
+                      {{workflow.value}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field> 
+              </div>
+              <div fxFlex="none">
+                <div class="fw-bold pb-2">Runs</div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select Run</mat-label>
+                  <input type="text" matInput [(ngModel)]="runFilter" [matAutocomplete]="auto1">
+                  <mat-autocomplete #auto1="matAutocomplete" (optionSelected)="onRunChange($event)" placeholder="Select run">
+                    <mat-option *ngFor="let run of runs | filteredItems: runFilter : true" [value]="run.value">
+                      {{run.value}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field> 
+              </div>
+              <div fxFlex="none">
+                <div class="fw-bold pb-2">Top features</div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select Top feature</mat-label>
+                  <input type="text" matInput [(ngModel)]="topFeatureFilter" [matAutocomplete]="auto2">
+                  <mat-autocomplete #auto2="matAutocomplete" (optionSelected)="onTopFeaturesChange($event)" placeholder="Select Top Features">
+                    <mat-option *ngFor="let topFeature of topFeatures | filteredItems: topFeatureFilter : false" [value]="topFeature">
+                      {{topFeature}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field> 
+              </div>
+              <div fxFlex="none">
+                <div class="fw-bold pb-2">Step Names</div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select Step Name</mat-label>
+                  <input type="text" matInput [(ngModel)]="stepFilter" [matAutocomplete]="auto3">
+                  <mat-autocomplete #auto3="matAutocomplete" (optionSelected)="onStepNameChange($event)" placeholder="Select Step Names">
+                    <mat-option *ngFor="let stepName of stepNames | filteredItems: stepFilter : false" [value]="stepName">
+                      {{stepName}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field> 
+              </div>
+            </div>
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+              <button mat-stroked-button color="primary" (click)="reset(true)">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

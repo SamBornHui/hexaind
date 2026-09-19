@@ -1,0 +1,31 @@
+{
+  "name": "Sample ABAQUS Simulation",
+  "test_mode": true,
+  "run_job": false,
+  "software": {
+    "analysis": {
+      "code": "abaqus-dsls",
+      "version": "2023-golden-DSLS"
+    },
+    "hardware": {
+      "walltime": 3,
+      "coreType": "starlite_max",
+      "slots": 1,
+      "coresPerSlot": 4
+    },
+    "command": "abaqus cae noGUI=MG_Forming.py; abaqus job=FormingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive parallel=domain double=both output_precision=full; abaqus cae noGUI=MG_Springback.py; abaqus job=SpringbackJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus cae noGUI=MG_Buckling.py; abaqus job=BucklingJob.inp cpus=$RESCALE_CORES_PER_SLOT mp_mode=mpi interactive double=both output_precision=full; abaqus python PostProcessing.py;abaqus cae noGUI=Visualizer.py",
+    "reusable_job_file": "custom_driver.py,MG_Forming.py,MG_Springback.py,MG_Buckling.py,PostProcessing.py,Visualizer.py,scaler.pkl,gp_scaling.pkl,sedata.csv",
+    "dynamic_job_file": "param_values.csv",
+    "pre_python":null,
+    "post_python":"custom_driver.py,scaler.pkl,gp_scaling.pkl",
+    "output_file": "PerfMetricsFile.csv",
+    "visualize_files": [
+      "ShellGeometry.png",
+      "ShellGeometry_Closeup.png",
+      "FormingAnimation_Script.avi"
+    ],
+    "envVars": {
+      "DSLS_LICENSE_FILE": "4085@novelis"
+    }
+  }
+}

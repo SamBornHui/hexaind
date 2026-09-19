@@ -1,0 +1,83 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+        <div>
+            <h1>Select Dataset</h1>
+        </div>
+        <div>
+            <button mat-icon-button [mat-dialog-close]="true">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div class="p-2">
+        <mat-form-field appearance="outline">
+            <mat-label>Search for Dataset Names</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput placeholder="Search" [(ngModel)]="SearchTerm"
+                (ngModelChange)="searchDatasetNames($event)" />
+        </mat-form-field>
+    </div>
+    <div fxFlex class="y-auto">
+        <table mat-table [dataSource]="dataSource" (matSortChange)="sortData($event)" matSort>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+                <td mat-cell *matCellDef="let element">
+                    <mat-radio-button color="primary" name="table-radio-button" [value]="element"
+                        (click)="$event.stopPropagation()" (change)="onRadioChange(element)">
+                        <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px" style="cursor: pointer;">
+                            <div>
+                                <svg viewBox="0 0 25 25" class="svg-icon">
+                                    <use *ngIf="element.dataset_location[0]?.extension?.toLowerCase() === '.csv'"
+                                        xlink:href="#icon-csv"></use>
+                                    <use *ngIf="element.dataset_location[0]?.extension?.toLowerCase() === '.txt'"
+                                        xlink:href="#icon-txt"></use>
+                                    <use *ngIf="element.dataset_location[0]?.extension?.toLowerCase() === '.json'"
+                                        xlink:href="#icon-json"></use>
+                                    <use *ngIf="element.dataset_location[0]?.extension?.toLowerCase() === '.parquet'"
+                                        xlink:href="#icon-parquet"></use>
+                                    <use *ngIf="element.dataset_location[0]?.extension?.toLowerCase() === '.py'"
+                                        xlink:href="#icon-python"></use>
+                                    <use *ngIf="element.dataset_location[0]?.extension?.toLowerCase() === '.xlsx' || element.dataset_location[0]?.extension?.toLowerCase() === '.xls'"
+                                        xlink:href="#icon-excel"></use>
+                                </svg>
+                            </div>
+                            <div fxFlex>{{ element.name }}</div>
+                        </div>
+                    </mat-radio-button>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="global-type-chip">{{ element.dataset_type }}</span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="size">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
+                <td mat-cell *matCellDef="let element">{{ element.dataset_location[0].size }} kb</td>
+            </ng-container>
+
+            <ng-container matColumnDef="uploader">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>User</th>
+                <td mat-cell *matCellDef="let element">{{ element.created_by }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="last_modified">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Modified <mat-icon
+                        class="material-symbols-outlined text-grey icon-20 ms-1"
+                        matTooltip="User's local time">info</mat-icon></th>
+                <td mat-cell *matCellDef="let element">{{ element.dataset_location[0].last_modified_at | date:
+                    'd-MMM-yyyy h:mm a' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6">
+        <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+        <button mat-flat-button color="primary" (click)="onSubmit()">Import</button>
+    </div>
+</div>

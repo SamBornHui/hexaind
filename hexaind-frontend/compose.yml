@@ -1,0 +1,20 @@
+services:
+  hexaind-frontend:
+    image: "databrick/hexaind-frontend:${FRONTEND_VERSION:-develop}"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: hexaind-frontend
+    ports:
+      - "4200:4200"
+    environment:
+      - CLIENT_ID=${CLIENT_ID}
+      - AUTHORITY=${AUTHORITY}
+      - HEXAIND_API_URL=${HEXAIND3_BACKEND_URL}
+      - TDAM_API_URL=${TDAM_API_URL}
+      - HEXAIND_MB_API_URL=${HEXAIND3_MB_BACKEND_URL}
+      - HEXAIND_REDIRECT_URL=${HEXAIND3_FRONTEND_URL}
+      - HEXAIND2_URL_EXT=${SPECIFY_THE_WEB_UI_URL}
+      - HEXAIND3_URL_EXT=${HEXAIND3_FRONTEND_URL}
+      - HEXAIND_AUX_API_URL=${HEXAIND3_AUX_BACKEND_URL}
+    restart: always

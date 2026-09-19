@@ -1,0 +1,12 @@
+[
+    {"_id": "664c569824e6fd041c96c25a_664ee2ced73a5a44b61aadd9",
+    "version": "1.0",
+    "user_id": "664c569824e6fd041c96c25a",
+    "project_id": "664ee2ced73a5a44b61aadd9",
+    "role_id": "6602fe18ed1470d7309c6f8e",
+    "is_active": true,
+    "created_at": { "$date": "2024-05-21T08:08:56.139Z" },
+    "created_by": "664c569824e6fd041c96c25b",
+    "last_modified_at": { "$date": "2024-05-21T08:08:56.139Z" },
+    "last_modified_by": "664c569824e6fd041c96c25b"}
+]

@@ -1,0 +1,93 @@
+import datetime
+from functools import reduce
+from hashlib import sha512
+from pathlib import Path
+
+from airflow.decorators import dag, task
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.sensors.base import PokeReturnValue
+
+
+def get_path_hash(path: Path) -> str:
+    return sha512(
+        repr(
+            (
+                path.absolute(),
+                path.lstat().st_mtime,
+            )
+        ).encode()
+    ).hexdigest()
+
+
+def get_latest_hash(path: Path) -> str:
+    if not path.exists():
+        raise ValueError(f"{path} not found")
+    if path.is_file():
+        return get_path_hash(path)
+    return reduce(
+        lambda x, y: sha512(repr((x, y)).encode()).hexdigest(),
+        map(get_path_hash, path.glob("**/*")),
+        get_path_hash(path),
+    )
+
+
+default_args = {
+    "owner": "airflow",
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 1,
+    "retry_delay": datetime.timedelta(minutes=5),
+}
+
+
+@dag(
+    dag_id="{{ dag_id }}",
+    description="A dynamically generated dag to trigger run",
+    schedule_interval="{{ schedule_interval_minutes }}",
+    start_date={{start_date}},
+    end_date={{end_date}},
+    tags={{tags}},
+    catchup=False,
+)
+def file_monitoring_dag():
+    path = "{{ path }}"
+
+    @task(task_id="latest_hash")
+    def latest_hash(path: str) -> str:
+        return get_latest_hash(Path(path))
+
+    @task.sensor(
+        task_id="detect_change",
+        poke_interval=10,
+        timeout=3600,
+        mode="reschedule",
+    )
+    def detect_change(path: str, initial_hash: str) -> PokeReturnValue:
+        return PokeReturnValue(
+            is_done=get_latest_hash(Path(path)) != initial_hash,
+            xcom_value=None,
+        )
+
+    @task(task_id="process_change")
+    def process_change(path: str):
+        print(f"Processing the file...{path}")
+
+    trigger_workflow_run = TriggerDagRunOperator(
+        task_id="trigger_workflow", trigger_dag_id="{{ workflow_dag_id }}"
+    )
+
+    trigger_again_run = TriggerDagRunOperator(
+        task_id="trigger_again", trigger_dag_id="{{ dag_id }}"
+    )
+
+    initial_hash = latest_hash(path)
+    (
+        detect_change(path, initial_hash)
+        >> process_change(path)
+        >> trigger_again_run
+        >> trigger_workflow_run
+    )
+
+
+file_monitoring_dag()

@@ -1,0 +1,170 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px">
+  <div fxFlex="none">
+    <h1 class="global-main-title">Jupyter Hub
+      <mat-icon class="material-symbols-outlined global-info-icon"
+        matTooltip="This page is the repository for all Jupyter Servers for your project work.">
+        info
+      </mat-icon>
+    </h1>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="center" fxHide.lt-sm>
+      <div fxFlex="220px" fxFlex.lt-md="150px">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" (input)="onSearchTextChange($event)" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <button mat-flat-button color="primary" (click)="addJupyterServer()" [disabled]="dataSource.data.length > 0">
+        <mat-icon class="material-symbols-outlined">add</mat-icon>
+        Launch <span fxHide.lt-md>Server</span>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayoutAlign="center center" *ngIf="showLoader">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+  <div fxFlex fxLayoutAlign="center center" *ngIf="!dataSource || dataSource.data.length === 0">
+    <div class="global-nodata">No servers are created</div>
+  </div>
+  <div fxFlex  class="y-auto" *ngIf="dataSource.data.length > 0 && !showLoader">
+    <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows class="jh-table">
+      <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <ng-container *ngIf="column === 'Last Modified'; else defaultHeader">
+            {{ getColumnName(column) }} <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1" matTooltip="User's local time">info</mat-icon>
+          </ng-container>
+          <ng-template #defaultHeader>
+            {{ getColumnName(column) }}
+          </ng-template>
+        </th>
+        <td mat-cell *matCellDef="let server">
+          <ng-container [ngSwitch]="column">
+            <ng-container *ngSwitchCase="'expand'">
+              <button (click)="toggleExpandButtonClicked($event, server)" mat-icon-button>
+                <mat-icon>{{ server.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Name'">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+                <div>
+                  {{ server.server_name ? server.server_name : 'Unknown' }}
+                </div>
+                <div *ngIf="server.isInvalid" class="invalid-session-icon">
+                  <mat-icon class="material-symbols-outlined text-orange icon-16" matTooltip="Workflow Corrupted"
+                    style="top:3px;">warning</mat-icon>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Description'">
+              {{ server.server_description ? server.server_description : 'Unknown' }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'URL'">
+              <button mat-flat-button color="primary"
+                (click)="launchServer(server,server.launch_url);$event.stopPropagation()"
+                [disabled]="server.server_status !== 'RUNNING'"
+                [ngStyle]="{'background': server.server_status === 'RUNNING' ? '#006064' : '#e0e0e0'}">
+                Launch
+              </button>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Status'">
+              <div style="text-transform: uppercase;">{{ server.server_status ? server.server_status : 'Unknown' }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Last Modified'">
+              {{ server.last_activity ? (server.last_activity | date: 'd-MMM-yyyy h:mm a') : 'No activity' }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'menu'">
+              <button mat-icon-button [matMenuTriggerFor]="serverActionsMenu" [matMenuTriggerData]="{element: server}"
+                (click)="$event.stopPropagation()">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+            </ng-container>
+          </ng-container>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let server" class="internal-content" [attr.colspan]="displayedColumns.length"
+          [@detailExpand]="server == expandedElement ? 'expanded' : 'collapsed'">
+          <div *ngIf="server.notebooks && server.notebooks.length > 0">
+            <div fxLayout="row" fxLayoutAlign="start center" class="row" *ngFor="let notebook of server.notebooks">
+              <div fxFlex="76px" class="px-4 text-center">
+                <mat-icon class="material-symbols-outlined icon-20 text-grey" matTooltip="MASTER"
+                  *ngIf="notebook.nb_type == 'MASTER'">
+                  description
+                </mat-icon>
+                <mat-icon class="material-symbols-outlined icon-20 text-grey" matTooltip="CLONE"
+                  *ngIf="notebook.nb_type == 'CLONE'">
+                  content_copy
+                </mat-icon>
+              </div>
+              <div fxFlex="180px" class="px-4">
+                {{ notebook.name }}
+              </div>
+              <div fxFlex class="px-4">
+                {{ (notebook.description) ? notebook.description : 'No description available' }}
+              </div>
+              <div fxFlex="140px" class="px-4">
+                <button mat-flat-button color="primary" (click)="launchServer(notebook,notebook.launch_url)"
+                  [disabled]="server.server_status !== 'RUNNING'"
+                  [ngStyle]="{'background': server.server_status === 'RUNNING' ? '#006064' : '#e0e0e0'}">
+                  Launch
+                </button>
+              </div>
+              <div fxFlex="120px" class="px-4" style="text-transform: uppercase;">
+                {{ notebook.status ? notebook.status : 'Unknown' }}
+              </div>
+
+              <div fxFlex="220px" class="px-4">
+                {{ notebook.last_activity ? (notebook.last_activity | date: 'd-MMM-yyyy h:mm a') : 'No activity' }}
+              </div>
+              <div fxFlex="76px" class="px-4">
+                <button mat-icon-button [matMenuTriggerFor]="notebookActionsMenu"
+                  [matMenuTriggerData]="{element: notebook}">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let server; columns: displayedColumns"
+        (click)="toggleExpandButtonClicked($event, server)">
+      </tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
+    </table>
+  </div>
+</div>
+
+<mat-menu #serverActionsMenu="matMenu" class="global-menu">
+  <ng-template matMenuContent let-element="element">
+    <button mat-menu-item (click)="createNotebook('create',element)" if="element.server_status === 'RUNNING'">
+      <mat-icon class="material-symbols-outlined">create</mat-icon> Create notebook
+    </button>
+    <button mat-menu-item (click)="startServer(element)" [disabled]="element.server_status === 'RUNNING'">
+      <mat-icon class="material-symbols-outlined">play_arrow</mat-icon> Start
+    </button>
+    <button mat-menu-item (click)="stopServer(element)" [disabled]="element.server_status === 'STOPPED'">
+      <mat-icon class="material-symbols-outlined">stop</mat-icon> Stop
+    </button>
+    <button mat-menu-item (click)="deleteServer(element)">
+      <mat-icon class="material-symbols-outlined">delete</mat-icon> Delete
+    </button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #notebookActionsMenu="matMenu" class="global-menu">
+  <ng-template matMenuContent let-notebook="element">
+    <button mat-menu-item *ngIf="notebook.nb_type==='MASTER'" (click)="addJNBMasterClone('MASTER', notebook)">
+      <mat-icon class="material-symbols-outlined">copy_all</mat-icon> Clone
+    </button>
+    <button mat-menu-item *ngIf="notebook.nb_type==='CLONE'" (click)="addJNBMasterClone('CLONE', notebook)">
+      <mat-icon class="material-symbols-outlined">bubble</mat-icon> Promote to Master
+    </button>
+  </ng-template>
+</mat-menu>
+<app-notification #notification></app-notification>

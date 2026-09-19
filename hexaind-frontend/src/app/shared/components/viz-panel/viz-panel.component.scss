@@ -1,0 +1,74 @@
+:host {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--stroke-dark);
+  border-radius: 0.5rem;
+  background-color: #fff;
+  &.dragover {
+    border: 1px dashed black;
+  }
+}
+
+.mst-viz-panel {
+  &__title {
+    display: flex;
+    align-items: center;
+  }
+  &__description {
+    font-size: x-small;
+    color: var(--grey);
+  }
+  &__header {
+    padding: 4px 16px;
+    border-bottom: 1px solid var(--stroke-dark);
+    display: flex;
+    justify-content: space-between;
+    h3 {
+      font-weight: bold;
+      line-height: 32px;
+    }
+    &__tools {
+      display: flex;
+      gap: 4px;
+    }
+    &__data-config {
+      display: none;
+      position: relative;
+      &.show-editor {
+        display: block;
+        mst-viz-data-config {
+          position: absolute;
+          width: 100%;
+          background-color: #fff;
+          z-index: 2;
+        }
+      }
+    }
+  }
+  &__body {
+    flex: 1 1 0px;
+    min-width: 0;
+    min-height: 0;
+    padding: 16px;
+    &__table {
+      width: 100%;
+      height: 100%;
+      &__cell-bar {
+        position: relative;
+        border: 1px solid;
+        &__bar {
+          position: absolute;
+          height: 100%;
+          top: 0;
+          left: 0;
+        }
+      }
+    }
+    &__chart {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

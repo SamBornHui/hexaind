@@ -1,0 +1,84 @@
+<ng-container *ngTemplateOutlet="headerTemplate || null"></ng-container>
+<ng-container *ngIf="!isTable">
+  <div
+    #topSpacer
+    [style.height.px]="topSpacerHeight"
+    class="mst-virtual-scroll__spacer"
+    [class.mst-shimmer]="topSpacerHeight !== 0"
+  ></div>
+  <div
+    #pages
+    *ngFor="let pageIndex of visiblePages"
+    [attr.data-page-index]="pageIndex"
+    class="mst-virtual-scroll__page"
+  >
+    <ng-container
+      *ngTemplateOutlet="
+        pageTemplate;
+        context: { startIndex: pageIndex * limit }
+      "
+    ></ng-container>
+  </div>
+  <div
+    #bottomSpacer
+    [style.height.px]="bottomSpacerHeight"
+    class="mst-virtual-scroll__spacer mst-shimmer"
+  ></div>
+  <mst-loader
+    *ngIf="loading || (loading === undefined && loadingData)"
+    [diameter]="50"
+  />
+  <mst-empty
+    *ngIf="
+      !(loading || (loading === undefined && loadingData)) &&
+      (!items || items.length === 0) &&
+      emptyMessage
+    "
+    class="mst-virtual-scroll__empty"
+    [message]="emptyMessage"
+  />
+</ng-container>
+<ng-container *ngIf="isTable">
+  <tbody
+    #topSpacer
+    [style.height.px]="topSpacerHeight"
+    class="mst-virtual-scroll__spacer"
+    [class.mst-shimmer]="topSpacerHeight !== 0"
+  ></tbody>
+  <tbody
+    #pages
+    *ngFor="let pageIndex of visiblePages"
+    [attr.data-page-index]="pageIndex"
+    class="mst-virtual-scroll__page"
+  >
+    <ng-container
+      *ngTemplateOutlet="
+        pageTemplate;
+        context: { startIndex: pageIndex * limit }
+      "
+    ></ng-container>
+  </tbody>
+  <tbody
+    #bottomSpacer
+    [style.height.px]="bottomSpacerHeight"
+    class="mst-virtual-scroll__spacer mst-shimmer"
+  ></tbody>
+  <tfoot *ngIf="loading || (loading === undefined && loadingData)">
+    <tr>
+      <td colSpan="10000"><mst-loader [diameter]="50" /></td>
+    </tr>
+  </tfoot>
+  <tfoot
+    *ngIf="
+      !(loading || (loading === undefined && loadingData)) &&
+      (!items || items.length === 0) &&
+      emptyMessage
+    "
+  >
+    <tr>
+      <td colSpan="10000">
+        <mst-empty class="mst-virtual-scroll__empty" [message]="emptyMessage" />
+      </td>
+    </tr>
+  </tfoot>
+</ng-container>

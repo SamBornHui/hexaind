@@ -1,0 +1,24 @@
+<div class="global-overlay">
+  <div class="global-panel">
+    <div class="global-panel-header">
+      <button class="global-panel-close-button" (click)="onClosePanel()">
+        X
+      </button>
+      <label>Select which columns to keep from the original file:</label>
+    </div>
+    <!-- 
+    <div class="global-panel-content">
+      <app-column-picker [ingestActivity]="ingestActivity"></app-column-picker>
+    </div> -->
+
+    <div class="global-panel-footer">
+      <button
+        id="closeButton"
+        style="width: 100px; height: 35px"
+        (click)="onClosePanel()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

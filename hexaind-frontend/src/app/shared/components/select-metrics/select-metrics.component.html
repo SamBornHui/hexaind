@@ -1,0 +1,70 @@
+<mst-select-dimensions
+  [droppable]="droppable"
+  [items]="dimensions"
+  (change)="onDimensionsChange($event)"
+/>
+<ng-template #itemTemplate let-item="item" let-index="index">
+  <div class="mst-select-metrics__label">
+    <input
+      [value]="item.data.label || ''"
+      (change)="onLabelChange($event, index)"
+      placeholder="Input metric's label"
+    />
+  </div>
+</ng-template>
+<mst-drop-list
+  name="Metrics"
+  placeholder="Drop columns here"
+  [droppable]="droppable"
+  [items]="metricItems"
+  [itemTemplate]="itemTemplate"
+  [rightIconNames]="['settings', 'delete']"
+  (iconClick)="onIconClick($event)"
+  (drop)="onDrop($event)"
+/>
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>Edit Metric</h2>
+  <mat-dialog-content>
+    <div class="mst-select-metrics__dialog-content">
+      <mst-tabs
+        [selectedIndex]="item.metric.expressionType === 'SQL' ? 1 : 0"
+        [tabs]="[
+          { label: 'Simple', content: tab1Content },
+          { label: 'Custom SQL', content: tab2Content }
+        ]"
+        (tabChanged)="onMetricChange($event, 'expressionType')"
+      />
+      <ng-template #tab1Content
+        ><div class="mst-select-metrics__dialog-content__tab-content">
+          <mst-input
+            type="select"
+            label="Column"
+            [value]="item.metric.field"
+            [items]="columnItems"
+            (change)="onMetricChange($event, 'field')"
+          /><mst-input
+            type="select"
+            label="Aggregate"
+            [value]="item.metric.aggregateType"
+            [items]="aggregateTypeItems"
+            P
+            (change)="onMetricChange($event, 'aggregateType')"
+          /></div></ng-template
+      ><ng-template #tab2Content
+        ><div class="mst-select-metrics__dialog-content__tab-content">
+          <mst-editor
+            style="height: 300px"
+            language="sql"
+            placeholder="Type SQL query here..."
+            [schema]="schema"
+            [lineNumbers]="false"
+            [value]="item.metric.sql || ''"
+            (change)="onMetricChange($event, 'sql')"
+          /></div
+      ></ng-template></div
+  ></mat-dialog-content>
+  <mat-dialog-actions class="mst-select-metrics__dialog-actions">
+    <mst-button styleName="flat" (click)="onDialogAction()">Save</mst-button>
+    <mst-button mat-dialog-close>Close</mst-button>
+  </mat-dialog-actions>
+</ng-template>

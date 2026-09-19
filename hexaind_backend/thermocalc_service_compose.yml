@@ -1,0 +1,70 @@
+volumes:
+  thermocalc-destination:
+    name: thermocalc-destination
+    driver: local
+    driver_opts:
+      type: none
+      device: ${THERMOCALC_DESTINATION}
+      o: bind
+  hexaind-db-thermocalc:
+    driver: local
+
+services:
+  thermocalc_apis:
+    container_name: thermocalc_apis
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: &thermocalc-build
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    command: ["hexaind", "api", "thermocalc"]
+    ports:
+      - "8083:8000"
+    volumes:
+      - thermocalc-destination:${THERMOCALC_HOME}
+    env_file: &thermocalc-env-files
+      - path: thermocalc-overrides.env
+        required: false
+      - monitoring.env
+      - thermocalc.env
+      - jupyterhub.env
+      - celery.env
+      - azure.env
+      - backend.env
+    environment: &thermocalc-env
+      HEXAIND_HOME: ${THERMOCALC_HOME}
+      HEXAIND_DATA: ${THERMOCALC_HOME}
+      HEXAIND_DRIVE: ${THERMOCALC_HOME}
+    restart: always
+  thermocalc_api_worker:
+    container_name: thermocalc_api_worker
+    image: databrick/hexaind_backend:${BACKEND_VERSION:-develop}
+    build: *thermocalc-build
+    command: ["hexaind", "worker", "thermocalc_external"]
+    volumes:
+      - thermocalc-destination:${THERMOCALC_HOME}
+      - ${THERMOCALC_WHL_PATH}:${THERMOCALC_WHL_PATH}:ro
+    env_file: *thermocalc-env-files
+    environment: *thermocalc-env
+    restart: always
+
+  mongo_thermocalc:
+    image: "mongo:5.0.12"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER_NAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_PASSWORD}
+    ports:
+      - "27020:27019"
+    command: ["mongod", "--auth", "--port", "27019"]
+    volumes:
+      - hexaind-db-thermocalc:/data/db
+    profiles:
+      - rrm
+      - all
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27019 --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always

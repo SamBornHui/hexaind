@@ -1,0 +1,458 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 2</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output2" [(ngModel)]="widgetOutput2"
+                  (ngModelChange)="widgetOutput2 = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="100" fxFlex.lt-lg="100">
+              <app-features-list-common (changeMade)="changeMade = $event" [numericalDataSource]="numericalDataSource"
+                [categoricalDataSource]="categoricalDataSource" [configCache]="configCache">
+              </app-features-list-common>
+              <div class="p-4">
+                <!-- ============Input scaling============ -->
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Input feature scaling</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Method for normalizing input features, particularly useful when input features have different scales">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <mat-radio-group [(ngModel)]="selectedScalling" (change)="storeSelectedInputScalling($event)">
+                      <mat-radio-button color="primary" *ngFor="let scaling of scalingMethods" [value]="scaling">
+                        {{ displayNames[scaling] }}</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+                <!-- ============Split type============ -->
+                <!-- ============Test split============ -->
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Test split ratio (%)</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Proportion of the dataset allocated for testing the model, while the rest is used for training.">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                      <mat-radio-group [(ngModel)]="selectedSplitType" (change)="storeSelectedSplitType($event)"
+                        [disabled]="getSplitRatio() === 0">
+                        <mat-radio-button color="primary" *ngFor="let type of splitType" [value]="type">{{
+                          type | replaceAndCapitalize }}</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+                    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="96px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getSplitRatio()}}" (keyup.enter)="setSplitRatio($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="240px">
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="99" [min]="0" [step]="1"
+                          [discrete]="true" (change)="setSplitRatio($event)">
+                          <input matSliderThumb [ngModel]="getSplitRatio()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- ============Number of estimators============ -->
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Number of estimators</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Number of boosting rounds, or boosting trees">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="96px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getNumberOfEstimators()}}"
+                            (keyup.enter)="setNumberOfEstimators($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="240px">
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="1000" [min]="1"
+                          [step]="1" [discrete]="true" (change)="setNumberOfEstimators($event)">
+                          <input matSliderThumb [ngModel]="getNumberOfEstimators()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- ============Maximum depth============ -->
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Maximum depth</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Maximum number of levels in each decision tree.">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="96px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getMaxDepth()}}" (keyup.enter)="setMaxDepth($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="240px">
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="20" [min]="2" [step]="1"
+                          [discrete]="true" (change)="setMaxDepth($event)">
+                          <input matSliderThumb [ngModel]="getMaxDepth()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- ============Learning Rate============ -->
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Learning rate</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Step size to scale the contribution of each tree during training.">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="96px">
+                        <mat-form-field appearance="outline">
+                          <input matInput [ngModel]="getLearningRate()" (keyup.enter)="setLearningRate($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="240px">
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" max="1" min="0.00001"
+                          step="0.00001" [discrete]="true" (change)="setLearningRate($event)">
+                          <input matSliderThumb [ngModel]="getLearningRate()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ============Advanced Parameters============ -->
+              <mat-accordion class="global-accordion">
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title><b>Advanced parameters</b></mat-panel-title>
+                    <mat-panel-description>
+                      Configure advanced model settings
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <div class="p-4">
+                    <!-- ============K Fold============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div><mat-checkbox [checked]="getK_Fold() != null" (change)="setTheKfoldValue($event)"> <span
+                              class="fw-bold"> Cross-validation folds </span></mat-checkbox></div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Number of partitions used for cross-validation to evaluate the model performance.">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+                          *ngIf="getK_Fold() != null">
+                          <div fxFlex="96px">
+                            <mat-form-field appearance="outline">
+                              <input matInput value="{{getK_Fold()}}" (keyup.enter)="setK_Fold($event)"
+                                [disabled]="workflowCanvasService.IsViewingRunMode" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="100" [min]="2"
+                              [step]="1" [discrete]="true" (change)="setK_Fold($event)">
+                              <input matSliderThumb [ngModel]="getK_Fold()" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Sub sample============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div fxFlex="34px">&nbsp;</div>
+                        <div class="fw-bold">Row sampling ratio</div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Fraction of the training data randomly selected for use in each boosting iteration.">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <div fxFlex="96px">
+                            <mat-form-field appearance="outline">
+                              <input matInput value="{{getValueByType('sub-sample')}}"
+                                (keyup.enter)="setValueByType($event,'sub-sample')"
+                                [disabled]="workflowCanvasService.IsViewingRunMode" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="1" [min]="0.1"
+                              [step]="0.1" [discrete]="true" (change)="setValueByType($event,'sub-sample')">
+                              <input matSliderThumb [ngModel]="getValueByType('sub-sample')" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Col sample by tree============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div fxFlex="34px">&nbsp;</div>
+                        <div class="fw-bold">Feature sampling ratio per tree</div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Fraction of features randomly chosen for constructing each tree.">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <div fxFlex="96px">
+                            <mat-form-field appearance="outline">
+                              <input matInput value="{{getValueByType('sample_by_tree')}}"
+                                (keyup.enter)="setValueByType($event,'sample_by_tree')"
+                                [disabled]="workflowCanvasService.IsViewingRunMode" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="1" [min]="0.1"
+                              [step]="0.1" [discrete]="true" (change)="setValueByType($event,'sample_by_tree')">
+                              <input matSliderThumb [ngModel]="getValueByType('sample_by_tree')" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Col sample by level============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div fxFlex="34px">&nbsp;</div>
+                        <div class="fw-bold">Feature sampling ratio per level</div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Fraction of features randomly sampled for every tree level during tree construction.">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <div fxFlex="96px">
+                            <mat-form-field appearance="outline">
+                              <input matInput value="{{getValueByType('sample_by_level')}}"
+                                (keyup.enter)="setValueByType($event,'sample_by_level')"
+                                [disabled]="workflowCanvasService.IsViewingRunMode" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="1" [min]="0.1"
+                              [step]="0.1" [discrete]="true" (change)="setValueByType($event,'sample_by_level')">
+                              <input matSliderThumb [ngModel]="getValueByType('sample_by_level')" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Col sample by node============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div fxFlex="34px">&nbsp;</div>
+                        <div class="fw-bold">Feature sampling ratio per node</div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Fraction of features considered for each node split during tree construction">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <div fxFlex="96px">
+                            <mat-form-field appearance="outline">
+                              <input matInput value="{{getValueByType('sample_by_node')}}"
+                                (keyup.enter)="setValueByType($event,'sample_by_node')"
+                                [disabled]="workflowCanvasService.IsViewingRunMode" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="1" [min]="0.1"
+                              [step]="0.1" [discrete]="true" (change)="setValueByType($event,'sample_by_node')">
+                              <input matSliderThumb [ngModel]="getValueByType('sample_by_node')" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Number of parallel trees============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div><mat-checkbox [checked]="getboosted_random_forest()"
+                            (change)="setboosted_random_forest($event)"> <span class="fw-bold">Boosted random forest
+                            </span></mat-checkbox></div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Use of parallel trees to implement the Random Forest algorithm. Behaves as a standalone RF if ‘Number of estimators’=1">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <div fxFlex="none" class="fw-bold">Number of parallel trees</div>
+                          <div fxFlex="96px">
+                            <mat-form-field appearance="outline" *ngIf="getboosted_random_forest()">
+                              <input matInput value="{{getValueByType('sample_by_parallel_tree')}}"
+                                (keyup.enter)="setValueByType($event,'sample_by_parallel_tree')"
+                                [disabled]="workflowCanvasService.IsViewingRunMode" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider
+                              [disabled]="workflowCanvasService.IsViewingRunMode || !getboosted_random_forest()"
+                              [max]="1000" [min]="1" [step]="1" [discrete]="true"
+                              (change)="setValueByType($event,'sample_by_parallel_tree')">
+                              <input matSliderThumb [ngModel]="getValueByType('sample_by_parallel_tree')" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Random State============ -->
+                    <!-- *ngIf="this.configCache?.hyper_params?.split_type === 'Random'" -->
+                    <div fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="space-between center"
+                      class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="8px">
+                        <div fxFlex="34px">&nbsp;</div>
+                        <div class="fw-bold">Random state</div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Seed value to ensure model training and evaluation reproducibility. ‘None’ if reproducibility is not required"
+                          matTooltipPosition="above">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign="end center" fxFlex>
+                        <mat-radio-group [ngModel]="getRandomStateOptions()"
+                          (ngModelChange)="setTheRandomStateOptions($event)"
+                          [disabled]="selectedSplitType === 'Sequential' || getSplitRatio() === 0">
+                          <mat-radio-button value="None">None</mat-radio-button>
+                          <mat-radio-button value="0">0</mat-radio-button>
+                          <mat-radio-button value="42">42</mat-radio-button>
+                        </mat-radio-group>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                          <div fxFlex="100px">
+                            <mat-form-field appearance="outline" *ngIf="getRandomState() !== 'None'">
+                              <input matInput value="{{getRandomState()}}"
+                                [disabled]="workflowCanvasService.IsViewingRunMode || selectedSplitType === 'Sequential'"
+                                (keyup.enter)="setRandomState($event)" />
+                            </mat-form-field>
+                          </div>
+                          <div fxFlex="215px">
+                            <mat-slider
+                              [disabled]="workflowCanvasService.IsViewingRunMode || selectedSplitType === 'Sequential' || getSplitRatio() === 0 "
+                              [max]="100" [min]="0" [step]="1" [discrete]="true" (change)="setRandomState($event)">
+                              <input matSliderThumb [ngModel]="getRandomState()" />
+                            </mat-slider>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- ============Encoding type============ -->
+                    <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                        <div fxFlex="34px">&nbsp;</div>
+                        <div class="fw-bold">Categorical encoding</div>
+                        <mat-icon class="material-symbols-outlined text-grey"
+                          matTooltip="Approach used to transform categorical variables into a numerical format for model training.">info</mat-icon>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                        <mat-radio-group [(ngModel)]="selectedEncodingType" (change)="storeSelectedEncodingType($event)"
+                          [disabled]="!categoricalInputSelected()">
+                          <mat-radio-button color="primary" *ngFor="let type of EncodingType" [value]="type">
+                            {{ type }}</mat-radio-button>
+                        </mat-radio-group>
+                      </div>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="XG BOOST ML Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"
+  (callParentFunction)="openModelPreveiwDialog($event)"></app-config-action-bar>

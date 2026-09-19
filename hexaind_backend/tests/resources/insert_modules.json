@@ -1,0 +1,209 @@
+[
+  {
+    "_id": {
+      "$oid": "663096598d7aacb7039f6a27"
+    },
+    "id": null,
+    "version": "1.0",
+    "user_id": "66305fdca440017c54fd1866",
+    "project_id": "6630611a8d7aacb7039f6890",
+    "site_id": "1",
+    "action_id": "",
+    "name": "test",
+    "description": "Imported as part of CustomPythonWidgetRecipe browse",
+    "module_type": "PYTHON",
+    "upload_status": "COMPLETED",
+    "upload_stats": {
+      "percentage": "100%"
+    },
+    "metadata": {
+      "file_names": ["add_val.py", "input_data.csv", "output_data1.csv"],
+      "entry_file": "add_val.py",
+      "function_name": "hexaind_custom_widget_function",
+      "function_signature": "(dataframe: pandas.core.frame.DataFrame, column_name: str, const_value: str) -> pandas.core.frame.DataFrame",
+      "function_inputs": [
+        {
+          "name": "dataframe",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "column_name",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "const_value",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        }
+      ],
+      "function_outputs": ["<class 'pandas.core.frame.DataFrame'>"],
+      "pydoc_string": null,
+      "validation_request_id": "1714460249307",
+      "is_validated": true
+    },
+    "created_at": {
+      "$date": "2024-04-30T06:57:29.205Z"
+    },
+    "module_location": {
+      "extension": "ZIP",
+      "path": "/hexaind-data/modules/fefc6a5aefa140dcb442fdfd9720226d/add_const_new 2.zip",
+      "size": "717",
+      "last_modified_by": "66305fdca440017c54fd1866",
+      "last_modified_at": {
+        "$date": "2024-04-30T06:57:14.577Z"
+      }
+    },
+    "access_mode": "INTERNAL",
+    "tags": [],
+    "created_by": ""
+  },
+  {
+    "_id": {
+      "$oid": "66313931611dc1cfc5d2f30e"
+    },
+    "id": null,
+    "version": "1.0",
+    "user_id": "6630d8fb999319f9fde592d2",
+    "project_id": "66312ea88d4ae9c1600c9d67",
+    "site_id": "1",
+    "action_id": "",
+    "name": "test",
+    "description": "Imported as part of CustomPythonWidgetRecipe browse",
+    "module_type": "PYTHON",
+    "upload_status": "COMPLETED",
+    "upload_stats": {
+      "percentage": "100%"
+    },
+    "metadata": {
+      "file_names": ["string_inputs.py", "output_string_inputs.csv"],
+      "entry_file": "string_inputs.py",
+      "function_name": "hexaind_custom_widget_function",
+      "function_signature": "(start_date: str, end_date: str) -> (<class 'pandas.core.frame.DataFrame'>, <class 'pandas.core.frame.DataFrame'>)",
+      "function_inputs": [
+        {
+          "name": "start_date",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "end_date",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        }
+      ],
+      "function_outputs": [
+        "<class 'pandas.core.frame.DataFrame'>",
+        "<class 'pandas.core.frame.DataFrame'>"
+      ],
+      "pydoc_string": "Creates two identical pandas DataFrames for testing purposes.\n\nParameters\n----------\nstart_date : str\n    The start date for the widget. Must be in the format 'YYYY-MM-DD'.\n\nend_date : str\n    The end date for the widget. Must be in the format 'YYYY-MM-DD'.\n\nReturns\n-------\ntuple\n    A tuple containing two pandas DataFrames with the same data.",
+      "validation_request_id": "1714501937237",
+      "is_validated": true
+    },
+    "created_at": {
+      "$date": "2024-04-30T18:32:17.671Z"
+    },
+    "module_location": {
+      "extension": "ZIP",
+      "path": "/hexaind-data/modules/624b41343fd545baa6b4fc0f31642b83/dummy_string_inputs 7 1.zip",
+      "size": "831",
+      "last_modified_by": "6630d8fb999319f9fde592d2",
+      "last_modified_at": {
+        "$date": "2024-04-30T18:32:07.944Z"
+      }
+    },
+    "access_mode": "INTERNAL",
+    "tags": [],
+    "created_by": ""
+  },
+  {
+    "_id": {
+      "$oid": "6631c989aaae3b0245fc0f9a"
+    },
+    "id": null,
+    "version": "1.0",
+    "user_id": "66305fdca440017c54fd1866",
+    "project_id": "6630632980a04c658f67763c",
+    "site_id": "1",
+    "action_id": "",
+    "name": "test",
+    "description": "Imported as part of CustomPythonWidgetRecipe browse",
+    "module_type": "PYTHON",
+    "upload_status": "COMPLETED",
+    "upload_stats": {
+      "percentage": "100%"
+    },
+    "metadata": {
+      "file_names": ["main.py", "output_bq_test.csv", "service_account.json"],
+      "entry_file": "main.py",
+      "function_name": "hexaind_custom_widget_function",
+      "function_signature": "(initial_data: pandas.core.frame.DataFrame, start_Date: str, End_Date: str, selected_scaling_method: str, test_percentage: str, query: str) -> (<class 'pandas.core.frame.DataFrame'>, <class 'pandas.core.frame.DataFrame'>)",
+      "function_inputs": [
+        {
+          "name": "initial_data",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "start_Date",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "End_Date",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "selected_scaling_method",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "test_percentage",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        },
+        {
+          "name": "query",
+          "type": "<class 'str'>",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default_value": "<class 'inspect._empty'>"
+        }
+      ],
+      "function_outputs": [
+        "<class 'pandas.core.frame.DataFrame'>",
+        "<class 'pandas.core.frame.DataFrame'>"
+      ],
+      "pydoc_string": "Processes semiconductor manufacturing data from BigQuery, applies scaling, filters by date, and performs linear regression analysis on different tools.\n\nThis function fetches data from BigQuery, filters it based on provided date range, applies specified scaling to features, performs linear regression for each tool in the dataset, and calculates various performance metrics for the models. It returns detailed results for each tool as well as a summary dataframe with average coefficients.\n\nParameters\n----------\ninitial_data : pandas\n    Initial data that will get appened to mean data finally.\nstart_Date : str\n    Start date for filtering the dataset, format: YYYY-MM-DD (eg: 2023-02-01).\nEnd_Date : str\n    End date for filtering the dataset, format: YYYY-MM-DD (eg: 2023-03-31).\nselected_scaling_method : str\n    The method used to scale the input features. Valid options are \"StandardScaler\", \"MinMax\", \"RobustScaling\", and \"None\".\ntest_percentage : str\n    The percentage of the dataset to hold out as test data, represented as a string (e.g., '0.2' for 20%).\nquery : str\n    Specifies which query to run. Valid options are \"test_query\" for a sample dataset and \"main_query\" for the main dataset.\n\nReturns\n-------\ntuple\n    A tuple containing two pandas DataFrames:\n    - The first DataFrame contains the regression results, performance metrics, and other details for each tool.\n    - The second DataFrame is a summary that averages the coefficients across all tools and includes a CPK metric calculation.",
+      "validation_request_id": "1714538889104",
+      "is_validated": true
+    },
+    "created_at": {
+      "$date": "2024-05-01T04:48:09.822Z"
+    },
+    "module_location": {
+      "extension": "ZIP",
+      "path": "/hexaind-drive/bigquery_data_pull_ols_append_demo.zip",
+      "size": "4979",
+      "last_modified_by": "66305fdca440017c54fd1866",
+      "last_modified_at": {
+        "$date": "2024-04-25T11:18:00.763Z"
+      }
+    },
+    "access_mode": "INTERNAL",
+    "tags": [],
+    "created_by": ""
+  }
+]

@@ -1,0 +1,91 @@
+<div fxLayout="column" class="h-100" fxLayoutGap="8px">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <h1>Image Preview</h1>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" fxLayoutGap="16px" class="p-4" *ngIf="data.view=='cleanup'">
+    <div fxFlex="50" fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="title-aligned">
+        <h2>Original Image</h2>
+      </div>
+      <div fxFlex>
+        <div class="image-aspect-container">
+          <img class="global-image-fit-aspect" [src]="data.image">
+        </div>
+      </div>
+    </div>
+    <div fxFlex="50" fxLayout="column" fxLayoutGap="8px" class="ps-4 border-left">
+      <div fxFlex="none" class="title-aligned">
+        <h2>Modified Image</h2>
+      </div>
+      <div fxFlex>
+        <div class="image-aspect-container">
+          <img class="global-image-fit-aspect" [src]="data.manual_image">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Visualization Dropdown -->
+  <div *ngIf="isSegmentedImageAvailable()" fxFlex="none" fxLayoutAlign="end center" fxLayoutGap="8px" class="px-4">
+    <div fxFlex="none" class="fw-semi-bold text-md">Visualization</div>
+    <div fxFlex="300px">
+      <mat-form-field appearance="outline">
+        <mat-select [value]="dropDownVisualization.mainVal" (selectionChange)="changeVisualization($event)"
+          [disabled]="isVisualizationDisabled()">
+          <mat-optgroup label="Solid colors">
+            <mat-option value="solid,Black/white (default),Black/white (default)">Black/White (default)</mat-option>
+            <mat-option value="solid,Blue & Yellow">Parula</mat-option>
+          </mat-optgroup>
+          <mat-optgroup label="Outline">
+            <mat-option value="outline_segmented,magenta,Magenta">Magenta</mat-option>
+            <mat-option value="outline_segmented,red,Red">Red</mat-option>
+            <mat-option value="outline_segmented,yellow,Yellow">Yellow</mat-option>
+          </mat-optgroup>
+          <mat-optgroup label="Overlay">
+            <mat-option value="overlay_segmented,label segmented,Label segmented">Label Segmented</mat-option>
+            <mat-option value="overlay_segmented,magenta,Magenta">Magenta</mat-option>
+            <mat-option value="overlay_segmented,red,Red">Red</mat-option>
+            <mat-option value="overlay_segmented,yellow,Yellow">Yellow</mat-option>
+          </mat-optgroup>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" fxLayoutGap="16px" class="p-4" *ngIf="data.view=='segmented'">
+    <!-- Original Image Column -->
+    <div fxFlex="50" fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="title-aligned">
+        <h2>Original Image</h2>
+      </div>
+      <div fxFlex>
+        <div class="image-aspect-container">
+          <img class="global-image-fit-aspect" *ngIf="!segImage.manImageLoader" [src]="segImage.manImageBlob">
+          <div *ngIf="segImage.manImageLoader" fxFlex fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner diameter="24"></mat-spinner>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segmented Image Column -->
+    <div fxFlex="50" fxLayout="column" fxLayoutGap="8px" class="ps-4 border-left">
+      <div fxFlex="none" class="title-aligned">
+        <h2>Segmented Image</h2>
+      </div>
+      <div fxFlex>
+        <div class="image-aspect-container">
+          <img class="global-image-fit-aspect" *ngIf="!segImage.segImageLoader" [src]="segImage.segImageBlob">
+          <div *ngIf="segImage.segImageLoader" fxFlex fxLayout="row" fxLayoutAlign="center center">
+            <mat-spinner diameter="24"></mat-spinner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

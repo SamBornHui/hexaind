@@ -1,0 +1,316 @@
+.rslt-container {
+  height: 100%;
+  background-color: var(--secondary-surface);
+
+  .header {
+    padding: 6px 8px;
+    background-color: var(--white);
+    border-bottom: 1px solid var(--stroke-lite);
+
+    .title {
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .border-left {
+      border-left: 1px solid var(--stroke-lite);
+      padding-left: 4px;
+    }
+  }
+
+  .custom-btn-toggle {
+    border-bottom: 1px solid var(--primary);
+    position: relative;
+
+    .link {
+      display: inline-block;
+      padding: 8px 16px;
+      margin-right: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1.25px;
+      line-height: 1;
+      border-radius: 8px 8px 0 0;
+      background-color: var(--white);
+      border: 1px solid var(--stroke-lite);
+      cursor: pointer;
+
+      &.active {
+        background-color: var(--primary);
+        border: 1px solid var(--primary);
+        color: var(--white);
+      }
+
+      &.disabled {
+        background-color: var(--secondary-surface);
+        color: var(--grey);
+      }
+    }
+  }
+
+  //   .mat-mdc-tab-body-content {
+  //     display: block !important; /* Removes the flex behavior */
+  //   }
+
+  // .mat-mdc-tab-body-content > .graph-container-plots {
+  //     display: block !important; /* Ensure child element does not inherit flex styles */
+  //   }
+
+  .count-of-chamber {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    top: 6px;
+  }
+
+  .graph-container {
+    overflow: hidden;
+    // display: flex;
+    // flex-direction: row;
+    height: 100%;
+    // width: 100%;
+  }
+
+  // .graph-container-plots {
+  //   overflow: hidden;
+  //   display: flex;
+  //   flex-wrap: wrap;
+  //   // flex-direction: row;
+  //   height: 100%;
+  //   // width: 100%;
+  // }
+
+  .custom-graph-fit {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: flex;
+    flex-wrap: wrap !important;
+    // flex-direction: row;
+  }
+
+  // .custom-graph-fit-plots {
+  //   width: 100%;
+  //   height: 100%;
+  //   object-fit: contain;
+  //   display: flex;
+  //   flex-wrap: wrap;
+  //   // flex-direction: row;
+  // }
+
+  .graph-container-plots {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping if items overflow */
+    flex-direction: row; /* Ensure items are laid out in a row */
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .plot-graph {
+    display: flex; /* Use flex display to control layout */
+    flex-wrap: wrap !important; /* Ensure it wraps when necessary */
+    flex-direction: row; /* Explicitly state the direction of the flexbox */
+  }
+
+  .custom-graph-fit-plots {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensure the object fits inside the container */
+    display: block; /* Use block display for the object */
+  }
+
+  .custom-img-fit {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    aspect-ratio: 1;
+  }
+}
+
+// .styled-button {
+//   padding: 8px;
+//   font-weight: 400;
+//   font-size: large;
+//   background-color: #8f8593;
+//   color: white;
+//   border: none;
+//   border-radius: 10px;
+//   cursor: pointer;
+//   transition: background-color 0.3s;
+// }
+
+// .styled-button:focus {
+//   outline: none;
+// }
+
+// .active-button {
+//   background-color: #2c10e0;
+// }
+
+.fw-bold {
+  font-weight: 500;
+}
+
+.border-all {
+  border: 1px solid var(--stroke-dark);
+}
+
+.column-editor {
+  input {
+    border: 1px solid var(--stroke-dark);
+    border-radius: 4px;
+  }
+  .global-icon-button-sm {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 20px !important;
+    padding: 0;
+    border-radius: 10px;
+  }
+}
+
+.green-bg {
+  background-color: #85bd44; /* Light green for Improved */
+  color: #ffffff;
+}
+
+.yellow-bg {
+  background-color: #d3cf48; /* Light yellow for Same */
+  color: #ffffff;
+}
+
+.red-bg {
+  background-color: #ff5722; /* Light red for Degraded */
+  color: #ffffff;
+}
+
+.green-flag {
+  color: #28a745;
+}
+
+.yellow-flag {
+  color: #ffc107;
+}
+
+.red-flag {
+  color: #dc3545;
+}
+
+table.global-table-sm-alt-modal {
+  border-collapse: collapse; /* Ensure borders merge without spacing */
+  width: 100%; /* Optional: Adjust table width */
+}
+
+table.global-table-sm-alt-modal th,
+table.global-table-sm-alt-modal td {
+  border: 1px solid #ddd; /* Add grid lines to cells */
+  padding: 8px; /* Optional: Add padding for better readability */
+}
+
+table.global-table-sm-alt-modal th {
+  background-color: #f2f2f2; /* Light background for header */
+  text-align: left; /* Align text in header */
+}
+
+table.global-table-sm-alt-modal tr:hover {
+  background-color: #f1f1f1; /* Optional: Highlight row on hover */
+}
+
+table.global-table-sm-alt-modal tr {
+  border-bottom: 1px solid #ddd; /* Optional: Separate rows */
+}
+
+.gauge-container {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background-color: #e0e0e0; /* Light grey background */
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.gauge-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.global-table-sm-alt-modal {
+  tr {
+    height: auto;
+    padding: 0;
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  th {
+    background-color: var(--primary-lite) !important;
+  }
+
+  tr:nth-child(odd) td {
+    // background-color: var(--secondary-surface);
+  }
+  .selected td {
+    background-color: var(--primary) !important;
+    color: var(--white) !important;
+  }
+}
+
+.plots-align {
+  max-height: 100%;
+  height: 100%;
+}
+
+.plots-align-tab {
+  max-height: 100%;
+  height: 100%;
+}
+
+.responsive-flex {
+  height: 25%;
+}
+
+@media (max-height: 1100px) {
+  .responsive-flex {
+    height: 30%;
+  }
+}
+
+@media (max-height: 900px) {
+  .responsive-flex {
+    height: 35%;
+  }
+}
+@media (max-height: 800px) {
+  .responsive-flex {
+    height: 40%;
+  }
+}
+
+@media (max-height: 750px) {
+  .responsive-flex {
+    height: 45%;
+  }
+}
+
+@media (max-height: 720px) {
+  .responsive-flex {
+    height: 50%;
+  }
+}

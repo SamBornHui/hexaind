@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.mst-empty {
+  &__message {
+    color: var(--grey-lite);
+    line-height: 32px;
+    text-align: center;
+    &__text {
+      text-align: center;
+    }
+  }
+}

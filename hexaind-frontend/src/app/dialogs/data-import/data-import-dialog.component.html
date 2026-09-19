@@ -1,0 +1,162 @@
+<mat-dialog-content class="mat-typography">
+  <div
+    fxLayout="row"
+    fxLayoutGap="8px"
+    fxLayoutAlign="space-between center"
+    class="mb-2 border-bt"
+  >
+    <div class="steps">{{ headerMessage }}</div>
+    <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+      <mat-icon class="close-icon">close</mat-icon>
+    </button>
+  </div>
+
+  <div fxLayout="column" fxLayoutGap="16px">
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div class="text-sm">Name</div>
+      <div>
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            placeholder="Enter name"
+            [(ngModel)]="name"
+            (ngModelChange)="validate()"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div class="text-sm">Description</div>
+      <div>
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            placeholder="Enter Description"
+            [(ngModel)]="description"
+            (ngModelChange)="validate()"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="filename-background">
+      <ng-container *ngIf="!data.metadata">
+        <div *ngIf="fileName != ''"  fxFlex fxLayout="column" fxLayoutGap="8px">
+          <div
+            fxLayout="row"
+            fxLayoutGap="8px"
+            fxLayoutAlign=" center"
+            class="filename-container"
+          >
+            <img width="16px" src="assets/draft.png" class="me-2" />
+            <span class="filename">{{ fileName }}</span>
+          </div>
+          <div fxFlex="none" *ngIf="progress == 0">
+            <input
+              type="file"
+              class="file-input"
+              #fileUpload
+              (change)="onFileSelected($event)"
+              accept=".csv"
+            />
+          </div>
+          <div fxFlex="none" *ngIf="progress > 0">
+            <div fxFlex>
+              <div
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign=" center"
+                fxLayoutGap="16px"
+              >
+                <div fxFlex="none">{{ size }}</div>
+                <div fxFlex>
+                  <mat-progress-bar
+                    [color]="color"
+                    [mode]="mode"
+                    [value]="progress"
+                    [bufferValue]="bufferValue"
+                  >
+                  </mat-progress-bar>
+                </div>
+                <div fxFlex="none">{{ progress + "%" }}</div>
+                <mat-spinner diameter="30" *ngIf="progress < 100"></mat-spinner>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="list-folder-tree" *ngIf="data.file_type == 'Image Folder' && data.metadata.folder_struct[0]">
+        <ng-container *ngTemplateOutlet="recursiveList; context: { $implicit: data.metadata.folder_struct[0] }"></ng-container>
+        <ng-template #recursiveList let-node>
+          <li>
+            <ul fxLayout="row">
+              <svg viewBox="0 0 24 24" style="padding-right: 4px;" class="svg-icon">
+                <use *ngIf="node.is_folder" [attr.xlink:href]="'#icon-folder'"></use>
+                <use *ngIf="!node.is_folder" [attr.xlink:href]="'#icon-image'"></use>
+              </svg>
+              <div [ngClass]="{'bold-text': node.is_folder}"> 
+                {{ node.name }}
+              </div>
+            </ul>
+            <ul *ngIf="node.is_folder && node.children">
+              <ng-container *ngFor="let child of node.children">
+                <ng-container *ngTemplateOutlet="recursiveList; context: { $implicit: child }"></ng-container>
+              </ng-container>
+            </ul>
+          </li>
+        </ng-template>
+      </div>
+      <div style="max-height:200px; overflow-y: auto;" *ngIf="data.file_type == 'images' && data.metadata.folder_struct[0]">
+        <div *ngFor="let imageFile of data.metadata.folder_struct" fxLayout="row">
+          <svg viewBox="0 0 24 24" style="padding-right: 6px;" class="svg-icon">
+            <use xlink:href="#icon-image"></use>
+          </svg>
+          <div>
+            {{imageFile.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign = "start center" *ngIf="data.file_type == 'images' || data.file_type =='Image Folder'">
+      <input
+        #fileInputModule
+        type="file"
+        multiple
+        accept=".csv"
+        style="display: none"
+        (change)="uploadImageMetadata($event)"
+      />
+      <button
+        mat-flat-button
+        color="primary"
+        class="upload-button-height"
+        (click)="fileInputModule.click()"
+      >
+        Upload Material Metadata
+      </button>
+      <div *ngIf="selectedMetaDataFileName" class=" file-name">
+        {{selectedMetaDataFileName}}
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button
+    mat-stroked-button
+    color="primary"
+    mat-dialog-close
+    (click)="cancelRequest()"
+  >
+    Cancel
+  </button>
+  <button
+    *ngIf="!isLoading"
+    mat-flat-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="disableSubmit()"
+  >
+    Submit
+  </button>
+  <mat-spinner diameter="30" *ngIf="isLoading"></mat-spinner>
+</mat-dialog-actions>

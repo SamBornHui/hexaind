@@ -1,0 +1,25 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" class="border-bottom p-6">
+        <div fxFlex>
+            <h1>Rename Model
+            </h1>
+        </div>
+        <div fxFlex="none">
+            <button mat-icon-button (click)="close()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6">
+        <div fxFlex="none">
+            <div class="fw-bold mb-1">Name</div>
+            <mat-form-field appearance="outline">
+                <input matInput placeholder="Enter new name" [(ngModel)]="model_name" />
+            </mat-form-field>
+        </div>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center" class="p-6 pt-0">
+        <button mat-stroked-button color="primary" (click)="close()">Cancel</button>
+        <button mat-flat-button color="primary" (click)="updateTheModelObject()">Save</button>
+    </div>
+</div>

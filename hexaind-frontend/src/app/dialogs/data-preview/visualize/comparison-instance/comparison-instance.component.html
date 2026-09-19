@@ -1,0 +1,157 @@
+<div fxLayout="row" fxLayoutGap="16px" class="h-100">
+    <div fxFlex="70" fxLayoutAlign="center center" class="border-right pe-4">
+        <div *ngIf="isLoading && !plotData">
+            <mat-spinner diameter="24"></mat-spinner>
+        </div>
+        <div *ngIf="!isLoading && !plotData" class="global-nodata">
+            {{displayMessage}}
+        </div>
+        <div class="global-image-container" *ngIf="!isLoading && plotData">
+            <object *ngIf="interactive" type="text/html" [data]="plotData" class="custom-graph-fit"></object>
+            <img *ngIf="!interactive" [src]="plotData" class="global-image-fit">
+        </div>
+    </div>
+
+    <div fxFlex="30" fxLayout="column" fxLayoutGap="16px">
+        <div fxFlex fxLayout="column" fxLayoutGap="8px" class="y-auto">
+            <div fxFlex="none">
+                <div class="fw-bold pb-1">Plot type</div>
+                <div>
+                    <mat-form-field appearance="outline">
+                        <mat-select [(ngModel)]="selectedPlotType" (selectionChange)="onPlotTypeChange()" placeholder="Select plot type">
+                            <mat-option *ngFor="let plot of plotTypes" [value]="plot.type">
+                                {{ plot.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div fxFlex="none" *ngIf="selectedPlotType !== 'IQR_PLOT'">
+                <div class="fw-bold pb-1">X-axis</div>
+                <mat-form-field appearance="outline">
+                    <input type="text" matInput [matAutocomplete]="autoX" [(ngModel)]="selectedXAxisColumnName"
+                        (input)="filterOptions($event, 'X')" [disabled]="selectedPlotType === ''" placeholder="Choose X-axis" [matTooltip]="_selectedXAxisColumnName && _selectedXAxisColumnName.length > 25 ? _selectedXAxisColumnName : ''" matTooltipPosition="above">
+                    <mat-icon matSuffix>search</mat-icon>
+                    <mat-autocomplete #autoX="matAutocomplete">
+                        <mat-option *ngFor="let columnName of filteredXAxis()"
+                            [value]="columnName" matTooltip="{{ columnName }}" matTooltipPosition="above">{{columnName}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div fxFlex="none" *ngIf="selectedPlotType !== 'HISTOGRAM'">
+                <div class="fw-bold pb-1">Y-axis</div>
+                <mat-form-field appearance="outline">
+                    <input type="text" matInput [matAutocomplete]="autoY" [(ngModel)]="selectedYAxisColumnName"
+                        (input)="filterOptions($event, 'Y')" [disabled]="selectedPlotType === ''" placeholder="Choose Y-axis" [matTooltip]="_selectedYAxisColumnName && _selectedYAxisColumnName.length > 25 ? _selectedYAxisColumnName : ''" matTooltipPosition="above">
+                    <mat-icon matSuffix>search</mat-icon>
+                    <mat-autocomplete #autoY="matAutocomplete">
+                        <mat-option *ngFor="let columnName of filteredYAxis()"
+                            [value]="columnName" matTooltip="{{ columnName }}" matTooltipPosition="above">{{columnName}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <div fxFlex="none" *ngIf="selectedPlotType === 'SCATTER_PLOT'">
+                <mat-checkbox [(ngModel)]="isLineFitEnabled"
+                (change)="onLineFitChange()">
+                Line Fit
+                </mat-checkbox>
+            </div>
+            <div fxFlex="none" *ngIf="selectedPlotType !== 'IQR_PLOT'">
+                <div class="fw-bold pb-1">Color by</div>
+                <div class="text-md">
+                    <mat-form-field appearance="outline">
+                        <input type="text" matInput [matAutocomplete]="autoZ" placeholder="Choose feature" [(ngModel)]="selectedColourBy"
+                            (input)="filterOptions($event, 'Z')">
+                        <mat-icon matSuffix>search</mat-icon>
+                        <mat-autocomplete #autoZ="matAutocomplete">
+                            <mat-option [value]="">--unselect--</mat-option>
+                            <mat-option *ngFor="let option of filteredAvailableColourBy()" [value]="option">{{ option
+                                }}</mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div fxFlex="none" class="text-end">
+            <button mat-flat-button color="primary" (click)="generate()" [disabled]="disableGenerateButton">
+                Generate
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- <div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="8px">
+        <div fxFlex>
+            <div class="fw-bold pb-1">X-axis</div>
+            <div class="text-md">
+                <mat-form-field appearance="outline">
+                    <input type="text" placeholder="Choose X-axis" matInput [matAutocomplete]="autoX"
+                        [(ngModel)]="selectedXAxisColumnName" (input)="filterOptions($event, 'X')">
+                        <mat-icon matSuffix>search</mat-icon>
+                    <mat-autocomplete #autoX="matAutocomplete">
+                        <mat-option *ngFor="let columnName of filteredXAxis()"
+                            [value]="columnName">{{columnName}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex>
+            <div class="fw-bold pb-1">Y-axis</div>
+            <div class="text-md">
+                <mat-form-field appearance="outline">
+                    <input type="text" placeholder="Choose Y-axis" matInput [matAutocomplete]="autoY"
+                        [(ngModel)]="selectedYAxisColumnName" (input)="filterOptions($event, 'Y')">
+                        <mat-icon matSuffix>search</mat-icon>
+                    <mat-autocomplete #autoY="matAutocomplete">
+                        <mat-option *ngFor="let columnName of filteredYAxis()"
+                            [value]="columnName">{{columnName}}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex>
+            <div class="fw-bold pb-1">Color by</div>
+            <div class="text-md">
+                <mat-form-field appearance="outline">
+                    <input type="text" placeholder="Choose color by" matInput [matAutocomplete]="autoZ"
+                        [(ngModel)]="selectedColourBy" (input)="filterOptions($event, 'Z')">
+                        <mat-icon matSuffix>search</mat-icon>
+                    <mat-autocomplete #autoZ="matAutocomplete">
+                        <mat-option [value]="">--unselect--</mat-option>
+                        <mat-option *ngFor="let option of filteredAvailableColourBy()" [value]="option">{{ option
+                            }}</mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+        </div>
+        <div fxFlex="none">
+            <div>
+                <button mat-flat-button color="primary" (click)="generate()" [disabled]="disableGenerateButton">
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div fxFlex fxLayout="column" fxLayoutAlign="center center" class="y-auto">
+        <div *ngIf="isLoading && !plotData">
+            <mat-spinner diameter="24"></mat-spinner>
+        </div>
+        <div *ngIf="!isLoading && !plotData" class="global-nodata">
+            {{displayMessage}}
+        </div>
+        <div *ngIf="plotData" fxLayout="column" fxLayoutAlign="center center" class="h-100">
+            <object *ngIf="interactive" type="text/html" [data]="plotData" class="h-100" style="aspect-ratio: 1;height:100vh; width:100vh;"></object>
+            <img *ngIf="!interactive" [src]="plotData" class="global-image-fit">
+        </div>
+    </div>
+</div> -->
+<!-- <div fxFlex="none" fxLayoutAlign="end">
+    <mat-radio-group color="primary" [(ngModel)]="visualizationType" (change)="isRadioButonChanged=true;updateButtonState()">
+        <mat-radio-button value="DISTRIBUTION">Distribution</mat-radio-button>
+        <mat-radio-button value="CONTOUR">Contour</mat-radio-button>
+        <mat-radio-button value="SPLINEFIT">Splinefit</mat-radio-button>
+        <mat-radio-button value="LINEARFIT">Linearfit</mat-radio-button>
+    </mat-radio-group>
+</div> -->

@@ -1,0 +1,36 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom p-6">
+    <div>
+      <h2>Download Visualization Data</h2>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon class="close-icon">close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div fxFlex="none">Select trial index to download visualization</div>
+    <div fxFlex class="y-auto">
+      <table mat-table [dataSource]="data.trialsData" matSort>
+        <ng-container matColumnDef="trial_index">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Trial Index</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.selected">{{
+              element.trial_index
+              }}</mat-checkbox>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row class="custom-mat-row" *matRowDef="let row; columns: displayedColumns"
+          [class.selected]="row.selected"></tr>
+      </table>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center" class="p-6 pt-0">
+    <button mat-stroked-button color="primary" mat-dialog-close>Cancel</button>
+    <button mat-flat-button color="primary" (click)="downloadFile()" [disabled]="enableDownloadButton()">
+      Download
+    </button>
+  </div>
+</div>

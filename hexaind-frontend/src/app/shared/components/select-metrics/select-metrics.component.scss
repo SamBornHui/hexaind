@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+.mst-select-metrics {
+  &__label {
+    > input {
+      border: 0;
+      background-color: transparent;
+      width: 100%;
+    }
+  }
+  &__dialog-content {
+    min-width: 300px;
+    min-height: 300px;
+    &__tab-content {
+      padding-top: 8px;
+    }
+  }
+  &__dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

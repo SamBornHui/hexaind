@@ -1,0 +1,37 @@
+:host {
+  position: fixed;
+  top: 0;
+  right: 0; /* Adjust based on openDirection */
+  height: 100%;
+  width: var(--panel-width); /* Use CSS variable */
+  background-color: white;
+  z-index: var(--panel-z-index); /* Use CSS variable */
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden {
+  display: none;
+}
+
+.mst-drawer {
+  &__header {
+    display: flex;
+    padding-left: 16px;
+    padding-right: 8px;
+    align-items: center;
+    &__title {
+      line-height: 44px;
+      font-size: var(--mst-title-font-size);
+      font-weight: bold;
+      flex: 1;
+    }
+  }
+  &__body {
+    padding: 16px;
+    padding-top: 0;
+    flex: 1;
+    min-height: 0;
+  }
+}

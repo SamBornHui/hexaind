@@ -1,0 +1,25 @@
+<div class="dialog-overlay">
+  <div class="dialog">
+    <div fxLayout="column">
+      <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom">
+        <div>
+          <h3>File content({{fileName}})</h3>
+        </div>
+        <div>
+          <button mat-icon-button (click)="onClosePanel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div #editor>
+      <textarea class="python-textarea" readonly>{{ editorContent }}</textarea>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+      <button mat-stroked-button color="primary" id="closeButton" (click)="onClosePanel()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

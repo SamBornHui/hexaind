@@ -1,0 +1,671 @@
+<div fxLayout="column" class="p-relative h-100" *ngIf="customConfig">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data" [widgetConfig]="getWidgetDetails"></app-configs-information>
+        </div>
+      </mat-tab>
+      <!-- <mat-tab label="Inputs" *ngIf="!isWidgetBuilderPreview">
+        <div class="global-widget-area">
+          <div fxLayout="row" fxLayoutGap="24px">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex="none">
+                  This widget expects {{ customConfig.inputs.length }} inputs
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px" *ngIf="customConfig.inputs.length">
+                <div fxFlex>
+                  <div class="fw-bold">Select Input(s)</div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px" *ngFor="let input of widgetControl?.Widget?.inputs; let i = index">
+                <div fxFlex>
+                  <div fxLayout="row" fxLayoutGap="16px">
+                    <mat-form-field appearance="outline">
+                      <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select tabular input"
+                        name="inputWidgetSelector" [(ngModel)]="selectedInputWidget[i]"
+                        (selectionChange)="setSelectedInputWidget($event.value, i)">
+                        <ng-container *ngFor="let inputWidget of inputWidgets">
+                          <mat-option *ngFor="let output of inputWidget.outputs" [value]="output">
+                            {{inputWidget.name}} - {{ output.name }}
+                          </mat-option>
+                        </ng-container>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>      
+            </div>
+          </div>
+        </div>
+      </mat-tab> -->
+
+      <mat-tab label="Inputs" *ngIf="!isWidgetBuilderPreview">
+        <div class="global-widget-area">
+          <div fxLayout="column" fxLayoutGap="24px">
+            <div>
+              This widget expects {{ customConfig.inputs.length }} inputs
+            </div>
+            <div *ngIf="customConfig.inputs.length">
+              <div class="fw-bold">Select Input(s) for the following Variables</div>
+            </div>
+            <!-- <div fxLayout="row">
+              <div fxFlex="50" fxFlex.lt-lg="100" fxLayout="column" fxLayoutGap="16px">
+                <div *ngFor="let input of widgetControl?.Widget?.inputs; let i = index">
+                  <div class="fw-bold pb-1">Tabular</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" name="inputWidgetSelector"
+                      [(ngModel)]="selectedInputWidget[i]" (selectionChange)="setSelectedInputWidget($event.value, i)">
+                      <ng-container *ngFor="let inputWidget of inputWidgets">
+                        <mat-option *ngFor="let output of inputWidget.outputs" [value]="output">
+                          {{ inputWidget.name }} - {{ output.name }}
+                        </mat-option>
+                      </ng-container>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div> -->
+            <div class="table-container" fxLayout="column" fxLayoutGap="16px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Input Type</th>
+                    <th>Previous Widget Input</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let input of widgetControl?.Widget?.inputs; let i = index">
+                    <td>
+                      {{input.map_to_argument}}
+                      <mat-icon class="material-symbols-outlined global-info-icon" style="padding-top: 2px;"
+                      [matTooltip]="help_details?.[input.map_to_argument || ''] || ''">info</mat-icon>
+                    </td>
+                    <td>
+                      {{getInputType(input.map_to_argument)}}
+                    </td>
+                    <td>
+                      <mat-form-field appearance="outline">
+                        <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" name="inputWidgetSelector"
+                          [(ngModel)]="selectedInputWidget[i]" (selectionChange)="setSelectedInputWidget($event.value, i)">
+                          <ng-container *ngFor="let inputWidget of inputWidgets">
+                            <mat-option *ngFor="let output of inputWidget.outputs" [value]="output">
+                              {{ inputWidget.name }} - {{ output.name }}
+                            </mat-option>
+                          </ng-container>
+                        </mat-select>
+                      </mat-form-field>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Outputs" *ngIf="!isWidgetBuilderPreview">
+        <div class="global-widget-area">
+          <div fxLayout="row" fxLayoutGap="24px">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex="none">
+                  This widget generate {{ customConfig.outputs.length }} output:
+                  Tabular data
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex>
+                  <div class="fw-bold">Select Output</div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px"
+                *ngFor="let outputs of widgetControl?.Widget?.outputs; let i = index">
+                <div fxFlex>
+                  <div fxLayout="row" fxLayoutGap="16px">
+                    <mat-form-field appearance="outline">
+                      <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput[i]"
+                        (ngModelChange)="updateWidgetOutput(i, $event)" />
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs" *ngIf="isWidgetBuilderPreview">
+        <div class="global-widget-area">
+          <div fxLayout="row" fxLayoutGap="24px">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex="none">
+                  This widget expects {{ customConfig.inputs.length }} inputs
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px" *ngIf="customConfig.inputs.length">
+                <div fxFlex>
+                  <div class="fw-bold">Select Input(s) for the following Variables</div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px" *ngFor="let inputs of customConfig?.inputs; let i = index">
+                <div fxFlex>
+                  <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="center center">
+                    <!-- <div fxFlex="30" style="font-weight: 600;font-size: larger">
+                      {{inputs.map_to_argument}}
+                    </div> -->
+                    <div class="fw-bold pb-1">Tabular</div>
+                    <mat-form-field appearance="outline" fxFlex="100">
+                      <mat-select [disabled]="true" placeholder="Select tabular input" name="inputWidgetSelector">
+                        <mat-option>
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs" *ngIf="isWidgetBuilderPreview">
+        <div class="global-widget-area">
+          <div fxLayout="row" fxLayoutGap="24px">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex="none">
+                  This widget generate {{ customConfig.outputs.length }} output:
+                  Tabular data
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex>
+                  <div class="fw-bold">Select Output</div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px" *ngFor="
+              let outputs of customConfig?.outputs;
+              let i = index
+            ">
+                <div fxFlex>
+                  <div fxLayout="row" fxLayoutGap="16px">
+                    <mat-form-field appearance="outline">
+                      <input matInput type="string" placeholder="Select output" disabled="true" />
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div *ngIf="config?.widget_parameters?.length == 0">
+            This tab is empty for this widget
+          </div>
+          <div class="table-container" fxLayout="column" fxLayoutGap="16px"
+            *ngIf="(config?.widget_parameters)!.length > 0">
+            <!-- <div fxFlex fxLayout="row" fxLayoutGap="24px" class="bg-for-loop"
+          *ngFor="let params of customConfig.config.widget_parameters; let i = index">
+          <div fxFlex fxLayout="column" fxLayoutGap="24px">
+            <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+              <div class="fw-bold">Argument name</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input matInput placeholder="Enter Input Argument name" [(ngModel)]="params.arg_name"
+                    name="argName{{i}}" (ngModelChange)="setArgName($event, i)" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div fxFlex fxLayout="column" fxLayoutGap="24px">
+            <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+              <div class="fw-bold">Value</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input matInput [disabled]="params.type ==='<class \'pandas.core.frame.DataFrame\'>'"
+                    [placeholder]="params.type ==='<class \'pandas.core.frame.DataFrame\'>' ? 'Dataset' : 'Enter Input Value'"
+                    [(ngModel)]="params.value" name="value{{i}}" (ngModelChange)="setValue($event, i)" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="params.type === '<class \'str\'>'" fxFlex fxLayout="column" fxLayoutGap="24px">
+            <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+              <div class="fw-bold">Default Value</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input matInput [disabled]="true" [value]="params.default_value" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="params.type === '<class \'pandas.core.frame.DataFrame\'>'" fxFlex="none" fxLayout="column"
+            fxLayoutGap="24px">
+            <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+              <input type="file" accept=".csv" #fileInput style="display: none;" (change)="onFileSelected($event)">
+              <button mat-flat-button color="primary" class="upload-btn" (click)="onUploadFile()">
+                <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                Upload file
+              </button>
+            </div>
+          </div>
+        </div> -->
+            <table>
+              <thead>
+                <tr>
+                  <th>Argument Name</th>
+                  <th>Argument Type</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let params of config?.widget_parameters; let i = index">
+                  <td>
+                    {{ params.arg_name }}
+                    <mat-icon class="material-symbols-outlined global-info-icon" style="padding-top: 2px;"
+                      [matTooltip]="help_details?.[params.arg_name] || ''">info</mat-icon>
+                  </td>
+                  <td>
+                    {{getParamType(params.type)}}
+                  </td>
+                  <td>
+                    <ng-container
+                      *ngIf="(isStringResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline" *ngIf="
+                      params.type != '<class \'pandas.core.frame.DataFrame\'>'
+                    ">
+                        <input matInput placeholder="Enter String Value" [(ngModel)]="params.value.result.string_value"
+                          name="stringValue{{ i }}" (ngModelChange)="setValue($event, i)" />
+                      </mat-form-field>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="(isStringsListResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline" *ngIf="
+                      params.type != '<class \'pandas.core.frame.DataFrame\'>'
+                    ">
+                        <input matInput placeholder="Enter comma seperated strings"
+                          [ngModel]="params.value.result.strings_list_value.join(',')" name="stringValue{{ i }}"
+                          (ngModelChange)="setStringListValue($event, i, params)" />
+                      </mat-form-field>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="(isIntegerResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline" *ngIf="
+                      params.type != '<class \'pandas.core.frame.DataFrame\'>'
+                    ">
+                        <input matInput placeholder="Enter Integer Value"
+                          [(ngModel)]="params.value.result.integer_value" name="stringValue{{ i }}"
+                          (ngModelChange)="setIntegerValue($event, i)" />
+                      </mat-form-field>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="(isFloatResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline" *ngIf="
+                      params.type != '<class \'pandas.core.frame.DataFrame\'>'
+                    ">
+                        <input matInput placeholder="Enter Float Value" [(ngModel)]="params.value.result.float_value"
+                          name="stringValue{{ i }}" (ngModelChange)="setFloatValue($event, i)" />
+                      </mat-form-field>
+                    </ng-container>
+
+                    <ng-container fxFlex fxLayoutGap="10px"
+                      *ngIf="(isDictionaryResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline" *ngIf="
+                      params.type != '<class \'pandas.core.frame.DataFrame\'>'
+                    ">
+                        <textarea matInput placeholder="Enter Python Dictionary with curly braces"
+                          [(ngModel)]="params.value.result.dict_value" name="stringValue{{ i }}"
+                          (ngModelChange)="setDictionaryValue($event, i)"></textarea>
+                      </mat-form-field>
+                      <button color="primary" mat-flat-button (click)="openDictionaryInput(params)">
+                        Expand
+                      </button>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="(isFloatListResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter comma seperated floats"
+                          [ngModel]="params.value.result.floats_list_value.join(',')" name="stringValue{{ i }}"
+                          (ngModelChange)="setFloatListValues($event, i, params)" />
+                      </mat-form-field>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="(isIntergerListResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter comma seperated integers"
+                          [ngModel]="params.value.result.integers_list_value.join(',')" name="stringValue{{ i }}"
+                          (ngModelChange)="setIntegerListValue($event, i, params)" />
+                      </mat-form-field>
+                    </ng-container>
+
+                    <ng-container
+                      *ngIf="(isBooleanResult(params.value.result) && !(params.drop_down_details?.is_dropdown))">
+                      <mat-form-field appearance="outline">
+                        <mat-select placeholder="Select boolean Value" [(ngModel)]="params.value.result.boolean_value">
+                          <mat-option value="True">True</mat-option>
+                          <mat-option value="False">False</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                    </ng-container>
+
+
+
+                    <ng-container *ngIf="params.drop_down_details?.is_dropdown">
+                      <div
+                        *ngIf="params.drop_down_details?.drop_down_source_details?.drop_down_source_type == 'STATIC'">
+                        <!-- List all the static values configured -->
+                        <mat-form-field style="overflow: auto;" appearance="outline">
+                          <mat-select
+                            [ngModel]="params.drop_down_details?.drop_down_source_details.drop_down_selected_values"
+                            (selectionChange)="onSelectionChange($event, params)" multiple>
+                            <mat-option
+                              *ngFor="let option of params.drop_down_details?.drop_down_source_details.drop_down_values"
+                              [value]="option">
+                              {{ option }}
+                            </mat-option>
+                          </mat-select>
+
+                        </mat-form-field>
+
+
+                      </div>
+                      <div fxLayout="row" fxLayoutGap="15px"
+                        *ngIf="params.drop_down_details?.drop_down_source_details?.drop_down_source_type == 'DYNAMIC'">
+
+                        <mat-form-field fxFlex appearance="outline">
+                          <mat-label>Select the widget</mat-label>
+                          <!-- List of dropdowns of datasets will be present from previous widget , on select fetch the required columns  -->
+                          <mat-select (selectionChange)="resetIndividualParamterConfig($event, params)"
+                            [(ngModel)]="params.drop_down_details?.drop_down_source_details.dynamic_drop_down_source_data_name"
+                            name="inputWidget1Selector" placeholder="Select the Widget Input" #matSelect>
+                            <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget.urn">
+                              {{ inputWidget.name }}
+                            </mat-option>
+                          </mat-select>
+
+                        </mat-form-field>
+
+                        <mat-form-field fxFlex appearance="outline"
+                          *ngIf="params.drop_down_details?.drop_down_source_details?.dynamic_drop_down_source_data_output_name || params.drop_down_details?.drop_down_source_details?.output_list?.length">
+                          <mat-label>Select the Widget Output</mat-label>
+                          <mat-select
+                            (selectionChange)="resetSelectedValues(params.drop_down_details?.drop_down_source_details, $event)"
+                            [(ngModel)]="params.drop_down_details?.drop_down_source_details.dynamic_drop_down_source_data_output_name"
+                            name="inputWidget1Selector" placeholder="Select the Respective Widget Output"
+                            disabled={{!params.drop_down_details?.drop_down_source_details?.output_list}}>
+                            <mat-option
+                              *ngFor="let outputData of params.drop_down_details?.drop_down_source_details.output_list?.length ? params.drop_down_details?.drop_down_source_details.output_list : []"
+                              [value]="outputData.outputName">
+                              {{ outputData.outputName }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field fxFlex appearance="outline" style="overflow: auto; padding-top: 5px;"
+                          *ngIf="params.drop_down_details?.drop_down_source_details?.drop_down_selected_values?.length > 0">
+                          <mat-label>Selected value(s)</mat-label>
+                          <input matInput
+                            [value]="params.drop_down_details?.drop_down_source_details?.drop_down_selected_values.slice(0,10)"
+                            disabled>
+                        </mat-form-field>
+                        <!-- <div appearance="outline" style="overflow: auto;"
+                              *ngIf="params.drop_down_details?.drop_down_source_details?.drop_down_selected_value?.length === 0">
+                              {{}}
+                            </div> -->
+
+                        <!-- <mat-form-field appearance="outline">
+                              <mat-select style="overflow: auto;width: 35vw;"
+                                [ngModel]="params.drop_down_details?.drop_down_source_details.drop_down_selected_values"
+                                (selectionChange)="onSelectionChange($event, params)" name="inputWidgetSelector" multiple appearance="outline"
+                                placeholder="{{params.drop_down_details?.drop_down_source_details.dynamic_sub_type}}">
+                                <mat-option *ngFor="let name of params.drop_down_details?.drop_down_source_details.drop_down_values" [value]="name">
+                                  {{name}}
+                                </mat-option>
+                              </mat-select>
+
+                            </mat-form-field>
+                            -->
+                        <div *ngIf="params.isLoading" fxLayout="row" fxLayoutAlign="center center"
+                          style="text-align: center;">
+                          <mat-spinner style="width:20%" diameter="25"></mat-spinner>
+                          <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                            Fetching dataset columns...
+                          </p>
+                        </div>
+                        <button style="max-width:15%" fxFlex
+                          *ngIf="params.drop_down_details?.drop_down_source_details?.drop_down_selected_values?.length > 0 && !params.isLoading"
+                          mat-flat-button color="primary" (click)="configureDataDropDown(params)">Edit
+                          configuration</button>
+                        <button style="max-width:10%" fxFlex
+                          *ngIf="params.drop_down_details?.drop_down_source_details?.drop_down_selected_values?.length == 0 && !params.isLoading"
+                          mat-flat-button color="primary" (click)="configureDataDropDown(params)">Configure</button>
+
+
+                        <ng-container *ngIf="showDropDownConfig">
+                          <div class="popup-overlay"></div>
+                          <div class="popup-content">
+                            <div style="height:90vh; width:70vw" fxLayout="column" fxLayoutGap="16px"
+                              fxLayoutAlign="start">
+                              <div class="disclaimer-message">{{ getMessageDescriptionForDropDown() }}</div>
+                              <div fxLayout="row" fxLayoutAlign="center center" class="fw-bold pb-2">
+                                <div fxFlex="30vw">Available Columns</div>
+                                <div fxFlex="108px"></div>
+                                <div fxFlex="30vw">Selected Columns</div>
+                              </div>
+                              <div fxLayout="row" fxLayoutAlign="start start">
+                                <div fxFlex="30vw" class="columns-section-container"> <!-- Available columns -->
+                                  <div class="search-keyword-container">
+                                    <mat-form-field appearance="outline">
+                                      <mat-label>Filter based on keywords</mat-label>
+                                      <div class="search-field">
+                                        <input matInput (keyup)="applyFilterOnColumns()" placeholder="Search"
+                                          [(ngModel)]="columnsFilterWord" class="search-bar">
+                                      </div>
+                                    </mat-form-field>
+                                  </div>
+                                  <mat-checkbox [(ngModel)]="isAllColumnsChecked"
+                                    [disabled]="columnsDataSource.length == 0" (change)="toggleAllColumns($event)"
+                                    class="select-all">Select All</mat-checkbox>
+                                  <div class="columns-table-outer">
+                                    <div class="columns-table-container" style="overflow: auto;">
+                                      <cdk-virtual-scroll-viewport itemSize="50" style="height: 45vh">
+                                        <div *cdkVirtualFor="let element of columnsDataSource" class="example-item">
+                                          <mat-checkbox [(ngModel)]="element.checked" (change)="onColumnClicked()" />
+                                          <span matTooltip="{{element.name}}" matTooltipPosition="above"
+                                            class="truncate-column-name">
+                                            {{element.name}}
+                                          </span>
+                                        </div>
+                                      </cdk-virtual-scroll-viewport>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div fxFlex="108px" class="move-buttons-container">
+                                  <button mat-icon-button (click)="onSelectColumns()"
+                                    matTooltip="Move to selected columns" matTooltipPosition="above">
+                                    <span class="material-symbols-outlined">
+                                      arrow_forward
+                                    </span>
+                                  </button>
+                                  <button mat-icon-button (click)="onUnselectColumns()" matTooltip="Unselect columns"
+                                    matTooltipPosition="below">
+                                    <span class="material-symbols-outlined">
+                                      arrow_back
+                                    </span>
+                                  </button>
+                                </div>
+                                <div fxFlex="30vw" class="columns-section-container"> <!-- Selected columns -->
+                                  <div class="search-keyword-container">
+                                    <mat-form-field appearance="outline">
+                                      <mat-label>Filter based on keywords</mat-label>
+                                      <div class="search-field">
+                                        <input matInput (keyup)="applyFilterOnSelectedColumns()" placeholder="Search"
+                                          [(ngModel)]="selectedColumnsFilterWord" class="search-bar">
+                                        <!-- <mat-icon class="search-icon">search</mat-icon>                    -->
+                                      </div>
+                                    </mat-form-field>
+                                  </div>
+                                  <mat-checkbox [(ngModel)]="isAllSelectedColumnsChecked"
+                                    [disabled]="selectedColumnsDataSource.length == 0"
+                                    (change)="toggleAllSelectedColumns($event)" class="select-all">Select
+                                    All</mat-checkbox>
+                                  <div class="columns-table-outer">
+                                    <div class="columns-table-container" style="overflow:auto">
+                                      <cdk-virtual-scroll-viewport itemSize="50" style="height: 45vh">
+                                        <div *cdkVirtualFor="let element of selectedColumnsDataSource"
+                                          class="example-item">
+                                          <mat-checkbox [(ngModel)]="element.checked"
+                                            (change)="onSelectedColumnClicked()" />
+                                          <span matTooltip="{{element.name}}" matTooltipPosition="above"
+                                            class="truncate-column-name">
+                                            {{element.name}}
+                                          </span>
+                                        </div>
+                                      </cdk-virtual-scroll-viewport>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div fxLayout="row" style="width:65vw" fxLayoutAlign="flex-end center">
+                                <div fxFlex="50" fxLayout="row" fxLayoutAlign="flex-end flex-end">
+                                  <button fxFlex="15" mat-flat-button color="primary" style="margin-right: 10px;"
+                                    (click)="onClosingConfigTemplate()">
+                                    Save
+                                  </button>
+                                  <button fxFlex="15" mat-flat-button color="primary"
+                                    (click)="closeDropDownConfiguration()">
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+                        </ng-container>
+
+                      </div>
+
+                    </ng-container>
+
+                    <!-- <ng-container *ngIf="isDatasetResult(params.value.result)">
+                      <div *ngIf="
+                      params.type === '<class \'pandas.core.frame.DataFrame\'>'
+                    ">
+                        <div *ngIf="params.value.result.dataset_id == ''">
+                          <input type="file" accept=".csv" #fileInput style="display: none"
+                            (change)="onFileSelected($event, i)" />
+                          <button mat-flat-button color="primary" class="upload-btn" (click)="onUploadFile()">
+                            <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                            Upload file
+                          </button>
+                        </div>
+                        <div *ngIf="params.value.result.dataset_id != ''">
+                          Dataset ID: {{ params.value.result.dataset_id }}
+                        </div>
+                      </div>
+                    </ng-container> -->
+
+                    <ng-container *ngIf="isDatasetResult(params.value.result)">
+                      <div *ngIf="params.type === '<class \'pandas.core.frame.DataFrame\'>'">
+
+                        <!-- Show upload file button if dataset_id exists -->
+                        <div *ngIf="params.value.result.dataset_id != ''">
+                          <p>Current Dataset ID: {{ params.value.result.dataset_id }}</p>
+                          <input type="file" accept=".csv" #fileInput style="display: none"
+                            (change)="onFileSelected($event, i)" />
+                          <button mat-flat-button color="primary" class="upload-btn" (click)="fileInput.click()">
+                            <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                            Replace Dataset
+                          </button>
+                        </div>
+
+                        <!-- If no dataset_id exists, just show the upload file button -->
+                        <div *ngIf="params.value.result.dataset_id == ''">
+                          <input type="file" accept=".csv" #fileInput style="display: none"
+                            (change)="onFileSelected($event, i)" />
+                          <button mat-flat-button color="primary" class="upload-btn" (click)="fileInput.click()">
+                            <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                            Upload file
+                          </button>
+                        </div>
+
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="isFilePathResult(params.value.result)">
+                      <div *ngIf="params.type === '<class \'pathlib.Path\'>'">
+
+                        <div style="display:flex; flex-direction:row; gap:10px; align-items: center;" flexLayoutAlign="" *ngIf="params.value.result?.file_path_value?.length != 0">
+                          <p style="padding-top: 15px; font-weight: 500;" *ngIf="!isFileUploadInProgress">Current File: {{ getFileNameFromFilePath(params.value.result.file_path_value) }}</p>
+                          <input type="file" accept="*/*" #fileInput1 style="display: none"
+                            (change)="uploadFileToFileSystem($event, params)" />
+                          <button *ngIf="!isFileUploadInProgress" mat-flat-button color="primary" class="upload-btn"
+                            (click)="fileInput1.click()">
+                            <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                            Replace File
+                          </button>
+                          <mat-spinner *ngIf="isFileUploadInProgress" style="width:20%" diameter="25"></mat-spinner>
+                        </div>
+
+                        <div style="display:flex; flex-direction:row; gap:10px; align-items: center;" *ngIf="params.value.result.file_path_value == ''">
+                          <input type="file" accept="*/*" #fileInput1 style="display: none"
+                            (change)="uploadFileToFileSystem($event, params)" />
+                          <button *ngIf="!isFileUploadInProgress" mat-flat-button color="primary" class="upload-btn"
+                            (click)="fileInput1.click()">
+                            <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                            Upload file
+                          </button>
+                          <mat-spinner *ngIf="isFileUploadInProgress" style="width:20%" diameter="25"></mat-spinner>
+                        </div>
+
+                      </div>
+                    </ng-container>
+
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings></app-settings>
+        </div>
+        
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode && !isWidgetBuilderPreview" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="global-widget-actions">
+    <button style="max-height:50px; margin-right: 15px;" *ngIf="!isWidgetBuilderPreview" [disabled]="isCPWCodeEditButtonDisabled" mat-flat-button color="primary" (click)="getCpwFilesAndOpenEditor()">
+      Edit Widget Code
+    </button>
+    <button mat-flat-button color="primary" (click)="SaveCpw()" [disabled]="isSaveDisabled">
+      Save
+    </button>
+  </div>
+</div>
+<div class="global-widget-actions" *ngIf="isWidgetBuilderPreview">
+  <button mat-flat-button color="primary" (click)="publish()">
+    Save & Publish
+  </button>
+</div>
+<app-config-action-bar *ngIf="!isWidgetBuilderPreview" widgetName="CPW Widget"
+  widgetUrn="{{ this.widgetControl?.Widget?.urn }}" siteId="1" (callParentFunction)="openDataPreveiwDialog($event)">
+</app-config-action-bar>

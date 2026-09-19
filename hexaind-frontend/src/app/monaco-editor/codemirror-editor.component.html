@@ -1,0 +1,17 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+        <div>
+            <h1 *ngIf="data.mode =='python' ">Python Code</h1>
+            <h1 *ngIf="data.mode =='text/x-ini' ">Configuration</h1>
+            <h1 *ngIf="data.mode =='application/json' ">JSON Data</h1>
+        </div>
+        <div>
+            <button mat-icon-button mat-dialog-close>
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div *ngIf="data.content" fxFlex class="p-6 y-auto">
+        <ngx-codemirror [(ngModel)]="data.content" [options]="editorOptions" class="h-100 d-block"></ngx-codemirror>
+    </div>
+</div>

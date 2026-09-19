@@ -1,0 +1,50 @@
+trigger: none
+
+resources:
+  pipelines:
+    - pipeline: hexaind-frontend-build
+      source: hexaind-frontend-build
+      trigger:
+        branches:
+          include:
+            - develop
+
+variables:
+  dockerRegistryServiceConnection: "Databrick Docker Hub Connection"
+  imageName: "databrick/hexaind-frontend"
+
+jobs:
+  - job: Deploy
+    displayName: "Deploy services"
+    pool:
+      name: "Self-hosted for Node GCP"
+    steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: "specific"
+          project: "hexaind-frontend"
+          definition: "hexaind-frontend-build"
+          buildVersionToDownload: "latest"
+          artifactName: "drop"
+          targetPath: "$(Pipeline.Workspace)"
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - script: |
+          # Define the path to the latest_image_tag.txt file
+          tag_file_path="$(Pipeline.Workspace)/drop/latest_image_tag.txt"
+
+          # Read version from latest_image_tag.txt file
+          version=$(cat $tag_file_path)
+
+          # Update hexaind-frontend
+          docker stop hexaind-frontend || true
+          docker rm -f hexaind-frontend || true
+          docker tag $(imageName):develop $(imageName):previous
+          docker pull $(imageName):$version
+          docker run -d --name hexaind-frontend -p 4200:4200 -e HEXAIND_API_URL=https://hexaind3test1be.corp.databrick.tech $(imageName):$version
+        displayName: "Deploy hexaind-frontend"

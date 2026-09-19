@@ -1,0 +1,30 @@
+<div
+  *ngIf="directions.includes('left')"
+  class="mst-resizer__bar mst-resizer__bar--left"
+  (mousedown)="onResizeStart($event, 'left')"
+></div>
+<div
+  *ngIf="directions.includes('right')"
+  class="mst-resizer__bar mst-resizer__bar--right"
+  (mousedown)="onResizeStart($event, 'right')"
+></div>
+<div
+  *ngIf="directions.includes('top')"
+  class="mst-resizer__bar mst-resizer__bar--top"
+  (mousedown)="onResizeStart($event, 'top')"
+></div>
+<div
+  *ngIf="directions.includes('bottom')"
+  class="mst-resizer__bar mst-resizer__bar--bottom"
+  (mousedown)="onResizeStart($event, 'bottom')"
+></div>
+<div
+  #indicator
+  class="mst-resizer__indicator"
+  [style.top.px]="
+    ['top', 'bottom'].includes(direction) ? indicatorPosition : undefined
+  "
+  [style.left.px]="
+    ['left', 'right'].includes(direction) ? indicatorPosition : undefined
+  "
+></div>

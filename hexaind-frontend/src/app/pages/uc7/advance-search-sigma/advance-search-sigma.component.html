@@ -1,0 +1,157 @@
+<div fxLayout="column" class="dc-container h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <h1>Advance Filter</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onClose()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" fxLayoutGap="24px" class="p-6 y-auto">
+    <div fxFlex fxLayout="column" fxLayoutGap="16px">
+      <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+        *ngFor="let filter of filters; let index=index">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <mat-label>Method</mat-label>
+            <mat-select [(ngModel)]="filter.function">
+              <mat-option *ngFor="let function of functionList" [value]="function.value">{{function.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <mat-label>Text</mat-label>
+            <input matInput placeholder="Input value" [(ngModel)]="filter.value">
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <mat-label>Operator</mat-label>
+            <mat-select [(ngModel)]="filter.operator">
+              <mat-option *ngFor="let operator of operatorList" [value]="operator">{{operator}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex="52px" fxLayout="row" fxLayoutGap="4px">
+          <mat-icon class="material-symbols-outlined global-icon-button-grey" (click)="removeFilter(filter.id)"
+            *ngIf="index!==0">remove_circle</mat-icon>
+          <mat-icon class="material-symbols-outlined global-icon-button-grey" (click)="addNewFilter()"
+            *ngIf="index==0">add_circle</mat-icon>
+        </div>
+      </div>
+      <div fxFlex fxLayout="column" fxLayoutGap="8px">
+        <div fxFlex="none" class="fw-bold">
+          Filtered Data ({{filteredItems.length}})
+        </div>
+        <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+          <div fxFlex>
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix>search</mat-icon>
+              <input 
+                matInput 
+                placeholder="Search" 
+                [(ngModel)]="searchItems" 
+                (keyup.enter)="onSearch()"
+              />
+            </mat-form-field>
+          </div>
+          <div fxFlex="150px">
+            <mat-form-field appearance="outline">
+              <mat-select [(value)]="selectedPage" (selectionChange)="onUC2GenerateUniquesPagination($event.value)" placeholder="Select Page">
+                <mat-option *ngFor="let page of [].constructor(totalPages); let i = index" [value]="i + 1">
+                  Page {{ i + 1 }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+        </div>
+        <div fxFlex fxLayout="column" class="y-auto">
+          <div *ngIf="showLoader">
+            <div fxLayout="column" fxLayoutAlign="center center">
+                <mat-spinner diameter="48"></mat-spinner>
+            </div>
+          </div>
+          <div *ngFor="let item of filteredItems">
+            <mat-checkbox [(ngModel)]="item.selected" color="primary" (change)="onSelectionChange($event, item.name)">
+              {{ item.name }}
+            </mat-checkbox>
+          </div>
+        </div>
+        <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center">
+          <div fxFlex>
+            <div>
+              <mat-checkbox color="primary" (change)="toggleSelectAll()" [checked]="selectAllItems">
+                Select All</mat-checkbox>
+            </div>
+          </div>
+          <div fxFlex="none">
+            <button mat-flat-button color="primary" [disabled]="filters.length == 0" (click)="applyFiltersFunction()">
+              Filter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div fxFlex="50" fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="fw-bold">Selected Items ({{selectedFilterValues.length}})</div>
+    
+      <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+              <mat-icon matPrefix>search</mat-icon>
+              <input 
+                matInput 
+                placeholder="Search" 
+                [(ngModel)]="searchSelectItems" 
+                (keyup.enter)="onSelectSearch()"
+              />
+            </mat-form-field>
+        </div>
+
+        <div fxFlex>
+          <div>
+            <mat-checkbox color="primary" (change)="toggleSelectedAll()" [checked]="selectedAllItems">
+              Select All</mat-checkbox>
+          </div>
+        </div>
+    
+        <div fxFlex="150px">
+          <mat-form-field appearance="outline">
+            <mat-select [(value)]="selectedItemsPage" (selectionChange)="onUC2GenerateUniquesPaginationSelected($event.value)" placeholder="Select Page">
+              <mat-option *ngFor="let page of [].constructor(totalSelectedItemsPages); let i = index" [value]="i + 1">
+                Page {{ i + 1 }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    
+      <!-- List of selected items with checkboxes -->
+      <div fxFlex fxLayout="column" fxLayoutGap="4px" class="y-auto bg-surface p-3 rounded-1">
+        <div *ngFor="let selectedItem of selectedFilterValues">
+          <mat-checkbox [(ngModel)]="selectedItem.selected" (change)="onSelectedItemChange(selectedItem)">
+            {{ selectedItem.name }}
+          </mat-checkbox>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="p-6 pt-0">
+    <button mat-stroked-button color="primary" (click)="resetAdvanceSearch()">
+      Reset
+    </button>
+    <button mat-stroked-button color="primary" (click)="onClose()">
+      Cancel
+    </button>
+    <button mat-flat-button color="primary" [disabled]="enableApplyButton()" (click)="onApplyFilter()">
+      Save
+    </button>
+  </div>
+</div>

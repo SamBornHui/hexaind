@@ -1,0 +1,198 @@
+<div class="h-100 pt-7" fxLayout="column" fxLayoutGap="24px" *ngIf="selectedTab === 'Unread'">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="160px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>Activity</mat-label>
+          <mat-select (selectionChange)="onSelectionChange($event)">
+            <mat-option value="">All</mat-option>
+            <mat-option value="WORKFLOWS">Workflows</mat-option>
+            <mat-option value="DATA">Datasets</mat-option>
+            <mat-option value="MODEL">Models</mat-option>
+            <mat-option value="SCHEDULED_JOBS">Jobs</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <!-- TODO: for Future use -->
+      <!-- <div fxFlex="110px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>Users</mat-label>
+          <mat-select (selectionChange)="onUserSelectionChange($event)">
+            <mat-option *ngFor="let user of filteredUsers" [value]="user._id">
+              {{ user.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div> -->
+      <div fxFlex="160px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>Sort By</mat-label>
+          <mat-select>
+            <mat-option (click)="onToggleSort()" value="Importance">Importance</mat-option>
+            <mat-option (click)="onTimeSelectionOption()" value="time">Time</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <ng-container *ngIf="selectedDate == 'time'">
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startDatePicker" placeholder="Choose start date"
+            [(ngModel)]="selectedStartDate" (dateChange)="onStartDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endDatePicker" placeholder="Choose end date" [(ngModel)]="selectedEndDate"
+            (dateChange)="onEndDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endDatePicker></mat-datepicker>
+        </mat-form-field>
+      </ng-container>
+    </div>
+    <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <div>
+        <button mat-flat-button color="primary" [disabled]="getUnreadNotificationCount() === 0"
+          (click)="markAllNotifucationAsread()">Mark all as read</button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="getUnreadNotificationCount() > 0" fxFlex fxLayout="column" class="notification-container">
+    <ng-container *ngFor="let notification of notifications">
+      <div fxFlex="none" fxLayout="row" fxLayoutGap="24px" class="row" *ngIf="!notification.read.includes(user._id)">
+        <div fxFlex="24px"><mat-icon class="unread">circle</mat-icon></div>
+        <div fxFlex="none">
+          <mat-icon *ngIf="notification.notification_type == 'SUCCESS'"
+            class="material-symbols-outlined text-green">check_circle</mat-icon>
+          <mat-icon *ngIf="notification.notification_type == 'ERROR' || notification.notification_type == 'SYSTEM'"
+            class="material-symbols-outlined text-red">error</mat-icon>
+          <mat-icon *ngIf="notification.notification_type == 'INFO'"
+            class="material-symbols-outlined text-grey">info</mat-icon>
+          <mat-icon *ngIf="notification.notification_type == 'WARNING'"
+            class="material-symbols-outlined text-orange">warning</mat-icon>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="16px">
+          <div class="text-lg">
+            {{ notification.message }}
+          </div>
+          <div class="link"
+            (click)="notification.notification_category === 'WORKFLOWS' || notification.notification_category === 'MODEL' ? onViewWorkflowSession(notification) : (notification.notification_category === 'DATA' ? onViewDataset(notification) : onViewJob(notification))">
+            {{ notification.notification_category === 'WORKFLOWS' ? 'View workflow' : notification.notification_category === 'MODEL' ? 'View model' :
+            (notification.notification_category === 'DATA' ? 'View dataset' : 'View job') }}
+          </div>
+        </div>
+        <div fxFlex="120px" class="text-grey">{{ notification.created_at | TimeAgo }}</div>
+        <div fxFlex="120px">
+          <div class="link" (click)="updateNotificationStatus(notification._id, true)">Mark
+            as read</div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  <div fxFlex *ngIf="getUnreadNotificationCount() === 0">
+    <div class="global-nodata">
+      No unread notifications.
+    </div>
+  </div>
+</div>
+
+<div class="h-100 pt-7" fxLayout="column" fxLayoutGap="24px" *ngIf="selectedTab == 'All'">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="160px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>Activity</mat-label>
+          <mat-select (selectionChange)="onSelectionChange($event)">
+            <mat-option value="">All</mat-option>
+            <mat-option value="WORKFLOWS">Workflows</mat-option>
+            <mat-option value="DATA">Datasets</mat-option>
+            <mat-option value="MODEL">Models</mat-option>
+            <mat-option value="SCHEDULED_JOBS">Jobs</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <!-- TODO: for Future use -->
+      <!-- <div fxFlex="110px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>Users</mat-label>
+          <mat-select (selectionChange)="onUserSelectionChange($event)">
+            <mat-option *ngFor="let user of filteredUsers" [value]="user._id">
+              {{ user.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div> -->
+      <div fxFlex="160px">
+        <mat-form-field appearance="outline">
+          <mat-label>Sort By</mat-label>
+          <mat-select>
+            <mat-option (click)="onToggleSort()" value="Importance">Importance</mat-option>
+            <mat-option (click)="onTimeSelectionOption()" value="time">Time</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <ng-container *ngIf="selectedDate == 'time'">
+        <mat-form-field appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startDatePicker" placeholder="Choose start date"
+            [(ngModel)]="selectedStartDate" (dateChange)="onStartDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endDatePicker" placeholder="Choose end date" [(ngModel)]="selectedEndDate"
+            (dateChange)="onEndDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endDatePicker></mat-datepicker>
+        </mat-form-field>
+      </ng-container>
+    </div>
+    <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <div>
+        <button mat-flat-button color="primary" [disabled]="getUnreadNotificationCount() === 0"
+          (click)="markAllNotifucationAsread()">Mark all as read</button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" class="notification-container">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="24px" class="row" *ngFor="let notification of notifications">
+      <div fxFlex="24px"><mat-icon *ngIf="!notification.read.includes(user._id)" class="unread">circle</mat-icon></div>
+      <div fxFlex="none">
+        <mat-icon *ngIf="notification.notification_type == 'SUCCESS'"
+          class="material-symbols-outlined text-green">check_circle</mat-icon>
+        <mat-icon *ngIf="notification.notification_type == 'ERROR' || notification.notification_type == 'SYSTEM'"
+          class="material-symbols-outlined text-red">error</mat-icon>
+        <mat-icon *ngIf="notification.notification_type == 'INFO'"
+          class="material-symbols-outlined text-blue">info</mat-icon>
+        <mat-icon *ngIf="notification.notification_type == 'WARNING'"
+          class="material-symbols-outlined text-warning">warning</mat-icon>
+      </div>
+      <div fxFlex fxLayout="column" fxLayoutGap="16px">
+        <div class="text-lg" *ngIf="!notification.read.includes(user._id)">
+          {{ notification.message }}
+        </div>
+        <div class="text-md" *ngIf="notification.read.includes(user._id)">
+          {{ notification.message }}
+        </div>
+        <div class="link"
+          (click)="notification.notification_category === 'WORKFLOWS' || notification.notification_category === 'MODEL' ? onViewWorkflowSession(notification) : (notification.notification_category === 'DATA' ? onViewDataset(notification) : onViewJob(notification))">
+          {{ notification.notification_category === 'WORKFLOWS' ? 'View workflow' : notification.notification_category === 'MODEL' ? 'View model' :
+          (notification.notification_category === 'DATA' ? 'View dataset' : 'View job') }}
+        </div>
+      </div>
+      <div fxFlex="120px" class="text-grey">{{ notification.created_at | TimeAgo }}</div>
+      <div fxFlex="120px">
+        <div class="link" *ngIf="!notification.read.includes(user._id)"
+          (click)="updateNotificationStatus(notification._id, true)">
+          Mark
+          as read</div>
+        <div class="link" *ngIf="notification.read.includes(user._id)"
+          (click)="updateNotificationStatus(notification._id, false)">
+          Mark as unread</div>
+      </div>
+    </div>
+  </div>
+</div>

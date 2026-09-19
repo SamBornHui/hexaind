@@ -1,0 +1,13 @@
+.mst-file-upload {
+  &__dropzone {
+    border: 1px dashed var(--stroke-dark);
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    &.dragover {
+      border-color: #007bff; /* Or your desired highlight color */
+      background-color: #e9ecef;
+    }
+  }
+}

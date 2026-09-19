@@ -1,0 +1,13 @@
+<div class="mst-table-header-cell__content">
+  <div class="mst-table-header-cell__content__text mst-shared-truncate">
+    {{ column.name }}
+  </div>
+  <mst-hint *ngIf="column.hint" [hint]="column.hint" [titleOnly]="true" />
+</div>
+<div
+  *ngIf="sortDirection && sortDirection !== 'none'"
+  class="mst-table-header-cell__sort-arrow"
+  [class.desc]="sortDirection === 'desc'"
+>
+  <mst-icon iconName="arrow_upward" [options]="{ weight: 400, opsz: 20 }" />
+</div>

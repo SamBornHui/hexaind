@@ -1,0 +1,30 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <div>
+        <span class="fw-bold">Preview: </span>
+        <span>{{ data["name"] }}</span>
+      </div>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-6 h-100 y-auto">
+    <div class="global-image-container">
+      <img
+        loading="lazy"
+        class="global-image-fit"
+        src="{{ data.rawImage }}"
+        (load)="imageLoaded()"
+      />
+    </div>
+  </div>
+</div>

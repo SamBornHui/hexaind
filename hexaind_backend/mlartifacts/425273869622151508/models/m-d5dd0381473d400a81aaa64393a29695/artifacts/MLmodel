@@ -1,0 +1,23 @@
+artifact_path: mlflow-artifacts:/425273869622151508/models/m-d5dd0381473d400a81aaa64393a29695/artifacts
+flavors:
+  python_function:
+    artifacts:
+      scaler_x:
+        path: artifacts/scaler_x.pkl
+        uri: /Users/muhammadumersohailkhan/Desktop/Projects/HEXAIND/hexaind-data/datasets/p_68721a96724f2d1b259d98d8/Workflow_Results/wf_6877d4a7fd665addc99bab30/wf_6877d4e8fd665addc99bac55/r_6877d501fd665addc99bacb9/XGBoost_model_eba2b042ea86438eac539542348391d3/scaler_x.pkl
+    cloudpickle_version: 3.1.1
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.10.13
+    streamable: false
+mlflow_version: 3.1.1
+model_id: m-d5dd0381473d400a81aaa64393a29695
+model_size_bytes: 74951
+model_uuid: m-d5dd0381473d400a81aaa64393a29695
+prompts: null
+run_id: eba2b042ea86438eac539542348391d3
+utc_time_created: '2025-07-16 16:36:20.922429'

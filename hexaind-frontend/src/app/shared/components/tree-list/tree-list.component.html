@@ -1,0 +1,15 @@
+<ng-template #itemTemplate let-item="item" let-index="index">
+  <mst-tree-item
+    [item]="item"
+    [index]="index"
+    (arrowClick)="onArrowClick($event)"
+  />
+</ng-template>
+<mst-list
+  listItemClassName="has-left-icon"
+  [selectedIds]="selectedIds"
+  [selectedItemHighlight]="selectedItemHighlight"
+  [items]="items"
+  [itemTemplate]="itemTemplate"
+  (itemClick)="onItemClick($event)"
+/>

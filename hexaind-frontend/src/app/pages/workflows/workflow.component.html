@@ -1,0 +1,601 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px" (click)="deleteConfirmation = false">
+  <div fxFlex="none">
+    <h1 class="global-main-title">Workflows
+      <mat-icon class="material-symbols-outlined global-info-icon"
+        matTooltip="This page is a repository for Workflows, which are reusable, no-code data transformation applications powered by ML and AI.">
+        info
+      </mat-icon>
+    </h1>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="fixed-header">
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="220px" fxFlex.lt-md="150px">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="searchText" (input)="onSearchTextChange($event)" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <div *ngIf="assets.create == true || assets == 'server_admin'">
+        <button mat-flat-button color="primary" (click)="createNewWorkflowSession()">
+          <mat-icon class="material-symbols-outlined">add</mat-icon>
+          Create <span fxHide.lt-md>Workflow</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex *ngIf="showLoader" fxLayout="column" fxLayoutAlign="center center" style="align-items: center">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+  <!-- <div fxFlex class="y-auto" *ngIf="!showLoader">
+    <div class="centered-info-message" *ngIf="sessions.length === 0 && isSessionLoaded"> No Workflows are present in
+      this project </div>
+      {{sessions | json}} 
+    <table mat-table [dataSource]="sessions" matSort (matSortChange)="sortData($event)" multiTemplateDataRows class="worlflow-table"
+      *ngIf="sessions.length != 0 && isSessionLoaded">
+      <div *ngIf="!showLoader">
+        <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            <ng-container *ngIf="column === 'Last Modified' || column === 'Date Created'; else defaultHeader">
+              {{ getColumnName(column) }}&nbsp;<span class="text-sm text-grey ws-nowrap">(Local Time)</span>
+            </ng-container>
+            <ng-template #defaultHeader>
+              {{ getColumnName(column) }}
+            </ng-template>
+          </th>
+          <td mat-cell *matCellDef="let workflowSession">
+            <ng-container [ngSwitch]="column">
+              <ng-container *ngSwitchCase="'expand'">
+                <button (click)="toggleExpandButtonClicked($event, workflowSession)" mat-icon-button>
+                  <mat-icon>{{
+                    workflowSession.expanded ? "expand_less" : "expand_more"
+                    }}</mat-icon>
+                </button>
+              </ng-container>
+              <ng-container *ngSwitchCase="'Name'">
+                {{ workflowSession.name ? workflowSession.name : "Unknown" }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'Description'">
+                {{
+                workflowSession.description
+                ? workflowSession.description
+                : "Unknown"
+                }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'Version'"> &nbsp; </ng-container>
+              <ng-container *ngSwitchCase="'Created By'">
+                {{
+                workflowSession.owner_name
+                ? workflowSession.owner_name
+                : "Unknown"
+                }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'Date Created'" class="vertical-container">
+                {{
+                workflowSession.created_at | date: "dd-MMM-yyyy hh:mm:a"
+                }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'Last Modified'" class="vertical-container">
+                {{
+                workflowSession.last_modified_at | date: "dd-MMM-yyyy hh:mm:a"
+                }}
+              </ng-container>
+
+              <ng-container *ngSwitchCase="'menu'" class="vertical-container">
+                <button matTooltip="View Workflow Dataset Results for Master"
+                  (click)="onPreviewDatasetResultForWorkflowSession(workflowSession)" style="margin-bottom: -5px"
+                  mat-icon-button class="expand-button">
+                  <mat-icon>preview</mat-icon>
+                </button>
+              </ng-container>
+
+            </ng-container>
+          </td>
+        </ng-container>
+      </div>
+
+      
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let workflowSession" [attr.colspan]="displayedColumns.length">
+          <div class="example-element-detail" [@detailExpand]="
+              workflowSession == expandedElement ? 'expanded' : 'collapsed'
+            ">
+            <div>
+              <div *ngIf="role_name !== 'LIMITED ACCESS'" class="expanded-content" fxLayout="row"
+                (click)="onViewWorkflowSession(workflowSession)">
+                <div fxFlex="64px" class="column-placeholder px-4 py-3">
+                  <mat-icon class="material-symbols-outlined icon-20 text-grey" matTooltip="Master Workflow">
+                    description
+                  </mat-icon>
+                </div>
+                <div fxFlex="204px" class="column-name p-4">
+                  {{ workflowSession.name }}test
+                </div>
+                <div fxFlex class="column-description p-4">
+                  {{ workflowSession.description }}
+                </div>
+                <div fxFlex="100px" class="column-version p-4">
+                  {{ workflowSession.version }}
+                </div>
+                <div fxFlex="200px" class="column-last-modified p-4">
+                  {{
+                  workflowSession.owner_name
+                  ? workflowSession.owner_name
+                  : "Unknown"
+                  }}
+                </div>
+                <div fxFlex="220px" class="column-last-modified-by p-4">
+                  {{
+                  workflowSession.created_at
+                  | date: "dd-MMM-yyyy hh:mm:a"
+                  }}
+                </div>
+                <div fxFlex="220px" class="column-last-modified-by p-4">
+                  {{
+                  workflowSession.last_modified_at
+                  | date: "dd-MMM-yyyy hh:mm:a"
+                  }}
+                </div>
+
+                <div fxFlex="64px" class="column-actions ps-4">
+                  <button matTooltip="Menu" mat-icon-button class="expand-button" (click)="
+                      trackedWorkflowSession = workflowSession;
+                      $event.stopPropagation()
+                    " [matMenuTriggerFor]="workflowSessionActionsMenu" (click)="deleteConfirmation = false">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="workflowSession.saved_workflows && workflowSession.saved_workflows.length > 0">
+                <div *ngFor="let savedWorkflow of workflowSession.saved_workflows"
+                  (click)="onViewPublishedWorkflow(workflowSession, savedWorkflow)" class="expanded-content"
+                  fxLayout="row">
+                  <div fxFlex="64px" class="column-placeholder px-4 py-3">
+                    <mat-icon class="material-symbols-outlined icon-20 text-grey" matTooltip="Versioned Workflow">
+                      content_copy
+                    </mat-icon>
+                  </div>
+                  <div fxFlex="204px" class="column-name p-4">
+                    {{ savedWorkflow.name }}
+                  </div>
+                  <div fxFlex class="column-description p-4">
+                    {{ savedWorkflow.description }}
+                  </div>
+                  <div fxFlex="100px" class="column-version p-4">
+                    {{ savedWorkflow.workflow_version }}
+                  </div>
+                  <div fxFlex="200px" class="column-owner p-4">
+                    {{ savedWorkflow.last_modified_by }}
+                  </div>
+                  <div fxFlex="220px" class="column-last-modified-by p-4">
+                    {{ lastAccessedDate(savedWorkflow.created_at) | date: "dd-MMM-yyyy hh:mm:a" }}
+                  </div>
+                  <div fxFlex="220px" class="column-last-modified-by p-4">
+                    {{ savedWorkflow.last_modified_at | date: "dd-MMM-yyyy hh:mm:a" }}
+                  </div>
+
+                  <div fxFlex="64px" class="column-actions ps-4">
+                    <button mat-icon-button class="expand-button"
+                      (click)="trackedWorkflowSession = workflowSession; trackedPublishedWorkflow = savedWorkflow; $event.stopPropagation()"
+                      [matMenuTriggerFor]="publishedWorkflowActionsMenu" (click)="deleteConfirmation = false">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!workflowSession.saved_workflows || workflowSession.saved_workflows.length === 0"
+                class="expanded-content" fxLayout="row">
+                <div fxFlex class="column-description p-4">
+                  No Published Workflows available
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let workflowSession; columns: displayedColumns" class="example-element-row"
+        [class.example-expanded-row]="expandedElement === workflowSession"
+        (click)="toggleExpandButtonClicked($event, workflowSession)"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+  </div> -->
+
+
+  <div fxFlex class="y-auto" *ngIf="!showLoader">
+    <div class="centered-info-message" *ngIf="sessions && sessions.length === 0 && isSessionLoaded">
+      No Workflows are present in this project
+    </div>
+
+    <table mat-table [dataSource]="sessions" matSort (matSortChange)="sortData($event)" multiTemplateDataRows
+      class="workflow-table" *ngIf="sessions && sessions.length !== 0 && isSessionLoaded">
+      <!-- Columns -->
+      <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <ng-container *ngIf="column === 'Last Modified' || column === 'Date Created'; else defaultHeader">
+            {{ getColumnName(column) }} <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+              matTooltip="User's local time">info</mat-icon>
+          </ng-container>
+          <ng-template #defaultHeader>
+            {{ getColumnName(column) }}
+          </ng-template>
+        </th>
+        <td mat-cell *matCellDef="let workflowSession">
+          <ng-container [ngSwitch]="column">
+            <ng-container *ngSwitchCase="'expand'">
+              <button (click)="toggleExpandButtonClicked($event, workflowSession)" mat-icon-button>
+                <mat-icon>{{ workflowSession.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Name'">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="p-relative">
+                <mat-icon class="icon-star" [ngClass]="
+                checkFavStatus(workflowSession) ? 'text-primary' : 'text-grey'"
+                  (click)="toggleSelection(workflowSession);$event.stopPropagation()">
+                  {{ checkFavStatus(workflowSession) ? "star" : "star_outline" }}
+                </mat-icon>
+                <div fxFlex class="text-container">
+                  <div class="text-ellipse p-absolute"
+                    matTooltip="{{workflowSession.name.length > 20 ? workflowSession.name : ''}}"
+                    matTooltipPosition="above">
+                    {{ workflowSession.name ? workflowSession.name : 'Unknown' }}
+                  </div>
+                </div>
+                <div fxFlex="none" *ngIf="isTemplateWorkflow(workflowSession)">
+                  <mat-icon class="material-symbols-outlined book-mark-icon"
+                    matTooltip="This workflow is a template that can be loaded to workflows">book_mark
+                  </mat-icon>
+                </div>
+                <div fxFlex="none" *ngIf="workflowSession.isInvalid">
+                  <mat-icon class="material-symbols-outlined text-orange icon-16"
+                    matTooltip="Workflow Corrupted">warning</mat-icon>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Description'">
+              <!-- <span [matTooltip]="workflowSession.description.length > 100 ? workflowSession.description : ''"
+                matTooltipPosition="above">
+                {{ workflowSession.description.length > 100 ? (workflowSession.description | slice:0:100) + '...' :
+                (workflowSession.description ? workflowSession.description : 'Unknown') }}
+              </span> -->
+              <div class="text-container">
+                <div class="text-ellipse p-absolute"
+                  matTooltip="{{workflowSession.description.length > 50 ? workflowSession.description : ''}}"
+                  matTooltipPosition="above">
+                  {{ workflowSession.description ? workflowSession.description : 'Unknown' }}
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Version'">&nbsp;</ng-container>
+            <ng-container *ngSwitchCase="'Created By'">
+              {{ workflowSession.owner_name ? workflowSession.owner_name : 'Unknown' }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'Date Created'" class="vertical-container">
+              {{ workflowSession.created_at | date: 'd-MMM-yyyy h:mm a' }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'Last Modified'" class="vertical-container">
+              {{ workflowSession.last_modified_at | date: 'd-MMM-yyyy h:mm a' }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'menu'" class="vertical-container">
+              <button matTooltip="View Workflow Dataset Results for Master"
+                (click)="onPreviewDatasetResultForWorkflowSession(workflowSession)" style="margin-bottom: -5px"
+                mat-icon-button class="expand-button">
+                <mat-icon>preview</mat-icon>
+              </button>
+            </ng-container>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- Expanded Content Column -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let workflowSession" [attr.colspan]="displayedColumns.length">
+          <!-- Expanded details content -->
+          <div class="example-element-detail"
+            [@detailExpand]="workflowSession == expandedElement ? 'expanded' : 'collapsed'">
+            <!-- Your expanded details content here -->
+            <!-- Example: Displaying additional details for expanded rows -->
+            <div>
+              <div *ngIf="role_name !== 'LIMITED ACCESS'" class="expanded-content" fxLayout="row"
+                (click)="onViewWorkflowSession(workflowSession)">
+                <!-- Example columns for expanded details -->
+                <div class="column-placeholder">
+                  <mat-icon class="material-symbols-outlined icon-20 text-grey" matTooltip="Master Workflow">
+                    description
+                  </mat-icon>
+                </div>
+                <div class="column-name">
+                  <div class="text-container">
+                    <div class="text-ellipse p-absolute"
+                      matTooltip="{{workflowSession.name.length > 30 ? workflowSession.name : ''}}"
+                      matTooltipPosition="above">
+                      {{ workflowSession.name }}
+                    </div>
+                  </div>
+                </div>
+                <div fxFlex class="column-description">
+                  <div fxLayout="row" fxLayoutGap="4px">
+                    <div fxFlex class="text-container"
+                      [matTooltip]="workflowSession.description.length > 50 ? workflowSession.description : ''"
+                      matTooltipPosition="above">
+                      <div class="text-ellipse p-absolute">
+                        {{ workflowSession.description.length > 50 ? (workflowSession.description | slice:0:50) + '...'
+                        :
+                        (workflowSession.description ? workflowSession.description : 'Unknown') }}
+                      </div>
+                    </div>
+                    <div fxFlex="none"
+                      *ngIf="workflowSession.last_run_status && workflowSession.last_run_status !== 'N.A.'">
+                      <div class="status-chip">({{ workflowSession.last_run_status }})</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column-version">
+                  {{ workflowSession.version }}
+                </div>
+                <div class="column-date">
+                  {{ workflowSession.owner_name ? workflowSession.owner_name : 'Unknown' }}
+                </div>
+                <div class="column-date">
+                  {{ workflowSession.created_at | date: 'd-MMM-yyyy h:mm a' }}
+                </div>
+                <div class="column-date">
+                  {{ workflowSession.last_modified_at | date: 'd-MMM-yyyy h:mm a' }}
+                </div>
+                <div class="column-actions">
+                  <button matTooltip="Menu" mat-icon-button class="expand-button"
+                    (click)="trackedWorkflowSession = workflowSession; trackedPublishedWorkflow = savedWorkflow; $event.stopPropagation()"
+                    [matMenuTriggerFor]="workflowSessionActionsMenu" (click)="deleteConfirmation = false">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Example: Displaying published workflows -->
+              <div *ngIf="workflowSession.saved_workflows && workflowSession.saved_workflows.length > 0">
+                <div *ngFor="let savedWorkflow of workflowSession.saved_workflows"
+                  (click)="onViewPublishedWorkflow(workflowSession, savedWorkflow)" class="expanded-content"
+                  fxLayout="row">
+                  <div class="column-placeholder">
+                    <mat-icon class="material-symbols-outlined icon-20 text-grey" matTooltip="Versioned Workflow">
+                      content_copy
+                    </mat-icon>
+                  </div>
+                  <div class="column-name">
+                    <div class="text-container">
+                      <div class="text-ellipse p-absolute"
+                        matTooltip="{{savedWorkflow.name.length > 20 ? savedWorkflow.name : ''}}"
+                        matTooltipPosition="above">
+                        {{ savedWorkflow.name }}
+                      </div>
+                    </div>
+                  </div>
+                  <div fxFlex class="column-description">
+                    <div fxLayout="row" fxLayoutGap="4px">
+                      <div fxFlex class="text-container"
+                        [matTooltip]="savedWorkflow.description.length > 50 ? savedWorkflow.description : ''"
+                        matTooltipPosition="above">
+                        <div class="text-ellipse p-absolute">
+                          {{ savedWorkflow.description.length > 50 ? (savedWorkflow.description | slice:0:50) + '...' :
+                          (savedWorkflow.description ? savedWorkflow.description : 'Unknown') }}
+                        </div>
+                      </div>
+                      <div fxFlex="none"
+                        *ngIf="savedWorkflow.last_run_status && savedWorkflow.last_run_status !== 'N.A.'">
+                        <div class="status-chip">({{ savedWorkflow.last_run_status }})</div>
+                      </div>
+                    </div>
+                    <!-- {{ savedWorkflow.description }} -->
+                  </div>
+                  <div class="column-version">
+                    {{ savedWorkflow.workflow_version }}
+                  </div>
+                  <div class="column-date">
+                    {{ savedWorkflow.last_modified_by }}
+                  </div>
+                  <div class="column-date">
+                    {{ lastAccessedDate(savedWorkflow.created_at) | date: 'd-MMM-yyyy h:mm a' }}
+                  </div>
+                  <div class="column-date">
+                    {{ savedWorkflow.last_modified_at | date: 'd-MMM-yyyy h:mm a' }}
+                  </div>
+                  <div class="column-actions">
+                    <button mat-icon-button class="expand-button"
+                      (click)="trackedWorkflowSession = workflowSession; trackedPublishedWorkflow = savedWorkflow; $event.stopPropagation()"
+                      [matMenuTriggerFor]="publishedWorkflowActionsMenu" (click)="deleteConfirmation = false">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Example: No published workflows available -->
+              <div *ngIf="!workflowSession.saved_workflows || workflowSession.saved_workflows.length === 0"
+                class="expanded-content" fxLayout="row">
+                <div fxFlex class="column-description p-4">
+                  No Published Workflows available
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Header and Row Definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let workflowSession; columns: displayedColumns" class="example-element-row"
+        [class.example-expanded-row]="expandedElement === workflowSession"
+        (click)="toggleExpandButtonClicked($event, workflowSession)"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+  </div>
+
+</div>
+<!--General workflow (Adding of Export option)-->
+
+<mat-menu #workflowSessionActionsMenu="matMenu" class="global-menu">
+  <ng-container *ngIf="!deleteConfirmation">
+    <button mat-menu-item (click)="onViewWorkflowSession(trackedWorkflowSession)"
+      *ngIf="assets.read == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">account_tree</mat-icon>
+      View Workflow
+    </button>
+    <button mat-menu-item (click)="onEditWorkflowSession(trackedWorkflowSession)"
+      *ngIf="assets.update == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">edit</mat-icon>
+      Edit
+    </button>
+    <button mat-menu-item (click)="deleteConfirmation = true; $event.stopPropagation(); openConfirmationDialog()"
+      *ngIf="assets.delete == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">delete</mat-icon>
+      Delete
+    </button>
+    <button mat-menu-item (click)="onViewWorkflowSessionRun(trackedWorkflowSession)">
+      <mat-icon class="material-symbols-outlined">play_arrow</mat-icon>
+      View Run
+    </button>
+    <button mat-menu-item *ngIf="!isTemplateWorkflow(trackedWorkflowSession)" (click)="
+        onPreviewDatasetResultForWorkflowSession(
+          trackedWorkflowSession
+        )
+      ">
+      <mat-icon class="material-symbols-outlined">preview</mat-icon>
+      View Workflow Dataset Results
+    </button>
+    <!-- <button mat-menu-item *ngIf="isTemplateWorkflow(trackedWorkflowSession)" (click)="onShareWorkflowTemplate(trackedWorkflowSession)">
+      <mat-icon class="material-symbols-outlined">share</mat-icon>
+      Share
+    </button> -->
+    <button mat-menu-item (click)="onDuplicateWorkflow(trackedWorkflowSession,'master')">
+      <mat-icon class="material-symbols-outlined">tab_duplicate</mat-icon>
+      Duplicate
+    </button>
+    <button mat-menu-item (click)="onExportWorkflow(trackedWorkflowSession,'master')"
+      *ngIf="assets.update == true || assets == 'server_admin'|| assets == 'project_admin'">
+      <mat-icon class="material-symbols-outlined">import_export</mat-icon>
+      Export
+    </button>
+  </ng-container>
+  <!-- <ng-container *ngIf="deleteConfirmation"> -->
+  <!-- <div mat-menu-item class="header">Are You Sure?</div>
+    <button
+      mat-menu-item
+      (click)="onDeleteWorkflowSession(trackedWorkflowSession)"
+    >
+      <mat-icon>check</mat-icon> Yes
+    </button>
+    <button mat-menu-item><mat-icon>close</mat-icon> No</button> -->
+  <ng-template #confirmationDialogTemplate>
+    <ng-container *ngIf="deleteConfirmation">
+      <!-- <h1 mat-dialog-title>Project Delete Confirmation</h1> -->
+      <div mat-dialog-content>
+        <p>
+          Are you sure? This will delete the "<strong>{{trackedWorkflowSession.name}}</strong>" workflow, along with all
+          associated versioned workflows, previously generated datasets, and scheduled jobs.
+        </p>
+
+      </div>
+      <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+        <button mat-flat-button (click)="onCancel()">Cancel</button>
+        <button mat-flat-button color="primary"
+          (click)="onDeleteWorkflowSession(trackedWorkflowSession)">Confirm</button>
+      </div>
+    </ng-container>
+
+  </ng-template>
+  <!-- </ng-container> -->
+</mat-menu>
+
+<!--Published workflow -->
+<mat-menu #publishedWorkflowActionsMenu="matMenu" class="global-menu">
+  <ng-container *ngIf="!deleteConfirmation">
+    <button mat-menu-item (click)="
+        onViewPublishedWorkflow(
+          trackedWorkflowSession,
+          trackedPublishedWorkflow
+        )
+      " *ngIf="assets.read == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">publish</mat-icon>
+      View Published Workflow
+    </button>
+    <button mat-menu-item (click)="onEditPublishedWorkflow(trackedPublishedWorkflow)"
+      *ngIf="assets.update == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">edit</mat-icon>
+      Edit
+    </button>
+    <button mat-menu-item
+      (click)="deleteConfirmation = true; $event.stopPropagation(); openVersionedConfirmationDialog()"
+      *ngIf="assets.delete == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">delete</mat-icon>
+      Delete
+    </button>
+    <button mat-menu-item (click)="
+        onViewPublishedWorkflowRuns(
+          trackedPublishedWorkflow,
+          trackedWorkflowSession
+        )
+      ">
+      <mat-icon class="material-symbols-outlined">play_arrow</mat-icon>
+      View Runs
+    </button>
+    <button mat-menu-item (click)="
+        onPreviewDatasetResultsForWorkflowVersion(
+          trackedPublishedWorkflow,
+          trackedWorkflowSession
+        )
+      ">
+      <mat-icon class="material-symbols-outlined">preview</mat-icon>
+      View Workflow Dataset Results
+    </button>
+    <button disabled mat-menu-item (click)="onDuplicateWorkflow(trackedPublishedWorkflow, 'version')"
+      *ngIf="assets.update == true || assets == 'server_admin'">
+      <mat-icon class="material-symbols-outlined">content_copy</mat-icon>
+      Duplicate
+    </button> 
+    <button mat-menu-item (click)="onExportWorkflow(trackedPublishedWorkflow, 'version')"
+      *ngIf="assets.update == true || assets == 'server_admin'|| assets == 'project_admin'">
+      <mat-icon class="material-symbols-outlined">import_export</mat-icon>
+      Export
+    </button>
+  </ng-container>
+  <!-- <ng-container *ngIf="deleteConfirmation">
+    <div mat-menu-item class="header">Are You Sure?</div>
+    <button mat-menu-item (click)="onDeletePublishedWorkflow(trackedPublishedWorkflow)">
+      <mat-icon>check</mat-icon> Yes
+    </button>
+    <button mat-menu-item><mat-icon>close</mat-icon> No</button>
+  </ng-container> -->
+  <ng-template #versionedconfirmationDialogTemplate>
+    <ng-container *ngIf="deleteConfirmation">
+      <!-- <h1 mat-dialog-title>Project Delete Confirmation</h1> -->
+      <div mat-dialog-content>
+        <p>
+          Are you sure? This will delete the "<strong>{{trackedPublishedWorkflow.name}}</strong>" workflow, along with
+          all associated scheduled jobs and previously generated datasets.
+        </p>
+      </div>
+      <div mat-dialog-actions fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+        <button mat-flat-button (click)="onCancel()">Cancel</button>
+        <button mat-flat-button color="primary"
+          (click)="onDeletePublishedWorkflow(trackedPublishedWorkflow)">Confirm</button>
+      </div>
+    </ng-container>
+
+  </ng-template>
+</mat-menu>
+
+<!-- Converted to matdialog on 23-04-2024 -->
+<!-- <app-create-new-workflow-session
+  *ngIf="IsCreatingNewWorkflowSession"
+  #newWorkflowPanel
+  (closeDialogClicked)="onCloseCreateNewWorkflowDialog()"
+  (workflowSessionCreatedEvent)="OnWorkflowSessionCreated($event)"
+>
+</app-create-new-workflow-session> -->

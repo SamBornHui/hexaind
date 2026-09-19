@@ -1,0 +1,28 @@
+{
+    "name": "Sample LS-DYNA Simulation",
+    "test_mode": false,
+    "run_job": true,
+    "software": {
+      "analysis": {
+        "code": "ls_dyna",
+        "version": "12.0.0"
+      },
+      "command": "ls-dyna -i _ShellBuckle_V2.3.1.k -p single -s 1",
+      "reusable_job_file": "custom_driver.py",
+      "dynamic_job_file": "param_values.csv, _1883_XXXX.material, Blank.k, Tools.k, shellbuckleXXXX.k",
+      "pre_python":null,
+      "post_python":"custom_driver.py",
+      "hardware": {
+        "walltime": 96,
+        "coreType": "starlite_max",
+        "slots": 1,
+        "type": "compute",
+        "coresPerSlot": 1
+      },
+      "envVars": {
+        "LSTC_LICENSE_SERVER": "31010@novelis"
+      },
+      "onDemandLicenseSeller": null,
+      "output_file": "abstat"
+    }
+  }

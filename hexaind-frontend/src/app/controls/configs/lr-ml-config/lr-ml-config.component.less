@@ -1,0 +1,55 @@
+/* Basic styling for virtual scroll table */
+.virtual-scroll {
+    height: 400px; /* Set the height of the scrollable area */
+    overflow: auto;
+    width: 100%;
+    border: 1px solid #ccc;
+  }
+  
+  /* Table container */
+  .table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 3px;
+  }
+  
+  /* Table Header Styling */
+  .table-header {
+    display: flex;
+    width: 100%;
+    font-weight: bold;
+    border: 1px solid #ccc;
+  }
+  
+  .header-cell {
+    flex: 1;
+    padding: 5px;
+    text-align: center;
+    border-right: 1px solid #ccc;
+  }
+  
+  .header-cell:last-child {
+    border-right: none;
+  }
+  
+  /* Table Row Styling */
+  .table-row {
+    display: flex;
+    border-bottom: 1px solid #f1f1f1;
+    width: 100%;
+  }
+  
+  .cell {
+    flex: 1;
+    padding: 5px;
+    text-align: center;
+    border-right: 1px solid #f1f1f1;
+    overflow: auto;
+  }
+  
+  .cell:last-child {
+    border-right: none;
+  }
+
+  

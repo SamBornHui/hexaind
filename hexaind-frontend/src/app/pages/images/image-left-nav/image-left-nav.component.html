@@ -1,0 +1,59 @@
+<div *ngIf="leftNavToggle" class="pt-3">
+    <mat-icon class="material-symbols-outlined global-icon-button-grey"
+        (click)="toggleLeftNav()">left_panel_open</mat-icon>
+</div>
+<div fxFlex="240px" fxFlex.gt-md="280px" fxFlex.gt-lg="320px" fxLayout="column" fxLayoutGap="16px"
+    *ngIf="!leftNavToggle" class="pt-3">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="border-bottom pb-2">
+        <div fxFlex class="fw-bold">Image Explorer</div>
+        <div fxFlex="none">
+            <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                (click)="toggleLeftNav()">left_panel_close</mat-icon>
+        </div>
+    </div>
+    <div fxFlex="none">
+        <mat-form-field appearance="outline">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput placeholder="Search" [(ngModel)]="searchImagesName" />
+        </mat-form-field>
+    </div>
+    <div fxFlex class="y-auto">
+        <div class="left-nav-container">
+            <div class="section" *ngFor="let folder of foldersList; let i = index"
+                [class.expanded]="folder.leftNavExpanded">
+                <!-- [class.active]="activeContainerIndex === i && activeRowIndex === null" -->
+                <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                    [class.active]="folder.leftNavExpanded" (click)="toggleLeftNavExpand(i)">
+                    <div fxFlex="none"><span class="arrow"></span></div>
+                    <div fxFlex class="text-ellipse">{{folder.folderId}}</div>
+                    <div fxFlex="none">{{folder.selectedimages.length}}</div>
+                    <div fxFlex="none">
+                        <div class="status-icon">
+                            <mat-icon class="text-green" *ngIf="segmentationAppliedImages(folder)=='full'">check_circle
+                            </mat-icon>
+                            <mat-icon *ngIf="segmentationAppliedImages(folder) == 'partial'"
+                                class="material-symbols-outlined text-blue">check_circle
+                            </mat-icon>
+                            <mat-icon *ngIf="segmentationAppliedImages(folder) == 'assigned'"
+                                class="material-symbols-outlined text-red">remove_circle</mat-icon>
+
+                            <mat-icon *ngIf="segmentationAppliedImages(folder) == 'not'"
+                                class="material-symbols-outlined text-grey">remove_circle</mat-icon>
+                        </div>
+                    </div>
+                </div>
+                <div [ngClass]="featureName === undefined ? 'content' : 'content-2'" *ngIf="folder.leftNavExpanded">
+                    <ng-container *ngFor="let row of folder.selectedimages; let j = index">
+                        <div fxLayout="row" *ngIf="displaySearched(row.path)" fxLayoutAlign="start center"
+                            fxLayoutGap="4px" class="row"
+                            [class.active]="activeContainerIndex === i && activeRowIndex === j && featureName == undefined"
+                            (click)="setActiveRow(i, j, row)">
+                            <div><mat-icon class="material-symbols-outlined text-grey">imagesmode</mat-icon></div>
+                            <div class="text-ellipse">{{getFileName(row.path)}}</div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

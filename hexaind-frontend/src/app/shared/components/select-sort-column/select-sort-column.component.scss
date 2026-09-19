@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+.mst-select-sort-column {
+  &__item {
+    display: flex;
+    gap: 4px;
+    &__field {
+      flex: 1;
+    }
+  }
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 300px;
+    margin: 0 16px;
+  }
+  &__dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

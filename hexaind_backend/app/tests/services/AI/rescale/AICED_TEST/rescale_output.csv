@@ -1,0 +1,2 @@
+job_id,token,output_file_path,trial_folder,test_mode,run_job,visualize_files,idx,parameters_file,sleep_time,visual_dir
+4zSnd,9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5,app/tests/services/AI/rescale/AICED_TEST/trial_30/4zSnd/PerfMetricsFile.csv,app/tests/services/AI/rescale/AICED_TEST/trial_30,True,False,"['ShellGeometry.png', 'ShellGeometry_Closeup.png', 'FormingAnimation_Script.avi']",1,app/tests/services/AI/rescale/AICED_TEST/trial_30/param_values.csv,5,

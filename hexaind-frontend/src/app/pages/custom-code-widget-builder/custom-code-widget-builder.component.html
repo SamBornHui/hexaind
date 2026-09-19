@@ -1,0 +1,785 @@
+<div fxLayout="column" class="cwb-container">
+  <div fxFlex="none" *ngIf="showMainHeader">
+    <app-header></app-header>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-back-button" (click)="navigate('custom-python-recipe')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">Custom Widget Builder</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-icon-button"
+          [disabled]="isDisabled || isViewing || isWidgetInPublishedState" (click)="save()">
+          <mat-icon class="material-symbols-outlined">SAVE</mat-icon>
+        </button>
+      </div>
+      <!--<div class="border-left">
+        <button
+          mat-icon-button
+          class="global-icon-button"
+          (click)="toggleMainHeader()"
+          [disabled]="!showMainHeader"
+        >
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    -->
+    </div>
+  </div>
+  <div fxFlex fxLayout="row">
+    <!-- showInfoTab -->
+    <!-- /showInfoTab -->
+
+    <!-- showExcute -->
+
+    <!-- /showExcute -->
+
+    <!-- showExecuteNxtab -->
+
+    <!-- /showExecuteNxtab -->
+
+    <!-- showPreviewTab -->
+    <!-- *ngIf="showPreviewTab" -->
+
+    <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6">
+      <div fxFlex="none" *ngIf="showSuccessfulValidationTab">
+        <h2>Configuration</h2>
+        <p>
+          All compatibility requirements have been met and HEXAIND’s validation
+          execution was successful. Now, you can configure various aspects of
+          your custom widget for its integration into workflows.
+        </p>
+      </div>
+      <!-- mat-stretch-tabs="false" -->
+      <div fxFlex style="overflow: auto;">
+        <mat-tab-group class="h-100">
+          <mat-tab label="Code">
+            <div fxFlex fxLayout="column" fxLayoutGap="24px" style="padding: 10px;" *ngIf="showInfoTab">
+              <div fxFlex="none">
+                <p>
+                  The next step is to upload and validate your prepared Python code and data. For detailed instructions
+                  on this file preparation,
+                  visit section 3.4 in the User Guide.
+                </p>
+              </div>
+              <h1>Upload</h1>
+              <div>
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                  <h4 style="font-weight:500">Choose Upload Source</h4>
+                  <mat-icon class="material-symbols-outlined text-grey">
+                    info
+                  </mat-icon>
+                </div>
+                <mat-radio-group color="primary" fxLayout="row" [disabled]="isViewing"
+                  [(ngModel)]="selectedUploadSource" (change)="onRadioButtonChange($event)">
+                  <div fxLayout="column">
+                    <mat-radio-button value="1" class="folder-upload">Local drive</mat-radio-button>
+                  </div>
+                  <div fxLayout="column">
+                    <mat-radio-button value="2" class="folder-upload">Remote drive</mat-radio-button>
+                  </div>
+                </mat-radio-group>
+              </div>
+              <div fxFlex="none">
+                <div fxLayout="column" fxLayoutGap="24px">
+                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+                    <div fxFlex="45">
+                      <mat-form-field appearance="outline">
+                        <input type="text" matInput placeholder="Choose ZIP or Python file" accept=".zip, .py"
+                          [(ngModel)]="selectedFileName" readonly="true" #fileInputText name="selectedFileName"
+                          (click)="isLocalDriveUpload ? fileInputText1.click() : diskMountDrive()" />
+                        <input type="file" #fileInputText1 style="display: none" accept=".zip, .py" [disabled]="isViewing"
+                          (change)="onFileSelected($event)" />
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="none" *ngIf="isLocalDriveUpload">
+                      <input type="file" #fileInput style="display: none" accept=".zip, .py"
+                        (change)="onFileSelected($event)" />
+                      <div style="display: flex; flex-direction: column">
+                        <button mat-raised-button color="primary"  *ngIf="!module_id" (click)="fileInput.click()" [disabled]="isViewing">
+                          Browse
+                        </button>
+                        <button
+                          mat-raised-button
+                          color="primary"
+                          *ngIf="module_id"
+                          (click)="fileInput.click()"
+                          [disabled]="isViewing"
+                        >
+                          ReUpload New Code
+                        </button>
+                      </div>
+                    </div>
+                    <div fxFlex="none" *ngIf="!isLocalDriveUpload">
+                      <button mat-raised-button color="primary" *ngIf="!module_id" (click)="diskMountDrive()" [disabled]="isViewing">
+                        Browse
+                      </button>
+                      <button *ngIf="module_id" mat-raised-button color="primary" (click)="diskMountDrive()" [disabled]="isViewing">
+                        ReUpload New Code
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="showLoader">
+                    <div fxLayout="column" fxLayoutAlign="center center">
+                      <mat-spinner diameter="48"></mat-spinner>
+                    </div>
+                  </div>
+                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+                    <div fxFlex="none">
+                      <button mat-raised-button color="primary" style="margin-right: 10px;" *ngIf="module_id" (click)="openDatasetDownload()">
+                        Download
+                      </button>
+                      <button mat-raised-button color="primary" [disabled]="isCPWCodeEditButtonDisabled" *ngIf="module_id || fileinput" (click)="processCPWCodeFilesAndOpenCodeEditor()">
+                        Edit python code
+                      </button>              
+                    </div>
+                  </div>
+                  <div *ngIf="!showLoader">
+                    <div *ngIf="fileinput">
+                      <div class="fw-bold pb-2">Unzipped Files:</div>
+                      <div *ngIf="getFiles" fxLayout="column wrap" fxLayoutGap="8px grid"
+                        class="bg-surface rounded-2 p-2 y-auto" style="max-height: 100px; overflow-y:auto">
+                        <div fxflex="25" *ngFor="let fileName of getFiles">
+                          {{ fileName }}
+                        </div>
+                      </div>
+                      <div class="mt-4 bg-surface rounded-2 p-2" fxLayout="row" fxLayoutGap="8px"
+                        fxLayoutAlign="start center">
+                        <mat-icon class="material-symbols-outlined icon-48"
+                          [class]="filesExtracted ? 'text-green' : 'text-red'">{{
+                          filesExtracted ? "check_circle" : "info"
+                          }}</mat-icon>
+                        <div>{{ filesExtractedResponse }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div style="max-width: 85vw;">
+                    <button mat-raised-button style="width: 200px;" color="primary" *ngIf="module_id" (click)="saveAndPushTheChanges()">
+                      upload the changes
+                    </button>   
+                    <div style="overflow: auto; margin: 10px; padding:3px; border: 1px solid green;" *ngFor="let file of extractedPythonFilesForEditing; let i = index">
+                      <h3 style="margin-bottom: 5px;">{{ file.name }}</h3>
+                      <ngx-codemirror  [(ngModel)]="extractedPythonFilesForEditing[i].content" [options]="editorOptions"></ngx-codemirror>
+                    </div>
+                    
+                  </div> -->
+                </div>
+              </div>
+              <div  fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <button mat-flat-button color="primary" (click)="openCustomCodeValidationDialog()"
+                  *ngIf="isCodeValidationEnabled">
+                  Validate
+                </button>
+                <button mat-flat-button color="primary" (click)="continue2()" *ngIf="isContinueToConfiguration">
+                  Continue
+                </button>
+              </div>
+            </div>
+          </mat-tab>
+          <mat-tab label="Configuration">
+            <h2 style="padding-top: 10px;">
+              Widget Metadata Information
+            </h2>
+            <div class="pb-1" style="padding-top: 10px;font-size: medium;">
+              Enter details about your widget below. These will aid in
+              identifying and understanding the widget for use in your
+              workflows.
+            </div>
+            <div fxLayout="column" fxLayoutGap="16px" style="overflow: hidden; height: 32%; padding: 10px">
+              <div fxFlex fxLayout="column" fxLayoutGap="20px" class="y-auto">
+                <div fxLayout="row" fxLayoutGap="24px">
+                  <div fxFlex="50">
+                    <div class="fw-bold pb-1">
+                      Widget Name<span class="required">*</span>
+                    </div>
+                    <mat-form-field appearance="outline">
+                      <input type="text" matInput placeholder="Enter name" [(ngModel)]="formData.name" required
+                        [disabled]="isViewing || (isEditing && !isWidgetInDraftState)" />
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="50">
+                    <div class="fw-bold pb-1">
+                      Description <span class="required">*</span>
+                    </div>
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Enter description" [(ngModel)]="formData.description" required
+                        [disabled]="isViewing" />
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutGap="24px">
+                  <div fxFlex="50">
+                    <div class="fw-bold pb-1">
+                      Reference Links
+                    </div>
+                    <mat-form-field appearance="outline">
+                      <input type="text" matInput placeholder="Enter URL" [(ngModel)]="formData.reference_links"
+                        required [disabled]="isViewing" />
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="50">
+                    <div class="fw-bold pb-1">
+                      Tags
+                    </div>
+                    <mat-form-field appearance="outline">
+                      <input type="text" matInput placeholder="Enter tags" [(ngModel)]="formData.tags" required
+                        [disabled]="isViewing" />
+                      <mat-hint>Enter in comma-separated values</mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="column" fxLayoutGap="16px" style="overflow: hidden; height: 8%; padding-top: 8px">
+              <div style="display: flex; align-items: center; margin-left: 8px; gap: 10px">
+                <div class="fw-bold">Color of widget</div>
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                  <div [(colorPicker)]="colorCode" [cpPosition]="'bottom'" [style.background]="defaultColor"
+                    (ngModelChange)="updateColor($event)" [ngModel]="colorCode" class="global-color-picker"
+                    [disabled]="isViewing"></div>
+                  <div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 style="padding-top: 10px;">
+                Parameters
+              </h2>
+              <div class="pb-1" style="padding-top: 10px;font-size: medium;">
+                The widget accepts {{finalresponse?.function_inputs.length}} parameters which are shown below.
+              </div>
+            </div>
+            <div fxLayout="column" fxLayoutGap="16px">
+              <div fxFlex fxLayout="column">
+                <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+                  class="py-2 border-bottom">
+                  <div class="fw-bold" style="min-width: 10vw">Parameter Name</div>
+                  <div class="fw-bold" style="min-width: 10vw">Parameter Datatype</div>
+                  <div class="fw-bold" style="min-width: 10vw">Is Dropdown</div>
+                  <div class="fw-bold" style="min-width: 10vw">Single/Multi Select</div>
+                  <div class="fw-bold" style="min-width: 20vw; padding-left: 50px;">Parameter Type</div>
+                  <div class="fw-bold" style="min-width: 15vw; padding-left: 40px;">Parameter Default Value</div>
+                  <div class="fw-bold" style="min-width: 15vw; padding-left: 90px;">Information</div>
+                </div>
+                <div fxFlex *ngIf="finalresponse?.function_inputs">
+                  <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="py-2 border-bottom" *ngFor="
+                      let item of finalresponse.function_inputs;
+                      let i = index
+                    ">
+                    <div style="width: 10vw; overflow:auto">{{ item.name }}</div>
+                    <div style="min-width: 10vw">
+                      {{ displayString[i] }}
+                    </div>
+                    <div style="min-width: 10vw">
+                      <input type="checkbox" class="custom-checkbox" name="terms"
+                        (click)="onIsDropDownChange($event,item)" [checked]="item.drop_down_details?.is_dropdown" />
+                    </div>
+                    <div style="min-width: 10vw">
+                      <ng-container *ngIf="item.drop_down_details?.is_dropdown">
+                        <mat-form-field appearance="outline">
+                          <mat-select [ngModel]="item.drop_down_details.drop_down_type"
+                            (ngModelChange)="onDropDownTypeChange($event,item)">
+                            <mat-option value="SINGLE_SELECT">Single Select</mat-option>
+                            <mat-option value="MULTI_SELECT">Multi Select</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </ng-container>
+                    </div>
+                    <div style="min-width: 20vw" fxFlex fxLayoutGap="10px">
+                      <mat-form-field appearance="outline">
+                        <mat-select name="{{ item.name }}_select" [(ngModel)]="formData[item.name + '_select']"
+                          (ngModelChange)="updateInputsMap()"
+                          [disabled]="isViewing || (isEditing && (!isWidgetInDraftState && !isPythonCodeUpdatedWhileEditing))">
+                          <mat-option value="INPUT_SELECTED_FROM_PRIOR_WIDGET">Input Selected From Prior
+                            Widget</mat-option>
+                          <mat-option value="INPUT_ENTERED_MANUALLY_ON_WIDGET">Input Entered Manually On
+                            Widget</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+
+                      <div
+                        *ngIf="formData[item.name + '_select'] === 'INPUT_SELECTED_FROM_PRIOR_WIDGET' && item.drop_down_details?.is_dropdown">
+                        <mat-form-field appearance="outline">
+                          <mat-select [ngModel]="item.drop_down_details.drop_down_source_details.dynamic_sub_type"
+                            (ngModelChange)="onParameterDropDownChange($event,item)">
+                            <mat-option value="COLUMN_NAMES">Column names</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                      <div
+                        *ngIf="formData[item.name + '_select'] === 'INPUT_ENTERED_MANUALLY_ON_WIDGET' && item.drop_down_details?.is_dropdown">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="text"
+                            [ngModel]="item.drop_down_details.drop_down_source_details.drop_down_values"
+                            (ngModelChange)="onParameterTextInputChange($event, item)"
+                            placeholder="Enter Comma seperated values" />
+
+                        </mat-form-field>
+
+                      </div>
+                    </div>
+                    <div style="min-width: 15vw">
+                      <div style="overflow: scroll; display: flex; max-width: 14vw; flex-direction: column; gap: 5px; align-items: center;"  
+                      *ngIf="formData[item.name + '_select'] !=='INPUT_SELECTED_FROM_PRIOR_WIDGET' && item.type == '<class \'pathlib.Path\'>'">
+                        <input type="file" accept="*/*" #fileInput1 style="display: none"
+                          (change)="uploadFileToFileSystem($event, item.name)" />
+                        <button style="max-width: 10vw;" *ngIf="!isFileUploadInProgress" mat-flat-button color="primary" class="upload-btn"
+                          (click)="fileInput1.click()">
+                          <mat-icon class="material-symbols-outlined">upload</mat-icon>
+                            File
+                        </button>
+                        <div *ngIf="inputTextValues[item.name]">{{getFileNameFromFilePath(inputTextValues[item.name])}}</div>
+                        <mat-spinner *ngIf="isFileUploadInProgress" style="width:20%" diameter="25"></mat-spinner>
+                      </div>
+                      <mat-form-field appearance="outline" *ngIf="item.type != '<class \'pathlib.Path\'>'">
+                        <input matInput *ngIf="
+                            formData[item.name + '_select'] ===
+                            'INPUT_SELECTED_FROM_PRIOR_WIDGET'
+                          " type="text" placeholder="N/A" disabled />
+                        <!-- <input
+                          *ngIf="
+                            formData[item.name + '_select'] !==
+                              'INPUT_SELECTED_FROM_PRIOR_WIDGET' &&
+                            item.type ===
+                              '<class \'pandas.core.frame.DataFrame\'>'
+                          "
+                          type="file"
+                          #fileInput
+                          style="display: block"
+                          accept=".csv"
+                          [name]="item.name + '_input_file'"
+                          (change)="onFileSelectedparameterValue($event)"
+                        /> -->
+                        <input matInput *ngIf="
+                            formData[item.name + '_select'] !==
+                              'INPUT_SELECTED_FROM_PRIOR_WIDGET' &&
+                            item.type !== '\<class \'pandas.core.frame.DataFrame\'>'
+                          " type="text" style="display: block" [name]="item.name + '_input_text'"
+                          placeholder="{{getPlaceHolderForPythonDataTypes(item.type)}}"
+                          [(ngModel)]="inputTextValues[item.name]" (ngModelChange)="
+                            onInputValueChanged($event, item.name)
+                          " />
+                        <input matInput type="text" style="display: none" />
+                      </mat-form-field>
+                    </div>
+                    <div style="padding-right: 2px;" style="min-width: 15vw">
+                      <mat-form-field appearance="outline">
+                        <ng-container *ngFor="
+                            let helpDetail of finalresponse_help_details
+                              | keyvalue
+                          ">
+                          <div *ngIf="helpDetail.key === item.name">
+                            <input matInput type="text" [name]="item.name" [(ngModel)]="helpDetail.value"
+                              (blur)="onBlur(helpDetail.key, helpDetail.value)" />
+                          </div>
+                        </ng-container>
+                        <input matInput type="text" style="display: none" />
+                      </mat-form-field>
+                    </div>
+                    <!-- <div fxFlex="100px">
+                        <label class="toggle-switch">
+                          <input *ngIf="formData[item.name + '_select'] !== 'INPUT_SELECTED_FROM_PRIOR_WIDGET'"
+                            type="checkbox" name="{{ item.name }}_is_mandatory" [(ngModel)]="isMandatory[item.name]"
+                            (ngModelChange)="updateInputsMap(null)" [checked]="isMandatory[item.name]">
+                          <ng-template #enableToggle>
+                            <input #enableToggle type="checkbox" name="{{ item.name }}_is_mandatory"
+                              [(ngModel)]="isMandatory[item.name]" (ngModelChange)="updateInputsMap(null)"
+                              [checked]="isMandatory[item.name]">
+                          </ng-template>
+                          <span class="toggle-slider"></span>
+                        </label>
+                      </div> -->
+                  </div>
+                </div>
+              </div>
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <button mat-flat-button color="primary"
+                  [disabled]="(!is_Publish && !isWidgetInPublishedState) || isViewing" (click)="publish()">
+                  Publish
+                </button>
+                <button mat-flat-button color="primary" (click)="openCustomWidgetPreview()">
+                  Preview
+                </button>
+              </div>
+            </div>
+
+            <!-- <div
+              fxFlex
+              class="bg-surface rounded-2 p-2 y-3"
+              style="margin-top: 8px"
+            >
+              <div class="pb-1">
+                See below the number and types of inputs your custom widget will
+                except from a preceding one in a workflow.
+              </div>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutGap="16px"
+              class="h-80 pt-4"
+              style="overflow: hidden"
+            >
+              <div fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto">
+                <div>
+                  <div class="fw-bold pb-1">Number of Inputs</div>
+                  <div class="global-static-value w-50 text-ellipse">
+                    {{ noofinputs }}
+                  </div>
+                </div>
+                <div *ngFor="let input of inputs_map">
+                  <div
+                    *ngIf="input.source == 'INPUT_SELECTED_FROM_PRIOR_WIDGET'"
+                  >
+                    <div class="fw-bold pb-1">{{ input.arg_name }}</div>
+                    <div
+                      class="global-static-value w-50 text-ellipse"
+                      *ngIf="
+                        input.type == '<class \'pandas.core.frame.DataFrame\'>'
+                      "
+                    >
+                      Tabular
+                    </div>
+                    <div
+                      class="global-static-value w-50 text-ellipse"
+                      *ngIf="input.type == '<class \'str\'>'"
+                    >
+                      String
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                fxFlex="none"
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign="end center"
+              >
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="continue11()"
+                >
+                  Back
+                </button>
+                <button mat-flat-button color="primary" (click)="continue3()">
+                  Continue
+                </button>
+                <button
+                  mat-flat-button
+                  color="primary"
+                  [disabled]="!is_Publish"
+                  (click)="openValidationDialog()"
+                >
+                  Publish
+                </button>
+              </div>
+            </div> -->
+
+            <!-- <div
+              fxFlex
+              class="bg-surface rounded-2 p-2 y-3"
+              style="margin-top: 8px"
+            >
+              <div class="pb-1">
+                See below the number and types of outputs your custom widget
+                will generate.
+              </div>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutGap="16px"
+              class="h-80 pt-4"
+              style="overflow: hidden"
+            >
+              <div fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto">
+                <div>
+                  <div class="fw-bold pb-1">Number of Outputs</div>
+                  <div class="global-static-value w-50 text-ellipse">
+                    {{ noofoutputs }}
+                  </div>
+                </div>
+                <div *ngFor="let output of get_output; let i = index">
+                  <div class="fw-bold pb-1">Output{{ i + 1 }}</div>
+                  <div
+                    class="global-static-value w-50 text-ellipse"
+                    *ngIf="
+                      output.type == '<class \'pandas.core.frame.DataFrame\'>'
+                    "
+                  >
+                    Tabular
+                  </div>
+                  <div
+                    class="global-static-value w-50 text-ellipse"
+                    *ngIf="output.type == '<class \'str\'>'"
+                  >
+                    String
+                  </div>
+                </div>
+              </div>
+              <div
+                fxFlex="none"
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign="end center"
+              >
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="continue2()"
+                >
+                  Back
+                </button>
+                <button mat-flat-button color="primary" (click)="continue4()">
+                  Continue
+                </button>
+                <button
+                  mat-flat-button
+                  color="primary"
+                  [disabled]="!is_Publish"
+                  (click)="openValidationDialog()"
+                >
+                  Publish
+                </button>
+              </div>
+            </div> -->
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+    <!-- /showPreviewTab -->
+  </div>
+</div>
+
+<mat-menu #importMenu="matMenu" yPosition="below">
+  <div class="scrollable">
+    <!-- <p class="import-data-panel text-grey fw-bold">From connectors</p>
+    <button mat-menu-item (click)="openConnectorPopup('BIGQUERY')">
+      <div fxLayout="row">
+        <img src="assets/BigQuery.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">BigQuery</span>
+      </div>
+    </button> -->
+    <p class="import-data-panel text-grey fw-bold">From mounted drive</p>
+    <button mat-menu-item (click)="showMountedDriveDialog()">
+      <div fxLayout="row">
+        <img src="assets/disk_drive.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">Disk drive</span>
+      </div>
+    </button>
+  </div>
+</mat-menu>
+
+<ng-template #popupTemplate>
+  <div class="custom-dialog-container" *ngIf="!isValidationInProgress && !isPublishingInProgress">
+    <h2 mat-dialog-title>
+      By publishing these widget these existing workflow's will get effected, do
+      you want to edit anyway?
+    </h2>
+    <div class="workflow-list">
+      <div class="workflow-item" *ngFor="let workflow of workFlowInWhichWidgetIsUsed">
+        {{ workflow.name }}
+      </div>
+    </div>
+    <mat-dialog-actions class="dialog-actions">
+      <button mat-button (click)="proceedToValidationAndPublish(true)">
+        Yes
+      </button>
+      <button mat-button (click)="proceedToValidationAndPublish(false)">
+        No
+      </button>
+    </mat-dialog-actions>
+  </div>
+  <div *ngIf="isValidationInProgress || isPublishingInProgress" class="custom-dialog-container">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <span class="loading-message">{{ validationMessage }}</span>
+  </div>
+  <div *ngIf="isValidationFailed">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <span class="loading-message">{{ validationMessage }}</span>
+  </div>
+</ng-template>
+
+<ng-template #validationTemplate>
+  <div fxFlex fxLayout="column" fxLayoutGap="24px" fxLayoutAlign="space-between Preview" class="p-6" *ngIf="showExcute">
+    <div fxFlex="none">
+      <h2>Execution</h2>
+      <p class="fw-bold">
+        This step is to confirm that HEXAIND is able to execute your code as expected and integrate it as a widget. To do
+        so,
+        identify the input data file(s) (that should’ve been uploaded in your Zipped folder) and enter parameter values
+        for
+        the hexaind_custom_widget_function to use. Also identify the output data file--this file should be the output you
+        received
+        when running the function on your own machine using the input data and parameters specified above
+      </p>
+      <p>
+        If HEXAIND’s execution of the function results in the same output(s) as the output data, you may proceed with
+        building your custom widget.
+      </p>
+      <p>
+        This Custom Widget takes {{finalresponse.function_inputs.length}} inputs and produces
+        {{finalresponse.function_outputs.length}} output.
+      </p>
+    </div>
+    <div fxlayout="row" fxLayoutGap="24px" class="y-auto" style="padding-bottom: 10px;">
+      <div fxFlex fxLayout="column" fxLayoutGap="16px">
+        <h3>Specify the following input(s)</h3>
+        <div *ngFor="let inputs of finalresponse.function_inputs">
+          <div *ngIf="inputs.type === '<class \'pandas.core.frame.DataFrame\'>'">
+            <div class="fw-bold pb-1">Select {{ inputs.name }}</div>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select" [(ngModel)]="inputValues[inputs.name]">
+                <ng-container *ngFor="let option of finalresponse.file_names_path">
+                  <mat-option *ngIf="isCsvFile(option.name)" [value]="option.path"
+                    [attr.type]="inputValues[inputs.type]">{{ option.name }}</mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div *ngIf="inputs.type === '<class \'str\'>'">
+            <div class="fw-bold pb-1">Select {{ inputs.name }}</div>
+            <mat-form-field appearance="outline">
+              <input matInput type="text" [(ngModel)]="inputValues[inputs.name]" [attr.type]="inputValues[inputs.type]"
+                placeholder="Enter value" name="{{ inputs.name }}" />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div fxFlex fxLayout="column" fxLayoutGap="16px">
+        <h3>Specify the validation output(s)</h3>
+        <div *ngFor="let output of finalresponse.function_outputs; let i = index">
+          <!-- "<class 'app.services.data.assets.custom_python_support.service.TextCPWDataset'>" -->
+          <div *ngIf="
+              output ===
+              '<class \'app.services.data.assets.custom_python_support.service.TextCPWDataset\'>'
+            ">
+            <div class="fw-bold pb-1">Select Output {{ i + 1 }}</div>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select" [(ngModel)]="selectedOutputs['output' + (i + 1)]">
+                <ng-container *ngFor="let option of finalresponse.file_names_path">
+                  <mat-option *ngIf="true" [attr.type]="output" [value]="option.path">{{ option.name }}</mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div *ngIf="output === '<class \'pandas.core.frame.DataFrame\'>'">
+            <div class="fw-bold pb-1">Select Output {{ i + 1 }}</div>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select" [(ngModel)]="selectedOutputs['output' + (i + 1)]">
+                <ng-container *ngFor="let option of finalresponse.file_names_path">
+                  <mat-option *ngIf="isCsvFile(option.name)" [attr.type]="output" [value]="option.path">{{ option.name
+                    }}</mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div *ngIf="output === '<class \'str\'>'">
+            <div class="fw-bold pb-1">Select Output {{ i + 1 }}</div>
+            <mat-form-field appearance="outline">
+              <input matInput type="text" [(ngModel)]="selectedOutputs['output' + (i + 1)]" [attr.type]="output"
+                placeholder="Enter value" name="Output {{ i + 1 }}" />
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end">
+      <div fxLayout="row" fxLayoutGap="8px">
+        <button mat-stroked-button color="primary" (click)="showInfo()">
+          Back
+        </button>
+        <button mat-flat-button color="primary" [disabled]="!areAllFieldsSelected()" (click)="execute()">
+          Execute
+        </button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showLoader" class="loader-overlay">
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <mat-spinner diameter="48"></mat-spinner>
+      <div class="loader-message-validation">Loading, please wait...</div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="24px" fxLayoutAlign="space-between stretch" class="p-6"
+    *ngIf="showExecuteNxtab && !showLoader">
+    <div *ngIf="!showLoader">
+      <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="is_preview">
+        <div fxFlex="none">
+          <div fxLayout="column wrap" fxLayoutGap="8px grid" class="y-auto" style="max-height: 200px">
+            <div fxFlex="25" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+              *ngFor="let inputs of formValues.validation_inputs">
+              <div>{{ inputs.param_name }}: {{ inputs.value }}</div>
+              <mat-icon [class]="executionStatus ? 'text-green' : 'text-red'">{{
+                executionStatus ? "check_circle" : "info"
+                }}</mat-icon>
+            </div>
+            <div fxFlex="25" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+              *ngFor="let outputs of formValues.validation_outputs">
+              <div>{{ outputs.param_name }}: {{ outputs.value }}</div>
+              <mat-icon [class]="executionStatus ? 'text-green' : 'text-red'">{{
+                executionStatus ? "check_circle" : "info"
+                }}</mat-icon>
+            </div>
+            <div fxFlex="25" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+              *ngIf="formValues.metadata.entry_file">
+              <div>Entry File: {{ formValues.metadata.entry_file }}</div>
+              <mat-icon [class]="executionStatus ? 'text-green' : 'text-red'">{{
+                executionStatus ? "check_circle" : "info"
+                }}</mat-icon>
+            </div>
+          </div>
+        </div>
+        <div fxFlex="none">
+          <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="bg-surface rounded-2 p-2">
+            <mat-icon class="material-symbols-outlined icon-48" [class]="executionStatus ? 'text-green' : 'text-red'">{{
+              executionStatus ? "check_circle" : "info" }}</mat-icon>
+            <div>{{ executionMsg }}</div>
+          </div>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="8px">
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+            <div>Activity Log</div>
+            <div>
+              <mat-icon style="cursor: pointer" (click)="toggleActivityLog()">{{
+                showActivityLog ? "arrow_drop_up" : "arrow_drop_down"
+                }}</mat-icon>
+            </div>
+          </div>
+          <div fxFlex *ngIf="showActivityLog">
+            <div class="scrollable">
+              <!-- Activity log entries go here -->
+              <div class="">Python script logs</div>
+              <div class="item" *ngFor="let log of activityLogs">
+                <div [ngStyle]="{
+                    color: log.isMainErrorMessage ? 'red' : ''
+                  }">
+                  {{ log.message }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <button mat-stroked-button color="primary" (click)="backExecute()">
+        Back
+      </button>
+      <button mat-flat-button color="primary" [disabled]="!executionStatus" (click)="preview()">
+        Configuration
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- <mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="save()">Save</button>
+  <button mat-menu-item (click)="saveAs()">Save As</button>
+</mat-menu> -->

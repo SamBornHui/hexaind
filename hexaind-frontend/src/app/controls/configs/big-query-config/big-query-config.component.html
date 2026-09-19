@@ -1,0 +1,484 @@
+<div fxLayout="column" class="p-relative h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex="35px" style="text-align: right" class="pt-1">
+                <span class="select-connector-1">1</span>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                  <h4>Select connector</h4>
+                  <mat-icon class="material-symbols-outlined text-grey">
+                    info
+                  </mat-icon>
+                </div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+                  <div>
+                    <mat-form-field appearance="outline" style="width: 360px">
+                      <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select connector"
+                        [(ngModel)]="connectorId" (ngModelChange)="connectorId = $event">
+                        <mat-option *ngFor="let connector of connectors" [value]="connector._id"
+                          (click)="connectorsOption(connector._id)">{{ connector.name }}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <button mat-flat-button color="primary" (click)="AuthenticateTheConnector()">
+                      Test
+                    </button>
+                    <!-- TODO: Taimoor Hassan -->
+                    <!-- <span class="text-green"><mat-icon>done</mat-icon>Connection Successfully Completed</span> -->
+                    <!-- <span class="text-red"><mat-icon>close</mat-icon> Connection Failed</span> -->
+                  </div>
+                  <div fxFlex fxLayout="row" fxLayoutGap="8px">
+                    <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+                    <div *ngIf="spinner" class="text-gray">
+                      Checking authentication...
+                    </div>
+                    <mat-icon matPrefix *ngIf="isJsonAuthenticationSuccessful" class="text-green">check</mat-icon>
+                    <div *ngIf="isJsonAuthenticationSuccessful" class="text-green">
+                      Authentication Successful
+                    </div>
+                    <mat-icon matPrefix *ngIf="isJsonAuthenticationFailed" class="text-red">cancel</mat-icon>
+                    <div *ngIf="isJsonAuthenticationFailed" class="text-red">
+                      Authentication Failed
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex="35px" style="text-align: right" class="pt-1">
+                <span class="select-connector-1">2</span>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="16px">
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                  <h4 class="pt-2">
+                    Select a method to connect to your dataset:
+                  </h4>
+                </div>
+                <div>
+                  <mat-radio-group color="primary" [disabled]="workflowCanvasService.IsViewingRunMode"
+                    [(ngModel)]="selectedRadioButtonValue" (change)="onRadioButtonChange()">
+                    <div fxLayout="column">
+                      <mat-radio-button value="1">Browser catalog</mat-radio-button>
+                    </div>
+                    <div fxLayout="column">
+                      <mat-radio-button value="2">Specify query string</mat-radio-button>
+                    </div>
+                  </mat-radio-group>
+                </div>
+                <ng-container *ngIf="selectedRadioButtonValue === '1'">
+                  <div fxFlex fxLayout="column" fxLayoutGap="8px" class="global-tree-explorer">
+                    <div>
+                      <mat-form-field appearance="outline">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput
+                          placeholder="Search catalog" />
+                      </mat-form-field>
+                    </div>
+                    <div fxLayout="column" fxLayoutGap="8px">
+                      <div *ngFor="let parentItem of parentItems">
+                        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+                          (click)="toggleCollapse(parentItem)">
+                          <div>
+                            <mat-icon *ngIf="parentItem.expanded">
+                              arrow_drop_down
+                            </mat-icon>
+                            <mat-icon *ngIf="!parentItem.expanded">
+                              arrow_right
+                            </mat-icon>
+                          </div>
+                          <div>
+                            <mat-icon class="material-symbols-outlined text-grey">
+                              dataset
+                            </mat-icon>
+                          </div>
+                          <div>{{ parentItem.name }}</div>
+                        </div>
+                        <div *ngIf="parentItem.expanded" class="child">
+                          <div *ngFor="let childItem of TableNames">
+                            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px" class="p-2 rounded-1"
+                              [ngClass]="{
+                              highlight: childItem === selectedChild
+                            }" (click)="
+                              singleClickHandler(childItem, parentItem.name)
+                            " (dblclick)="
+                              doubleClickHandler(childItem, parentItem.name)
+                            ">
+                              <div fxFlex="none">
+                                <mat-icon class="material-symbols-outlined text-grey">
+                                  data_table
+                                </mat-icon>
+                              </div>
+                              <div fxFlex>{{ childItem }}</div>
+                              <div fxFlex="none" *ngIf="childItem === selectedChild">
+                                <mat-icon class="text-primary">check</mat-icon>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="selectedRadioButtonValue === '2'">
+                  <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                    <div>
+                      <mat-form-field appearance="outline" style="width: 360px">
+                        <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select Query">
+                          <mat-option value="New Query" (click)="queryFirstOption()">New Query</mat-option>
+                          <mat-option *ngFor="let queryList of getQueries" [value]="queryList.name"
+                            (click)="queryOption(queryList)">{{ queryList.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div>
+                      <button mat-flat-button color="primary" (click)="getLoadProjectQueries()">
+                        Load
+                      </button>
+                    </div>
+                  </div>
+                  <div fxLayout="column" fxLayoutGap="8px" class="bg-surface rounded-2 p-4">
+                    <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                      <div class="fw-bold mb-1">Enter query string</div>
+                      <div>
+                        <mat-form-field appearance="outline">
+                          <textarea matInput rows="4" [(ngModel)]="textBoxQuery"></textarea>
+                        </mat-form-field>
+                        <div style="color: grey;">
+                          To use dynamic data scheduling feature use the following system generated
+                          <mat-icon class="material-symbols-outlined global-info-icon" style="padding-top: 2px;"
+                            matTooltip="SELECT CONVERT(datetime2, @last_run_date, 126) AS StandardDateFormat;">info</mat-icon>
+                        </div>
+                      </div>
+                      <div fxLayout="row" fxLayoutAlign="space-between center">
+                        <button [disabled]="workflowCanvasService.IsViewingRunMode" mat-flat-button color="primary"
+                          (click)="getQueryResult()">
+                          Test
+                        </button>
+                        <button mat-icon-button [disabled]="!deleteButton" [matMenuTriggerFor]="deleteMenu">
+                          <mat-icon class="material-symbols-outlined">delete</mat-icon>
+                        </button>
+                        <!-- TODO: Taimoor Hassan -->
+                        <!-- <span class="text-green"><mat-icon>done</mat-icon>Connection Successfully Completed</span> -->
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex="35px" style="text-align: right" class="pt-1">
+                <span class="select-connector-1">3</span>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="16px" class="pt-2">
+                <div class="fw-bold">Parameters:</div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="pb-2">
+                  <div>View System Generate Parameter Info</div>
+                  <div>
+                    <mat-icon (click)="systemGenerate()" style="cursor: pointer;">
+                      code
+                    </mat-icon>
+                    <!-- <button
+                    mat-flat-button
+                    color="primary"
+                    (click)="systemGenerate()"
+                  >
+                    View
+                  </button> -->
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="fw-bold border-bottom pb-2">
+                  <div fxFlex>Name</div>
+                  <div fxFlex>Value</div>
+                  <div fxFlex>Type</div>
+                  <div fxFlex>Sub Type</div>
+                  <div fxFlex="70px">Required</div>
+                  <div fxFlex="108px">&nbsp;</div>
+                </div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center"
+                  *ngFor="let parameter of parameters; let i = index">
+                  <div fxFlex>
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Enter parameter Name" [(ngModel)]="parameter.name"
+                        [disabled]="parameterButtonStatus" />
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex>
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Value" [(ngModel)]="parameter.value"
+                        [disabled]="parameterButtonStatus" />
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex>
+                    <mat-form-field appearance="outline">
+                      <mat-select placeholder="Type" [(ngModel)]="parameter.type" [disabled]="parameterButtonStatus">
+                        <mat-option value="scalar">SCALAR</mat-option>
+                        <mat-option value="tuple">TUPLE</mat-option>
+                        <mat-option value="list">LIST</mat-option>
+                        <mat-option value="date">DATE</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex>
+                    <mat-form-field appearance="outline">
+                      <mat-select placeholder="Sub type" [(ngModel)]="parameter.subtype"
+                        [disabled]="parameterButtonStatus">
+                        <mat-option value="integer">INTEGER</mat-option>
+                        <mat-option value="float">FLOAT</mat-option>
+                        <mat-option value="string">STRING</mat-option>
+                        <mat-option value="range">RANGE</mat-option>
+                        <mat-option value="list">LIST</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="70px">
+                    <mat-slide-toggle [(ngModel)]="parameter.required"></mat-slide-toggle>
+                  </div>
+                  <div fxFlex="108px" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                    <div>
+                      <button mat-icon-button color="primary" *ngIf="i > 0" (click)="removeParameter(i)">
+                        <mat-icon class="material-symbols-outlined">remove_circle</mat-icon>
+                      </button>
+                    </div>
+                    <div>
+                      <button mat-icon-button color="primary" (click)="addParameter()"
+                        [disabled]="parameterButtonStatus">
+                        <mat-icon class="material-symbols-outlined">add_circle</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex="35px" style="text-align: right" class="pt-1">
+                <span class="select-connector-1">4</span>
+              </div>
+              <div fxLayout="column" fxLayoutGap="16px" class="pt-2">
+                <div>
+                  <h4 class="pb-1">Name:</h4>
+                </div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                  <div>
+                    <mat-form-field appearance="outline" style="width: 360px">
+                      <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput [ngModel]="queryName"
+                        (ngModelChange)="bigQuerySaved($event)" placeholder="System Generated File Name" />
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <button [disabled]="
+                      workflowCanvasService.IsViewingRunMode || savebutton
+                    " mat-flat-button color="primary" (click)="saveQueryName()">
+                      {{ saveButtonText }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div
+              fxFlex="none"
+              fxLayout="row"
+              fxLayoutGap="8px"
+              fxLayoutAlign="end center"
+              class="p-4"
+              *ngIf="!workflowCanvasService.IsViewingRunMode"
+              >
+              <button
+                [disabled]="!changeMade"
+                style="margin-right: 10px"
+                mat-stroked-button
+                color="primary"
+                id="closeButton"
+                (click)="onCancel()"
+              >
+                Cancel
+              </button>
+              <button
+                [disabled]="!changeMade"
+                mat-flat-button
+                color="primary"
+                (click)="onSave()"
+                id="createBeutton"
+              >
+                Save
+              </button>
+            </div> -->
+          </div>
+        </div>
+      </mat-tab>
+      <!-- <mat-tab label="Outputs">
+        <div fxLayout="row" fxLayoutGap="24px" class="p-7 h-100 y-auto">
+          <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+            <div fxLayout="row" fxLayoutGap="8px">
+              <div fxFlex fxLayout="column" fxLayoutGap="8px" *ngFor="let row of config!.inputs; let i = index">
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                  <div class="fw-bold text-primary">Select Output</div>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Select output widget</mat-label>
+                    <mat-select [ngModel]="getInputWidget(i)" (ngModelChange)="setInputWidget(i, $event)"
+                      name="inputWidgetSelector">
+                      <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                        {{ inputWidget.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div fxLayout="row" fxLayoutGap="24px" class="p-7 h-100 y-auto">
+          <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                  <div class="fw-bold">Select BigQuery connector</div>
+                </div>
+                <div>
+                  <mat-form-field appearance="outline">
+                    <mat-select
+                      placeholder="Select connector"
+                      (ngModelChange)="connectorId = $event"
+                      [(ngModel)]="connectorId"
+                    >
+                      <mat-option
+                        *ngFor="let connector of connectors"
+                        [value]="connector._id"
+                        >{{ connector.name }}</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                  <div class="fw-bold">Select dataset type</div>
+                </div>
+                <div>
+                  <mat-form-field appearance="outline">
+                    <mat-select
+                      placeholder="Select type"
+                      [ngModel]="getDatasetType()"
+                      (ngModelChange)="setDatasetType($event)"
+                    >
+                      <mat-option
+                        *ngFor="let type of datasetTypeOptions"
+                        [value]="type"
+                      >
+                        {{ type }}</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <ng-container *ngIf="getDatasetType() === 'TABLE'">
+                  <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                    <div class="fw-bold">Set dataset name</div>
+                  </div>
+                  <div fxFlex="70px">
+                    <mat-form-field appearance="outline">
+                      <input
+                        matInput
+                        type="string"
+                        placeholder="Dataset name"
+                        [ngModel]="getDatasetName()"
+                        (ngModelChange)="setDatasetName($event)"
+                      />
+                    </mat-form-field>
+                  </div>
+  
+                  <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                    <div class="fw-bold">Set table name</div>
+                  </div>
+                  <div fxFlex="70px">
+                    <mat-form-field appearance="outline">
+                      <input
+                        matInput
+                        type="string"
+                        placeholder="Table name"
+                        [ngModel]="getTableName()"
+                        (ngModelChange)="setTableName($event)"
+                      />
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="getDatasetType() === 'QUERY'">
+                  <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                    <div class="fw-bold">Set query string</div>
+                  </div>
+                  <div fxFlex="70px">
+                    <mat-form-field appearance="outline">
+                      <textarea
+                        matInput
+                        type="string"
+                        placeholder="Enter query string"
+                        [ngModel]="getQueryString()"
+                        (ngModelChange)="setQueryString($event)"
+                      ></textarea>
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab> -->
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Output</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                    placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div>This tab is empty for this widget</div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="Big Query" widgetUrn="{{ this.widgetControl?.Widget?.urn }}"
+  siteId="1"></app-config-action-bar>
+
+<mat-menu #deleteMenu="matMenu" class="global-menu">
+  <div mat-menu-item class="header">
+    This Query will be permanently deleted
+  </div>
+  <button mat-menu-item (click)="confirmDelete(true)">
+    <mat-icon>check</mat-icon> Yes
+  </button>
+  <button mat-menu-item (click)="cancelDelete()">
+    <mat-icon>close</mat-icon> No
+  </button>
+</mat-menu>

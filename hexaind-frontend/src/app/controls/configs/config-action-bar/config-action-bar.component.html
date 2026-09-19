@@ -1,0 +1,35 @@
+<div class="global-float-button">
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div *ngIf="widgetName !== 'Text Widget'">
+      <mat-icon *ngIf="checkForTheRunStatus()" matTooltip="Preview"
+        [matMenuTriggerFor]="filterMlWidgets.length>1 && checkTheSelectedWidget() ? previewMenu : null"
+        class="material-symbols-outlined cursor-pointer"
+        (click)="filterMlWidgets.length>1 && checkTheSelectedWidget() ? null : onPreviewDataButton()">preview</mat-icon>
+      <mat-menu #previewMenu="matMenu">
+        <button mat-menu-item (click)="onMLPreviewData('single')">Preview selected AI/ML widget</button>
+        <button mat-menu-item (click)="onMLPreviewData('multiple')">Preview all AI/ML widgets</button>
+      </mat-menu>
+    </div>
+    <div *ngIf="widgetName == 'Text Widget'">
+      <mat-icon *ngIf="checkForTheRunStatus()" matTooltip="Preview" class="material-symbols-outlined cursor-pointer"
+        (click)="!datasetsLengthCheck() ? onPreviewDataButton() : null"
+        [matMenuTriggerFor]="datasetsLengthCheck() ? previewMenuText : null">preview</mat-icon>
+      <mat-menu #previewMenuText="matMenu" xPosition="before" class="global-menu">
+        <ng-container *ngFor="let dataset of TextWidgetconfig.sink; let i = index">
+          <button mat-menu-item (click)="multiTextFilesPreview(TextWidgetconfig.source[i].configuration.dataset_id)">
+            {{ dataset.dataset_name }}
+          </button>
+        </ng-container>
+      </mat-menu>
+    </div>
+    <div>
+      <mat-icon *ngIf="!this.workflowCanvasService.IsVersionedWorkflow" matTooltip="Execute Widget"
+        class="material-symbols-outlined cursor-pointer" (click)="onExecuteWidgetClicked()">bolt</mat-icon>
+    </div>
+    <!-- <div>
+      <mat-icon class="material-symbols-outlined">more_vert</mat-icon>
+    </div> -->
+    <div class="mt-1 fw-bold">{{ getWidgetName() }}</div>
+  </div>
+</div>
+<app-notification #notification></app-notification>

@@ -1,0 +1,98 @@
+[
+  {
+    "_id": {
+      "$oid": "66955348c109e706996ab008"
+    },
+    "name": "RescaleToken",
+    "description": "real token for p1 mobo wf",
+    "type": "RESCALE",
+    "configuration": {
+      "token": "9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5"
+    },
+    "owner_id": "664c569824e6fd041c96c25b",
+    "owner_name": "Test User",
+    "created_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "last_modified_by_id": "664c569824e6fd041c96c25b",
+    "last_modified_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "project_id": "664ee2ced73a5a44b61aadd9",
+    "site_id": "1",
+    "version": "1.0"
+  },
+  {
+    "_id": {
+      "$oid": "66960e31c65fb8e2b96bf4bd"
+    },
+    "name": "Rescale",
+    "description": "real token for p1 active learning wf",
+    "type": "RESCALE",
+    "configuration": {
+      "token": "9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5"
+    },
+    "owner_id": "664c569824e6fd041c96c25b",
+    "owner_name": "Test User",
+    "created_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "last_modified_by_id": "664c569824e6fd041c96c25b",
+    "last_modified_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "project_id": "664ee2ced73a5a44b61aadd9",
+    "site_id": "1",
+    "version": "1.0"
+  },
+  {
+    "_id": {
+      "$oid": "669795af9523d8940a1777c2"
+    },
+    "name": "RescaleToken-P3",
+    "description": "real token for p3 wf",
+    "type": "RESCALE",
+    "configuration": {
+      "token": "9460e4cdfcdbecf3aa9798564a50545b9ae9b2b5"
+    },
+    "owner_id": "664c569824e6fd041c96c25b",
+    "owner_name": "Test User",
+    "created_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "last_modified_by_id": "664c569824e6fd041c96c25b",
+    "last_modified_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "project_id": "664ee2ced73a5a44b61aadd9",
+    "site_id": "1",
+    "version": "1.0"
+  },
+  {
+    "_id": {
+      "$oid": "6698ba2a48cbbb13f3f49656"
+    },
+    "name": "Thermocalc-P2",
+    "description": "temporary token for p2 wf",
+    "type": "THERMOCALC",
+    "configuration": {
+      "method": "server_ip_address",
+      "host": "10.0.5.200",
+      "path": "/test"
+    },
+    "owner_id": "664c569824e6fd041c96c25b",
+    "owner_name": "Test User",
+    "created_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "last_modified_by_id": "664c569824e6fd041c96c25b",
+    "last_modified_at": {
+      "$date": "2024-05-22T11:58:52.183Z"
+    },
+    "project_id": "664ee2ced73a5a44b61aadd9",
+    "site_id": "1",
+    "version": "1.0",
+    "is_active": true
+  }
+]
+

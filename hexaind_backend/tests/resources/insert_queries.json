@@ -1,0 +1,47 @@
+[
+  {
+    "_id": {
+      "$oid": "66431493cc4766c7487407a7"
+    },
+    "id": "66431493cc4766c7487407a7",
+    "name": "updated-test",
+    "query_type": "BIGQUERY",
+    "query": "SELECT * FROM SAME",
+    "connector_id": "6644939801eba81873b9f59b",
+    "owner_id": "65967ecac48951a0928b7dac",
+    "owner_name": "Databrick Admin",
+    "created_at": {
+      "$date": "2024-05-14T07:36:51.587Z"
+    },
+    "last_modified_by_id": "65967ecac48951a0928b7dac",
+    "last_modified_at": {
+      "$date": "2024-05-14T08:04:22.596Z"
+    },
+    "project_id": "662b7facf87af6202b4e165e",
+    "site_id": "1",
+    "version": "1.0"
+  },
+  {
+    "_id": {
+      "$oid": "664788ec071ddcb04b7e912c"
+    },
+    "id": null,
+    "name": "Test Query",
+    "query_type": "BIGQUERY",
+    "query": "SELECT * FROM available_options",
+    "query_params": {},
+    "connector_id": "6644939801eba81873b9f59b",
+    "owner_id": "65967ecac48951a0928b7dac",
+    "owner_name": "Databrick Admin",
+    "created_at": {
+      "$date": "2024-05-17T16:42:20.775Z"
+    },
+    "last_modified_by_id": "65967ecac48951a0928b7dac",
+    "last_modified_at": {
+      "$date": "2024-05-17T16:42:20.775Z"
+    },
+    "project_id": "662b7facf87af6202b4e165e",
+    "site_id": "1",
+    "version": "1.0"
+  }
+]

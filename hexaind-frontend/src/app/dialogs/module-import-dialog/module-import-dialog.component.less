@@ -1,0 +1,71 @@
+.border-bt {
+  border-bottom: 1px solid var(--stroke-lite);
+  padding-bottom: 24px;
+  margin-bottom: 24px !important;
+}
+
+.steps {
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 36px;
+  color: #333333;
+}
+
+.close-button {
+  position: absolute;
+  right: 0;
+  margin-right: 10px;
+}
+
+::ng-deep .toggle-button mat-button-toggle button .mat-button-toggle-label-content {
+  line-height: 36px !important;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--grey);
+}
+
+::ng-deep .toggle-button .mat-button-toggle-checked .mat-button-toggle-label-content {
+  background-color: var(--selected-surface);
+  color: var(--primary);
+}
+
+.selection-mode {
+  color: var(--secondary);
+  font-size: 14px;
+  font-weight: 500;
+  display: block;
+}
+
+
+.text-desc {
+  line-height: 24px;
+  font-size: 16px;
+  color: var(--secondary);
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.upload-button {
+  background: var(--secondary-surface);
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.filename-container {
+  width: 300px;
+  background: var(--white);
+  border-radius: 8px;
+  padding: 0px 8px;
+}
+
+.filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.file-input {
+  display: none;
+}

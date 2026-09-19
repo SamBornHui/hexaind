@@ -1,0 +1,63 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Python Configuration">
+        <div class="global-widget-area">
+          <div fxLayout="column" fxLayoutGap="24px">
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="mt-6">
+                <div class="text-primary fw-bold">In [1]:</div>
+                <mat-icon class="material-symbols">skip_next</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="fw-bold pb-1">Choose dataset on the platform</div>
+                <mat-form-field appearance="outline">
+                  <textarea matInput rows="4" [disabled]="workflowCanvasService.IsViewingRunMode"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="mt-6">
+                <div class="text-primary fw-bold">In [2]:</div>
+                <mat-icon class="material-symbols">skip_next</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="fw-bold pb-1">Choose Python code file and additional configuration files</div>
+                <mat-form-field appearance="outline">
+                  <textarea matInput rows="4" [disabled]="workflowCanvasService.IsViewingRunMode"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="mt-6">
+                <div class="text-primary fw-bold">In [3]:</div>
+                <mat-icon class="material-symbols">skip_next</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="fw-bold pb-1">Choose JSON file</div>
+                <mat-form-field appearance="outline">
+                  <textarea matInput rows="4" [disabled]="workflowCanvasService.IsViewingRunMode"></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="Python" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

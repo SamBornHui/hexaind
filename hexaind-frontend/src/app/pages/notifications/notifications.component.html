@@ -1,0 +1,23 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px">
+  <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center">
+    <div>
+      <h1 class="global-main-title">Notifications</h1>
+    </div>
+    <div>
+      <div *ngIf="getUnreadNotificationCount() > 0"><mat-chip>{{ getUnreadNotificationCount() }} Unread</mat-chip></div>
+      <div *ngIf="getUnreadNotificationCount() == 0"></div>
+    </div>
+  </div>
+  <div fxFlex>
+    <mat-tab-group mat-stretch-tabs="false" (selectedTabChange)="selectTab($event.tab.textLabel)" class="h-100">
+      <mat-tab label="Unread">
+        <app-notification-details (callingEvent)="receiveData($event)" class="d-block h-100"
+          [selectedTab]="selectedTab"></app-notification-details>
+      </mat-tab>
+      <mat-tab label="All">
+        <app-notification-details (callingEvent)="receiveData($event)" class="d-block h-100"
+          [selectedTab]="selectedTab"></app-notification-details>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<ng-template #itemTemplate let-item="item" let-index="index">
+  <div class="mst-select-column__column">
+    <span class="mst-select-column__column__type">{{
+      item.type === "number" ? "#" : "abc"
+    }}</span>
+    <span
+      class="mst-select-column__column__name mst-shared-truncate"
+      [title]="item.name"
+      >{{ item.name }}</span
+    >
+  </div>
+</ng-template>
+<mst-select-list
+  [hideSearch]="hideSearch"
+  [title]="title"
+  [itemTemplate]="itemTemplate"
+  [items]="items"
+  [draggable]="true"
+  [selectedItemHighlight]="false"
+  (itemDragStart)="onItemDragStart($event)"
+  (itemDragEnd)="onItemDragEnd($event)"
+/>

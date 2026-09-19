@@ -1,0 +1,106 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <ng-container *ngIf="inputWidgets.length > 0">
+                <div>
+                  <div class="fw-bold pb-1">Loop initiation</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="selectedInputWidgetInitiation"
+                      (ngModelChange)="setSelectedInputWidgetInitiation($event)">
+                      <mat-option *ngFor="let inputWidget of inputWidgets; let i = index" [value]="inputWidget"
+                        [style.display]="i === 0 ? 'block' : 'none'">
+                        {{ getWidgetOutputName(inputWidget) }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div>
+                  <div class="fw-bold pb-1">Loop continuation</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="getSelectedInputWidgetContinuation"
+                      (ngModelChange)="setSelectedInputWidgetContinuation($event)">
+                      <mat-option *ngFor="let inputWidget of inputWidgets; let i = index" [value]="inputWidget"
+                        [style.display]="i === 1 ? 'block' : 'none'">
+                        {{ getWidgetOutputName(inputWidget) }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </ng-container>
+              <div *ngIf="inputWidgets.length === 0">
+                There are no widgets connected to this one.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button [disabled]="!changeInputMade" mat-stroked-button color="primary" id="closeButton"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button [disabled]="!changeInputMade" mat-flat-button color="primary" (click)="onInputSave()"
+            id="createBeutton">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" *ngIf="outputName">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="outputName" disabled />
+              </mat-form-field>
+            </div>
+            <div *ngIf="!outputName">
+              There are no inputs selected for this widget.
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+            Cancel
+          </button>
+          <button [disabled]="!changeMade" mat-flat-button color="primary" (click)="onSave()" id="createBeutton">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          This tab is empty for this widget
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button [disabled]="!changeSettingMade" mat-stroked-button color="primary" id="closeButton"
+            (click)="onSettingCancel()">
+            Cancel
+          </button>
+          <button [disabled]="!changeSettingMade" mat-flat-button color="primary" (click)="onSettingSave()"
+            id="createBeutton">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="Loop Start" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

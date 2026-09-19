@@ -1,0 +1,32 @@
+<div fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Apply Workflows</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="closeDialog()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-6 y-auto">Do you want to apply workflows now?</div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="closeDialog()">
+      Cancel
+    </button>
+    <button mat-flat-button color="primary" (click)="applyNow()">
+      Apply Now
+    </button>
+  </div>
+</div>

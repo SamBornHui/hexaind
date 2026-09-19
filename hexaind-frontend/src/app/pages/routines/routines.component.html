@@ -1,0 +1,52 @@
+<div class="table-container">      
+    <mat-table [dataSource]="dataSource">
+
+        <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef>
+                Title 
+                </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.title}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="workspaceName">
+            <mat-header-cell *matHeaderCellDef>
+                WorkSpace Name 
+                </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.workspaceName}} </mat-cell>
+        </ng-container>
+
+  <!-- <mat-cell *matCellDef="let element">
+                 {{element.name}} 
+                 <span class="ellipsis" (click)="showContextMenu($event)">...</span>
+            </mat-cell> -->
+        <!-- <ng-container matColumnDef="workflowName">
+            <mat-header-cell *matHeaderCellDef>
+                Workflow Name                      
+            </mat-header-cell>
+        </ng-container>   
+         -->
+        <ng-container matColumnDef="owner">
+            <mat-header-cell *matHeaderCellDef>
+                Owner 
+                </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.owner}} </mat-cell>
+        </ng-container>
+            
+        <ng-container matColumnDef="cadence">
+            <mat-header-cell *matHeaderCellDef>
+                Cadence
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.cadence}} </mat-cell>            
+        </ng-container>
+        
+        <ng-container matColumnDef="lastRun">
+            <mat-header-cell *matHeaderCellDef>
+                Last Run
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.lastRun}} </mat-cell>            
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" (dblclick)="onRowDblClick(row)"></mat-row>
+    </mat-table> 
+</div>
+

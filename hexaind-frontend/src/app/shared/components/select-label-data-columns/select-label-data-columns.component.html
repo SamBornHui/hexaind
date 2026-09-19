@@ -1,0 +1,25 @@
+<mst-drop-list
+  [droppable]="droppable"
+  [items]="labelItems"
+  [rightIconNames]="[]"
+  name="Label Column"
+  placeholder="Drop a column here"
+  (drop)="onDrop($event, 'label')"
+/>
+<mst-drop-list
+  [droppable]="droppable"
+  [items]="dataItems"
+  name="Data Columns"
+  placeholder="Drop columns here"
+  [rightIconNames]="['settings', 'delete']"
+  [keepBottomBorder]="true"
+  (drop)="onDrop($event, 'data')"
+  (iconClick)="onListIconClick($event)"
+/>
+<mst-chart-options-dialog
+  baseVizType="line"
+  [open]="optionsDialogOpen"
+  [options]="selectedItemInfo?.item?.options || {}"
+  (save)="onOptionsSave($event)"
+  (close)="onOptionsDialogClose()"
+/>

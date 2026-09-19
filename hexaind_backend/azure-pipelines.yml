@@ -1,0 +1,206 @@
+# YAML file for Azure DevOps pipeline
+
+pool:
+  name: "Self-hosted on-prem"
+  # demands:
+  #   - Agent.Name -equals self-hosted-on-prem-agent-build
+
+variables:
+  dockerRegistryServiceConnection: "Databrick Docker Hub Connection"
+  acrRegistry: "hexaind3.azurecr.io"
+  ACRserviceconnection: "ACR - Service Principle"
+  fullDate: $[format('{0:MMdd}', pipeline.startTime)]
+  teamsWebhookUrl: $(TEAMS_WEBHOOK_URL)
+
+jobs:
+  - job: build_image_on_PR
+    displayName: verifying building images
+    condition: |
+      and(
+        eq(variables['Build.Reason'], 'PullRequest'),
+        eq(variables['System.PullRequest.TargetBranch'], 'develop')
+      )
+
+    steps:
+      - script: |
+          docker build -f Dockerfile --target prod -t databrick/hexaind_backend:test .
+          docker build -f Dockerfile --target prod_ml -t databrick/hexaind_backend_ml:test .
+          docker build -f ./docker/jupyterhub.Dockerfile -t databrick/jupyterhub:test .
+          docker build -f ./docker/jupyternotebook.Dockerfile -t databrick/jupyternotebook:test .
+
+  - job: BuildAndPush
+    displayName: Build and push image
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/develop')
+
+    steps:
+      # - task: WhiteSource@21
+      #   inputs:
+      #     cwd: '$(System.DefaultWorkingDirectory)'
+      #   continueOnError: true
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: "ACR - Service Principle"
+          command: "login"
+        displayName: ACR Login
+
+      #hexaind_backend
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo "$(majorVersion).$(fullDate).$commitId" > latest_image_backend_tag.txt
+          echo $commitId
+          # whoami
+          # ps aux | grep agent
+          # ls -ld /opt/agent /home/azure-agent
+          docker build -f Dockerfile --target prod -t databrick/hexaind_backend:develop -t databrick/hexaind_backend:$(majorVersion).$(fullDate).$commitId -t $(acrRegistry)/hexaind_backend:develop .
+          docker push databrick/hexaind_backend:develop
+          docker push databrick/hexaind_backend:$(majorVersion).$(fullDate).$commitId
+          docker push $(acrRegistry)/hexaind_backend:develop
+
+        displayName: "Build & Push Docker image to ACR and Docker Hub"
+
+      # Publish backend artifact
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Backend Artifacts
+        inputs:
+          pathToPublish: "latest_image_backend_tag.txt"
+          artifactName: "backend_artifact"
+          publishLocation: "Container"
+
+      #hexaind_backend_ml
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo $commitId
+          docker build -f Dockerfile --target prod_ml -t databrick/hexaind_backend_ml:develop -t databrick/hexaind_backend_ml:$(majorVersion).$(fullDate).$commitId -t $(acrRegistry)/hexaind_backend_ml:develop .
+          docker push databrick/hexaind_backend_ml:develop
+          docker push databrick/hexaind_backend_ml:$(majorVersion).$(fullDate).$commitId
+          docker push $(acrRegistry)/hexaind_backend_ml:develop
+
+        displayName: "Build & Push Docker image"
+
+      #jupyterhub
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo $commitId
+          docker build -f ./docker/jupyterhub.Dockerfile -t databrick/jupyterhub:develop -t databrick/jupyterhub:$(majorVersion).$(fullDate).$commitId -t $(acrRegistry)/jupyterhub:develop .
+          docker push databrick/jupyterhub:develop
+          docker push databrick/jupyterhub:$(majorVersion).$(fullDate).$commitId 
+          docker push $(acrRegistry)/jupyterhub:develop
+
+        displayName: "Build & Push jupyterhub image"
+
+      #jupyternotebook
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo $commitId
+          docker build -f ./docker/jupyternotebook.Dockerfile -t databrick/jupyternotebook:develop -t databrick/jupyternotebook:$(majorVersion).$(fullDate).$commitId -t $(acrRegistry)/jupyternotebook:develop .
+          docker push databrick/jupyternotebook:develop
+          docker push databrick/jupyternotebook:$(majorVersion).$(fullDate).$commitId 
+          docker push $(acrRegistry)/jupyternotebook:develop
+
+        displayName: "Build & Push jupyternotebook image"
+
+  # Staging build
+
+  - job: BuildAndPushStaging
+    displayName: Build and push image
+    condition: contains(variables['Build.SourceBranch'], 'refs/heads/release')
+    steps:
+      # - task: WhiteSource@21
+      #   inputs:
+      #     cwd: '$(System.DefaultWorkingDirectory)'
+      #   continueOnError: true
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: "ACR - Service Principle"
+          command: "login"
+        displayName: ACR Login
+
+      #hexaind_backend
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo "$(majorVersion).$(fullDate).$commitId" > latest_image_backend_tag.txt
+          echo $commitId
+          docker build -f Dockerfile --target prod -t databrick/hexaind_backend:$(majorVersion).$(minorVersion).$(fullDate) -t $(acrRegistry)/hexaind_backend:$(majorVersion).$(minorVersion).$(fullDate) .
+          docker push databrick/hexaind_backend:$(majorVersion).$(minorVersion).$(fullDate)
+          docker push $(acrRegistry)/hexaind_backend:$(majorVersion).$(minorVersion).$(fullDate)
+
+        displayName: "Build & Push Docker image"
+
+      # Publish backend artifact
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Backend Artifacts
+        inputs:
+          pathToPublish: "latest_image_backend_tag.txt"
+          artifactName: "backend_artifact"
+          publishLocation: "Container"
+
+      #hexaind_backend_ml
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo $commitId
+          docker build -f Dockerfile --target prod_ml -t databrick/hexaind_backend_ml:$(majorVersion).$(minorVersion).$(fullDate) -t $(acrRegistry)/hexaind_backend_ml:$(majorVersion).$(minorVersion).$(fullDate) .
+          docker push databrick/hexaind_backend_ml:$(majorVersion).$(minorVersion).$(fullDate)
+          docker push $(acrRegistry)/hexaind_backend_ml:$(majorVersion).$(minorVersion).$(fullDate)
+
+        displayName: "Build & Push Docker image"
+
+      #jupyterhub
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo $commitId
+          docker build -f ./docker/jupyterhub.Dockerfile -t databrick/jupyterhub:$(majorVersion).$(minorVersion).$(fullDate) -t $(acrRegistry)/jupyterhub:$(majorVersion).$(minorVersion).$(fullDate) .
+          docker push databrick/jupyterhub:$(majorVersion).$(minorVersion).$(fullDate)
+          docker push $(acrRegistry)/jupyterhub:$(majorVersion).$(minorVersion).$(fullDate)
+
+        displayName: "Build & Push jupyterhub image"
+
+        #jupyternotebook
+      - script: |
+          commitId=$(echo $(Build.SourceVersion) | cut -c1-7)
+          echo $commitId
+          docker build -f ./docker/jupyternotebook.Dockerfile -t databrick/jupyternotebook:$(majorVersion).$(minorVersion).$(fullDate) -t $(acrRegistry)/jupyternotebook:$(majorVersion).$(minorVersion).$(fullDate) .
+          docker push databrick/jupyternotebook:$(majorVersion).$(minorVersion).$(fullDate)
+          docker push $(acrRegistry)/jupyternotebook:$(majorVersion).$(minorVersion).$(fullDate)
+
+        displayName: "Build & Push jupyternotebook image"
+
+  # Production Build
+
+  - job: BuildAndPushProd
+    displayName: Build and push image
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: "$(dockerRegistryServiceConnection)"
+          command: "login"
+        displayName: Docker Login
+
+      #workflow-api
+      - task: Docker@2
+        inputs:
+          command: build
+          repository: "databrick/workflow-api"
+          Dockerfile: "./docker/workflow_apis.Dockerfile"
+          tags: "release.$(fullDate)"
+        displayName: Build Docker image
+
+      - task: Docker@2
+        displayName: Push Docker image
+        inputs:
+          command: "push"
+          repository: "databrick/workflow-api"
+          tags: "release.$(fullDate)"
+          containerRegistry: "$(dockerRegistryServiceConnection)"

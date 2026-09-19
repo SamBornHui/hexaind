@@ -1,0 +1,566 @@
+<div fxLayout="column" class="converter-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button (click)="navigate('data-sheet-generator')" mat-icon-button class="global-back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">Datasheet Converter</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader()">
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div fxFlex fxLayout="row" class="y-auto">
+    <div fxLayout="column" fxLayoutGap="12px" class="left-panel">
+      <div fxFlex="none" class="left-link" (click)="showTab(1)" [class.active]="selectedTab === 1">
+        Tensile Importer
+      </div>
+      <div fxFlex="none" class="left-link" (click)="showTab(2)" [class.active]="selectedTab === 2">
+        FLC Importer
+      </div>
+      <div fxFlex="none" class="left-link" (click)="showTab(3); getDataSheetSource()"
+        [class.active]="selectedTab === 3">
+        Bulge Imports
+      </div>
+      <!-- Perhaps this code will be useful in future-->
+      <!-- <div
+        fxFlex="none"
+        class="left-link"
+        (click)="showTab(4)"
+        [class.active]="selectedTab === 4"
+      >
+        Failed Imports
+      </div> -->
+      <div fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto border-top pt-4"
+        *ngIf="selectedTab === 1 && tensileResults">
+        <div>
+          <div class="fw-bold pb-1">Datasheet number</div>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" name="dataSheet" [(ngModel)]="dataSheet"
+              (ngModelChange)="tensileFileConvert()" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Nominal Age (Days)</div>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" name="nominalAge" [(ngModel)]="nominalAge"
+              (ngModelChange)="tensileFileConvert()" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Lab reference</div>
+          <mat-form-field appearance="outline">
+            <input matInput name="labReference" [(ngModel)]="labReference" (ngModelChange)="tensileFileConvert()" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Operator</div>
+          <mat-form-field appearance="outline">
+            <input matInput name="operator" [(ngModel)]="operator" (ngModelChange)="tensileFileConvert()" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Pretreatement</div>
+          <mat-form-field appearance="outline">
+            <input matInput name="preTreatement" [(ngModel)]="preTreatement" (ngModelChange)="tensileFileConvert()" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Time Zone</div>
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Select" [(ngModel)]="timeZone" (ngModelChange)="tensileFileConvert()">
+              <mat-option *ngFor="let zone of timeZones" [value]="zone">
+                {{ zone }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto border-top pt-4"
+        *ngIf="selectedTab === 2 && flcParameters">
+        <div>
+          <div class="fw-bold pb-1">Test procedure</div>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="flcParameters.df_meta_data.test_procedure" name="test_procedure" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Datasheet number</div>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" [(ngModel)]="flcParameters.df_meta_data.datasheet" name="datasheet" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Test lab</div>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="flcParameters.df_meta_data.test_lab" name="test_lab" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Lab reference</div>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="flcParameters.df_meta_data.lab_ref" name="lab_ref" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Test date (YYYY-MM-DD)</div>
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="picker" [(ngModel)]="flcParameters.df_meta_data.test_date" name="test_date"
+              placeholder="Choose a date" />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Operator</div>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="flcParameters.df_meta_data.test_operator" name="test_operator" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Nominal age (days)</div>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" [(ngModel)]="flcParameters.df_meta_data.nominal_age" name="nominal_age" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Pretreatment</div>
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="flcParameters.df_meta_data.pretreatement" name="pretreatement" />
+          </mat-form-field>
+        </div>
+        <div>
+          <div class="fw-bold pb-1">Test direction (deg)</div>
+          <mat-form-field appearance="outline">
+            <input matInput type="number" [(ngModel)]="flcParameters.df_meta_data.test_direction"
+              name="test_direction" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div *ngIf="selectedTab === 3" fxFlex fxLayout="column" fxLayoutGap="16px" class="y-auto border-top pt-4">
+        <div>
+          <div class="fw-bold pb-1">Datasheet number</div>
+          <mat-form-field appearance="outline" (click)="getDataSheetSource()">
+            <mat-select placeholder="Select" [(ngModel)]="dataSheetNumber">
+              <mat-option *ngFor="let sheet of dataSheetsNumbers" [value]="sheet">
+                {{ sheet }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+    <div fxFlex fxLayout="column" class="p-6">
+      <!-- Tensile Importer -->
+      <div fxFlex fxLayout="column" fxLayoutGap="24px" *ngIf="selectedTab === 1">
+        <div fxFlex="none">
+          <h2>Tensile Excel to ASCII translation</h2>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="24px" class="upload-block">
+          <div fxLayout="column" fxLayoutGap="8px">
+            <div>Choose the file to convert</div>
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="bg-surface rounded-2 p-3"
+              (drop)="onFileDropped($event, 'tensileFile')" (dragover)="onDragOver($event)">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">cloud_upload</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="pb-2">Drag and drop file here</div>
+                <div class="text-sm text-grey">Limit 200MB per file</div>
+              </div>
+
+              <div fxFlex="none">
+                <input type="file" (change)="onFileSelected($event, 'tensileFile')" style="display: none"
+                  #tensileRawFileInput />
+              </div>
+
+              <div fxFlex="none">
+                <button mat-flat-button color="primary" (click)="tensileRawFileInput.click()">
+                  Browse File
+                </button>
+              </div>
+            </div>
+            <div *ngIf="tensileFile && tensileRawFileName !== ''" fxLayout="row" fxLayoutGap="16px"
+              fxLayoutAlign="center center" class="p-3">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">draft</mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">{{ tensileRawFileName }}</div>
+              <div fxFlex="80px" class="text-sm text-grey text-right">
+                <p>
+                  {{ tensileRawFileSize | fileSize }}
+                </p>
+              </div>
+              <div fxFlex="240px">
+                <mat-progress-bar mode="determinate" [value]="tensileRawUploadProgress"></mat-progress-bar>
+              </div>
+              <div fxFlex="none">
+                <button mat-icon-button color="primary" (click)="cancelUploading('file')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="tensileFile && tensileResults">
+            <div fxLayout="column" fxLayoutGap="8px">
+              <div class="fw-bold pb-1">Datetime column name</div>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-select placeholder="Select" [(ngModel)]="selectedDatetimeColumn"
+                  (ngModelChange)="tensileFileConvert()">
+                  <mat-option *ngFor="let option of tensileColumnValues" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <div class="fw-bold pb-1">Direction column name</div>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-select placeholder="Select" [(ngModel)]="selectedDirectionColumn"
+                  (ngModelChange)="tensileFileConvert()">
+                  <mat-option *ngFor="let option of tensileColumnValues" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <div class="fw-bold pb-1">Length column name</div>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-select placeholder="Select" [(ngModel)]="selectedLengthColumn"
+                  (ngModelChange)="tensileFileConvert()">
+                  <mat-option *ngFor="let option of tensileColumnValues" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <div class="fw-bold pb-1">Thickness column name</div>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-select placeholder="Select" [(ngModel)]="selectedThicknessColumn"
+                  (ngModelChange)="tensileFileConvert()">
+                  <mat-option *ngFor="let option of tensileColumnValues" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <div class="fw-bold pb-1">Width column name</div>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-select placeholder="Select" [(ngModel)]="selectedWidthColumn"
+                  (ngModelChange)="tensileFileConvert()">
+                  <mat-option *ngFor="let option of tensileColumnValues" [value]="option">{{ option }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div *ngIf="tensileFile && tensileResults">
+            <div class="p-relative" style="height: 400px">
+              <div style="
+                  overflow: auto;
+                  position: absolute;
+                  left: 0;
+                  right: 0;
+                  height: 100%;
+                ">
+                <table mat-table [dataSource]="dataSource">
+                  <ng-container matColumnDef="specimen">
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.specimen }}
+                    </td>
+                  </ng-container>
+
+                  <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns.slice(1)">
+                    <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element[column] }}
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                </table>
+              </div>
+            </div>
+
+            <div *ngIf="allFieldsSelected()" class="button-footer" fxLayout="row" fxLayoutGap="16px">
+              <mat-checkbox color="primary" [(ngModel)]="tensileDeleteExisting">Delete all existing files in samples
+                subfolder</mat-checkbox>
+              <button mat-stroked-button color="primary" (click)="saveTensileAscii()">
+                Save output to share import folder
+                <mat-spinner *ngIf="saveTensileLoader" style="display: inline-block; vertical-align: middle"
+                  diameter="24"></mat-spinner>
+              </button>
+
+              <button [disabled]="!tensileSavefilePath" mat-stroked-button color="primary"
+                (click)="downloadZip('Tensile')">
+                Download archive
+              </button>
+            </div>
+            <div>
+              <!-- <button
+                *ngIf="tensileSavefilePath"
+                mat-stroked-button
+                color="primary"
+                (click)="downloadZip('Tensile')"
+              >
+                Download archive
+              </button> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- FLC Importer -->
+      <div fxFlex fxLayout="column" fxLayoutGap="24px" *ngIf="selectedTab === 2">
+        <div fxFlex="none">
+          <h2>FLC Excel to ASCII translation</h2>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="24px" class="upload-block">
+          <div fxLayout="column" fxLayoutGap="8px">
+            <div>Choose the FLC raw file</div>
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="bg-surface rounded-2 p-3"
+              (drop)="onFileDropped($event, 'rawFile')" (dragover)="onDragOver($event)">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">cloud_upload</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="pb-2">Drag and drop file here</div>
+                <div class="text-sm text-grey">Limit 200MB per file</div>
+              </div>
+              <div fxFlex="none">
+                <input type="file" (change)="onFileSelected($event, 'rawFile')" style="display: none" #rawFileInput />
+                <button mat-flat-button color="primary" (click)="rawFileInput.click()">
+                  Browse File
+                </button>
+              </div>
+            </div>
+            <div *ngIf="rawFileName !== ''" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="center center" class="p-3">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">draft</mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">
+                {{ rawFileName }}
+              </div>
+              <div fxFlex="80px" class="text-sm text-grey text-right">
+                <p>
+                  {{ rawFileSize | fileSize }}
+                </p>
+              </div>
+              <div fxFlex="240px">
+                <mat-progress-bar mode="determinate" [value]="rawUploadProgress"></mat-progress-bar>
+              </div>
+              <div fxFlex="none">
+                <button mat-icon-button color="primary" (click)="cancelUpload('rawFile')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div fxLayout="column" fxLayoutGap="8px">
+            <div>Choose the FLC fit file</div>
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="bg-surface rounded-2 p-3"
+              (drop)="onFileDropped($event, 'fitFile')" (dragover)="onDragOver($event)">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">cloud_upload</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="pb-2">Drag and drop file here</div>
+                <div class="text-sm text-grey">Limit 200MB per file</div>
+              </div>
+              <div fxFlex="none">
+                <input type="file" (change)="onFileSelected($event, 'fitFile')" style="display: none" #fitFileInput />
+                <button mat-flat-button color="primary" (click)="fitFileInput.click()">
+                  Browse File
+                </button>
+              </div>
+            </div>
+            <div *ngIf="fitFileName !== ''" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="center center" class="p-3">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">draft</mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">
+                {{ fitFileName }}
+              </div>
+              <div fxFlex="80px" class="text-sm text-grey text-right">
+                <p>
+                  {{ fitFileSize | fileSize }}
+                </p>
+              </div>
+              <div fxFlex="240px">
+                <mat-progress-bar mode="determinate" [value]="fitUploadProgress"></mat-progress-bar>
+              </div>
+              <div fxFlex="none">
+                <button mat-icon-button color="primary" (click)="cancelUpload('fitFile')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ng-container *ngIf="flcResults">
+            <div *ngIf="rawFileName !== '' && fitFileName !== ''">
+              <div class="fw-bold pb-1">
+                Which file to use for populating metadata
+              </div>
+              <mat-form-field appearance="outline" class="w-50">
+                <mat-select placeholder="Select File" [(ngModel)]="selectedFile">
+                  <mat-option *ngFor="let file of uploadedFiles" [value]="file.value">
+                    {{ file.display }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div>
+              <button mat-stroked-button color="primary" *ngIf="allFilesSelected()" (click)="uploadFileToConvert()">
+                Convert
+                <mat-spinner *ngIf="graphLoader" style="display: inline-block; vertical-align: middle"
+                  diameter="24"></mat-spinner>
+              </button>
+            </div>
+
+            <div id="flcPlotDiv"></div>
+
+            <div *ngIf="flcParameters" fxLayout="row" fxLayoutGap="16px">
+              <mat-checkbox color="primary" [(ngModel)]="deleteExistingSubFolder">Delete all existing files in samples
+                subfolder</mat-checkbox>
+              <button mat-stroked-button color="primary" (click)="saveFLC()">
+                Save output to share import folder
+                <mat-spinner *ngIf="saveFLCLoader" style="display: inline-block; vertical-align: middle"
+                  diameter="24"></mat-spinner>
+              </button>
+
+              <button [disabled]="!flcSavefilePath" (click)="downloadZip('FLC')" mat-stroked-button color="primary">
+                Download archive
+              </button>
+            </div>
+
+          </ng-container>
+        </div>
+      </div>
+      <!-- Bulge Importer -->
+      <div fxFlex fxLayout="column" fxLayoutGap="24px" *ngIf="selectedTab === 3 && dataSheetNumber !== ''">
+        <div fxFlex="none">
+          <h2>Bulge Excel to ASCII translation</h2>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="24px" class="upload-block">
+          <div fxLayout="column" fxLayoutGap="8px">
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" class="bg-surface rounded-2 p-3"
+              (drop)="onFolderDropped($event)" (dragover)="onDragOver($event)">
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined icon-32 text-grey">cloud_upload</mat-icon>
+              </div>
+              <div fxFlex>
+                <div class="pb-2">Drag and drop folder here</div>
+                <div class="text-sm text-grey">Limit 200MB per file</div>
+              </div>
+
+              <div fxFlex="none">
+                <input type="file" #fileInput style="display: none" (change)="onDirectorySelected($event)" directory
+                  multiple webkitdirectory />
+              </div>
+
+              <div fxFlex="none">
+                <button mat-flat-button color="primary" (click)="fileInput.click()">
+                  Browse
+                </button>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+              <div fxFlex="100px">
+                <button *ngIf="showUploadButton" mat-flat-button color="primary" (click)="uploadDirectory()">
+                  Upload
+                </button>
+              </div>
+              <div fxFlex="auto" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="end center"
+                *ngIf="uploadProgress > 0 && totalFileSize > 0">
+                <div fxFlex="none">
+                  <p>
+                    {{ totalFileSize | fileSize }}
+                  </p>
+                </div>
+                <div fxFlex="240px">
+                  <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+                </div>
+                <div fxFlex="none">
+                  <button (click)="cancelUploading('folder')" mat-icon-button color="primary">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Failed Imports -->
+      <div fxFlex fxLayout="column" fxLayoutGap="24px" *ngIf="selectedTab === 4">
+        <div fxFlex="none">
+          <h2>List of files that failed to import</h2>
+        </div>
+        <div fxFlex class="y-auto">
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">0</div>
+            <div fxFlex>8899/Tensile/[IMPORT ERROR][IMPORT ERROR].DS_Store</div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">1</div>
+            <div fxFlex>314/FLC/[IMPORT ERROR]314_FLC_datasheet_fit.xlsx</div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">2</div>
+            <div fxFlex>314/FLC/[IMPORT ERROR]314_FLC_datasheet_raw.xlsx</div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">3</div>
+            <div fxFlex>
+              518/FLC/[IMPORT ERROR][IMPORT ERROR]518_FLC_datasheet_fit.xlsx
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">4</div>
+            <div fxFlex>
+              518/FLC/[IMPORT ERROR][IMPORT ERROR]518_FLC_datasheet_raw.xlsx
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">5</div>
+            <div fxFlex>888/Tensile/[IMPORT ERROR].DS_Store</div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">6</div>
+            <div fxFlex>
+              552/FLC/[IMPORT ERROR][IMPORT ERROR]552_FLC_datasheet_raw.xlsx
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">7</div>
+            <div fxFlex>
+              552/FLC/[IMPORT ERROR][IMPORT ERROR]552_FLC_datasheet_fit.xlsx
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">8</div>
+            <div fxFlex>
+              553/FLC/[IMPORT ERROR][IMPORT ERROR]553_FLC_datasheet_raw.xlsx
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+            <div fxFlex="32px">9</div>
+            <div fxFlex>
+              553/FLC/[IMPORT ERROR][IMPORT ERROR]553_FLC_datasheet_fit.xlsx
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+[
+  {
+    "_id": {
+      "$oid": "6644939801eba81873b9f59b"
+    },
+    "id": null,
+    "name": "Connector01",
+    "description": "Connector",
+    "type": "BIGQUERY",
+    "configuration": {
+      "authentication_type": "SERVICE_ACCOUNT",
+      "authentication_details": {
+        "type": "service_account",
+        "project_id": "healthy-saga-327423",
+        "client_email": "databrick-hexaind@healthy-saga-327423.iam.gserviceaccount.com",
+        "client_id": "117477604032134058122",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/databrick-hexaind%40healthy-saga-327423.iam.gserviceaccount.com"
+      }
+    },
+    "owner_id": "65967ecac48951a0928b7dac",
+    "owner_name": "Databrick Admin",
+    "created_at": {
+      "$date": "2024-05-15T10:51:04.808Z"
+    },
+    "last_modified_by_id": "65967ecac48951a0928b7dac",
+    "last_modified_at": {
+      "$date": "2024-05-15T10:51:04.808Z"
+    },
+    "project_id": "662b8004d30492f5652cb2fa",
+    "site_id": "1",
+    "version": "1.0"
+  }
+]

@@ -1,0 +1,148 @@
+{
+    "Auto_ML": {
+        "parameters": {
+            "problem_type": "",
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "Cat_boost": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": ""
+        }
+    },
+    "CSV": {
+        "inputs": {
+            "choose_upload_source": "Choose upload source"
+        },
+        "outputs": {
+            "select_output": "Select Output"
+        }
+    },
+    "Extra_trees": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "MPR": {
+        "parameters": {
+            "split_ratio": "Proportion of the dataset allocated for testing the model, while the rest is used for training.",
+            "input_scaling": "Method for normalizing input features, particularly useful when input features have different scales.",
+            "polynomial_degree": "The highest power of the polynomial features.",
+            "polynomial_degree_feature": "Allows setting different polynomial degrees for individual features.",
+            "cross_validation_folds": "Number of partitions used for cross-validation to evaluate the model performance.",
+            "random_state": "Seed value to ensure model training and evaluation reproducibility. 'None' if reproducibility is not required.",
+            "categorical_encoding": "Approach used to transform categorical variables into a numerical format for model training."
+        }
+    },
+    "GPR": {
+        "parameters": {
+            "mean_func": "Mean",
+            "variational": "Variational",
+            "number_of_latents": "Number of latents",
+            "number_of_inducing": "Number of inducing",
+            "split_ratio": "Split ratio",
+            "covariance_kernels": "Please see the Info tab for more documentation on usage",
+            "number_of_mixtures": "Number of mixtures"
+        }
+    },
+    "GPC": {
+        "parameters": {
+            "mean_func": "Mean",
+            "variational": "Variational",
+            "number_of_latents": "Number of latents",
+            "number_of_inducing": "Number of Inducing",
+            "covariance_kernels": "Covariance kernel(s)",
+            "spectral_kernel": "Spectral kernel",
+            "number_of_mixtures": "Number of mixtures"
+        }
+    },
+    "K_nearest_neighbour": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "LGBM": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "Linear_regression": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "MOBO": {
+        "parameters": {}
+    },
+    "Neural_network_FASTAI": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "Neural_network_TORCH": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "Prediction": {
+        "parameters": {
+            "prediction_model": "Upload Python file"
+        }
+    },
+    "Random_forest": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    },
+    "Rescale": {
+        "inputs": {
+            "input_1": ""
+        },
+        "parameters": {
+            "configure_rescale_connection": "",
+            "upload_json_file": "",
+            "json_file_preview": ""
+        }
+    },
+    "SVM": {
+        "parameters": {
+            "problem_type": "",
+            "kernel_type": "",
+            "c_regularization": "",
+            "gamma": "",
+            "coef": "",
+            "sampling": "Sampling"
+        }
+    },
+    "Thermocalc": {
+        "parameters": {
+            "configure_thermocalc_connection": "",
+            "upload_module_file": ""
+        }
+    },
+    "XG_boost": {
+        "parameters": {
+            "evalution_metrics": "",
+            "split_ration": "",
+            "num_of_trials": "Number of trials in the HPO (hyper-parameter optimization) process. More the number of trials, better is the hyper-parameter selection, although not guaranteed"
+        }
+    }
+}

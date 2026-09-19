@@ -1,0 +1,76 @@
+<ng-template #itemTemplate let-item="item" let-index="index">
+  <div class="mst-select-conditional-cell-styles__item">
+    <span
+      class="mst-select-conditional-cell-styles__item__field mst-shared-truncate"
+      [title]="item.data.filter.field"
+      >{{ item.data.filter.field }}</span
+    ><ng-container *ngIf="(item.data?.type || 'text') === 'text'"
+      ><span>{{ item.data?.filter.type }}</span
+      ><span>{{ item.data?.filter.value }}</span></ng-container
+    ><ng-container *ngIf="(item.data?.type || 'text') !== 'text'">{{
+      item.data?.type
+    }}</ng-container>
+  </div>
+</ng-template>
+<mst-drop-list
+  [droppable]="droppable"
+  name="Cell Styles"
+  placeholder="Drop columns here"
+  [items]="cellStyleItems"
+  [itemTemplate]="itemTemplate"
+  [rightIconNames]="['settings', 'delete']"
+  [keepBottomBorder]="true"
+  (iconClick)="onListIconClick($event)"
+  (drop)="onDrop($event)"
+/>
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>Edit Cell Style</h2>
+  <mat-dialog-content>
+    <div class="mst-select-conditional-cell-styles__fields">
+      <mst-input
+        type="select"
+        label="Cell Style Type"
+        [value]="item.cellStyleColumn.type || 'cell'"
+        [items]="cellStyleTypeItems"
+        (change)="onTypeChange($event)"
+      />
+      <ng-container
+        *ngIf="
+          !item.cellStyleColumn.type || item.cellStyleColumn.type === 'cell'
+        "
+      >
+        <mst-filter
+          [fields]="columnItems"
+          [filter]="item.cellStyleColumn.filter"
+          (change)="onFilterChange($event)"
+        />
+        <mst-input
+          type="toggle"
+          label="Styles"
+          [value]="item.hasStyles"
+          (change)="onHasStylesChange($event)"
+        />
+      </ng-container>
+      <mst-input
+        *ngIf="item.hasStyles || item.cellStyleColumn.type === 'bar'"
+        type="color"
+        label="Border Color"
+        [value]="item.cellStyleColumn.options.borderColor"
+        (change)="onStyleChange($event, 'borderColor')"
+      />
+      <mst-input
+        *ngIf="item.hasStyles || item.cellStyleColumn.type === 'bar'"
+        type="color"
+        label="Background Color"
+        [value]="item.cellStyleColumn.options.backgroundColor"
+        (change)="onStyleChange($event, 'backgroundColor')"
+      />
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions
+    class="mst-select-conditional-cell-styles__dialog__actions"
+  >
+    <mst-button styleName="flat" (click)="onDialogAction()">Save</mst-button>
+    <mst-button mat-dialog-close>Close</mst-button>
+  </mat-dialog-actions>
+</ng-template>

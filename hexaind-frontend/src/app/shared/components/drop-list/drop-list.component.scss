@@ -1,0 +1,44 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 200px;
+  header {
+    padding-bottom: 8px;
+  }
+}
+.mst-drop-list {
+  &__list {
+    border: 1px solid var(--stroke-dark);
+    border-radius: 0.375rem;
+    padding: 4px;
+    &.dragover {
+      border-color: var(--blue);
+      border-style: dashed;
+      background-color: #0072c510;
+      &--error {
+        border-color: var(--red);
+        background-color: #c2000010;
+        border-style: dashed;
+      }
+    }
+    &__placeholder {
+      border: 1px dashed var(--stroke-dark);
+      border-radius: 0.375rem;
+      text-align: center;
+      line-height: 38px;
+      color: var(--stroke-dark);
+      margin-top: 4px;
+      &.empty {
+        margin-top: 0;
+      }
+    }
+  }
+  &__dialog {
+    &__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  }
+}

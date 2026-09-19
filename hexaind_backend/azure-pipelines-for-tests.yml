@@ -1,0 +1,40 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+name: hexaind-backend-tests
+
+trigger:
+  - bugfix/HEXAIND-13459--ut5-workflow-and-integration-tests
+  - develop
+
+pool:
+  vmImage: ubuntu-latest
+
+strategy:
+  matrix:
+    Python310:
+      python.version: "3.10.13"
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "$(python.version)"
+    displayName: "Use Python $(python.version)"
+
+  - script: |
+      echo "Creating necessary folders"
+      mkdir -p hexaind-data hexaind-home hexaind-drive
+    displayName: "Create necessary folders"
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install -r ml_requirements.txt
+      pip freeze
+    displayName: "Install dependencies"
+
+  - script: |
+      pip install pytest pytest-env pytest-azurepipelines
+      pytest -m "not integration and not fixme"
+    displayName: "pytest"

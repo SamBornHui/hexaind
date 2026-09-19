@@ -1,0 +1,244 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 2</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output2" [(ngModel)]="widgetOutput2"
+                  (ngModelChange)="widgetOutput2 = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="100" fxFlex.lt-lg="100">
+              <app-features-list-common (changeMade)="changeMade = $event" [numericalDataSource]="numericalDataSource"
+              [categoricalDataSource]="categoricalDataSource" [configCache]="configCache">
+            </app-features-list-common>
+              <div class="p-4">
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Mean</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Mean module selection">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px" *ngIf="configCache">
+                    <mat-radio-group [(ngModel)]="configCache.mean" (change)="storeSelectedMean($event)">
+                      <mat-radio-button color="primary" value="constant">Constant Mean</mat-radio-button>
+                      <mat-radio-button color="primary" value="zero">Zero Mean</mat-radio-button>
+                      <mat-radio-button color="primary" value="linear">Linear Mean</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Sampling</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Sampling">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px" *ngIf="configCache">
+                    <mat-radio-group [(ngModel)]="configCache.sampler_type" (change)="storeSelectedSamplerType($event)">
+                      <mat-radio-button color="primary" value="smote">Over Sampling</mat-radio-button>
+                      <mat-radio-button color="primary" value="randomus">Under Sampling</mat-radio-button>
+                      <mat-radio-button color="primary" value="none">None</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+                <div *ngIf="configCache" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="8px">
+                    <div class="fw-bold">Variational</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Variational">info</mat-icon>
+                  </div>
+                  <mat-checkbox [(ngModel)]="configCache.variational" (change)="variationalCheck($event.checked)"
+                    [disabled]="disable_variational_func()">
+                  </mat-checkbox>
+                </div>
+
+                <ng-container *ngIf="configCache && configCache.variational">
+                  <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div class="fw-bold">Number of latents</div>
+                      <mat-icon class="material-symbols-outlined text-grey"
+                        matTooltip="Number of latents">info</mat-icon>
+                    </div>
+
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="80px">
+                        <mat-form-field appearance="outline">
+                          <input matInput [ngModel]="getNumberOfLatentGPs" (keyup.enter)="setNumberOfLatentGPs($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex>
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="endRangeForLatentGps()"
+                          [step]="1" [discrete]="true" (change)="setNumberOfLatentGPs($event)">
+                          <input matSliderThumb [ngModel]="getNumberOfLatentGPs" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div class="fw-bold">Number of inducing points</div>
+                      <mat-icon class="material-symbols-outlined text-grey"
+                        matTooltip="Number of inducing points">info</mat-icon>
+                    </div>
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="80px">
+                        <mat-form-field appearance="outline">
+                          <input matInput [ngModel]="getNumberOfInducingPoints"
+                            (keyup.enter)="setNumberOfInducingPoints($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex>
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode"
+                          [max]="endRangeForInducingpoints" [step]="1" [discrete]="true"
+                          (change)="setNumberOfInducingPoints($event)">
+                          <input matSliderThumb [ngModel]="getNumberOfInducingPoints" />
+                        </mat-slider>
+
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="8px">
+                    <div class="fw-bold">Covariance kernel(s)</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltipPosition="above"
+                      matTooltip="Covariance kernel(s)">info</mat-icon>
+                  </div>
+                  <div *ngIf="configCache" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="24px">
+                    <mat-checkbox [(ngModel)]="configCache.spectral_kernel_setting"
+                      (change)="toggleSpectralKernel($event.checked)">
+                      Spectral Mixture
+                    </mat-checkbox>
+                    <mat-checkbox
+                      *ngFor="let kernel of configCache.covariance_function?.covariance_function_selection || []; let i = index; trackBy: trackByFn"
+                      [ngModel]="getKernelSelection(i)" (ngModelChange)="updateKernelSelection(i, $event)">
+                      {{ getKernelName(i) }}
+                    </mat-checkbox>
+                  </div>
+                </div>
+
+                <ng-container *ngIf="configCache && configCache.spectral_kernel_setting">
+                  <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                    <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="8px">
+                      <div class="fw-bold">Number of mixtures</div>
+                      <mat-icon class="material-symbols-outlined text-grey" matTooltipPosition="above"
+                        matTooltip="Number of mixtures">info</mat-icon>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="24px">
+                      <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <div fxFlex="80px">
+                          <mat-form-field appearance="outline">
+                            <input matInput [value]="getNumerOfMixtures()"
+                              [disabled]="workflowCanvasService.IsViewingRunMode"
+                              (keyup.enter)="setNumerOfMixtures($event)" />
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex>
+                          <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="100" [min]="1"
+                            [step]="1" [discrete]="true" (change)="setNumerOfMixtures($event)">
+                            <input matSliderThumb [ngModel]="getNumerOfMixtures()" />
+                          </mat-slider>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<app-config-action-bar widgetName="GPC Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"
+  (callParentFunction)="openModelPreveiwDialog($event)"></app-config-action-bar>

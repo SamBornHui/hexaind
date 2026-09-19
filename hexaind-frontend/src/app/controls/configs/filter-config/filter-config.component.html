@@ -1,0 +1,135 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Set Output Name</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                    placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="fw-bold border-bottom pb-2">
+              <div fxFlex="108px">&nbsp;</div>
+              <div fxFlex>Field</div>
+              <div fxFlex>Data Type</div>
+              <div fxFlex>Operator</div>
+              <div fxFlex>Input Value</div>
+              <div fxFlex>Logical Operator</div>
+              <div fxFlex="108px">&nbsp;</div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center"
+              *ngFor="let filterPanel of filterPanels; let i = index">
+              <div fxFlex="108px" class="text-end">Expression</div>
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select field</mat-label>
+                  <input type="text" matInput (input)="onInputChange($event)"
+                    [ngModel]="getFilterColumnName(filterPanel)" [matAutocomplete]="auto">
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setFilterColumnName(filterPanel, $event)">
+                    <mat-option *ngFor="let columnName of columnsNames" [value]="columnName">
+                      {{columnName}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+
+              <div fxFlex style="border: 1px solid #E0E0E0; padding: 12.5px; height: 40px;">
+                {{getFilterDataType(filterPanel)}}
+              </div>
+
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select operator</mat-label>
+                  <mat-select [ngModel]="getFilterOperator(i)" (ngModelChange)="setFilterOperator(filterPanel, $event)">
+                    <mat-option *ngFor="let operator of operatorsArray(i, filterPanel);trackBy: trackByOperator" [value]="operator.value">
+                      {{ operator.display }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>                
+              </div>
+
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-label>Input value</mat-label>
+                  <input matInput placeholder="Input value" [type]="getDataType(i)" [ngModel]="getFilterInputValue(i)"
+                    (ngModelChange)="setFilterValue(filterPanel, $event)">
+                  <mat-icon matSuffix *ngIf="isFilterSelectionPopupEnabled(filterPanel)" (click)="openFilterSelectionDialog(i)">search</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-label>Logical Operator</mat-label>
+                  <mat-select [ngModel]="getFilterOperands(filterPanel)"
+                    (ngModelChange)="setFilterOperands(filterPanel,$event)">
+                    <mat-option *ngFor="let logicalOperator of logicalOperators"
+                      [value]="logicalOperator">{{logicalOperator}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div fxFlex="108px" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                <button mat-icon-button color="primary" *ngIf="i>0" (click)="removeFilterPanel(i)">
+                  <mat-icon class="material-symbols-outlined">remove_circle</mat-icon>
+                </button>
+                <button mat-icon-button (click)="isConfigValid()" color="primary">
+                  <mat-icon class="material-symbols-outlined">add_circle</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+  <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+    Cancel
+  </button>
+  <button [disabled]="!changeMade" mat-flat-button color="primary" id="createBeutton" (click)="onSave()">
+    Save
+  </button>
+</div>
+<app-config-action-bar widgetName="Filter" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

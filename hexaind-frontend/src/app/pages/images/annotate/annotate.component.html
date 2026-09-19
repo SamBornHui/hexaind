@@ -1,0 +1,513 @@
+<div class="image-annotate-container" fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex="none" class="pe-4 border-right">
+        <app-image-left-nav *ngIf="foldersList.length>0" [foldersList]="foldersList" class="h-100"
+            (contentClicked)="leftMenuImageClick($event)"></app-image-left-nav>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="16px">
+        <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="SegmentedPanel">
+            <div fxFlex="240px">
+                <mat-form-field appearance="outline">
+                    <mat-select placeholder="Select Option" [(ngModel)]="segmentVisSelected"
+                        (selectionChange)="changeVisualization($event)">
+                        <mat-option value="solid,Black/white (default),Black/white (default)">Black/white
+                            (default)</mat-option>
+                        <mat-option value="label segmented,red,red">Label segmented</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-icon class="material-symbols-outlined global-icon-button-grey me-2"
+                    (click)="zoomInPlot()">zoom_in</mat-icon>
+                <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                    (click)="zoomOutPlot()">zoom_out</mat-icon>
+            </div>
+        </div>
+        <div fxFlex class="p-relative">
+            <div fxLayout="row" style="height: 100%;" *ngIf="noSegmentationDone() && SegmentedPanel">
+                <div class="centered-info-message">
+                    This image has not been segmented yet
+                </div>
+            </div>
+            <div class="global-image-container segmented-image-container">
+                <canvas class="global-image-fit" #annotatecanvas
+                    *ngIf="selectedImage && !showSpinner && !SegmentedPanel"></canvas>
+                <div *ngIf="selectedImage && !showSpinner && SegmentedPanel" style="width: 100%; height: 100%;">
+                    <div #segmentedinteractive *ngIf="interactivePathExists()" id="segmented-annotation"
+                        style="width:100%;height:100%"></div>
+                </div>
+                <div *ngIf="showSpinner" fxLayoutAlign="center center" class="h-100">
+                    <mat-spinner [diameter]="24"></mat-spinner>
+                </div>
+
+
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="select-box"
+                *ngIf="selectBoxView && SegmentedPanel">
+                <div fxFlex>
+                    <mat-form-field appearance="outline">
+                        <mat-select placeholder="Select label" disableOptionCentering="true" [(ngModel)]="assignLabel">
+                            <mat-option [value]="'blank'"
+                                (click)="assignLabel = 'blank';customNewLabel='';">Blank</mat-option>
+                            <mat-option *ngFor="let label of segmentedLabelsList;" [value]="label"
+                                (click)="assignLabel=label;customNewLabel='';">{{label}}</mat-option>
+                            <mat-option [value]="'Other'"
+                                (click)="assignLabel = 'Other';customNewLabel='';;">Other</mat-option>
+                            <mat-option [value]="'Ignore'" class="text-red"
+                                (click)="assignLabel = 'Ignore';customNewLabel='';">Ignore</mat-option>
+                            <mat-form-field appearance="outline" class="p-relative">
+                                <input matInput [(ngModel)]="customNewLabel" placeholder="Enter custom label"
+                                    (click)="$event.stopPropagation()" style="padding-right: 52px;">
+                                <mat-icon class="custom-label-cancel" *ngIf="customNewLabel !=''"
+                                    (click)="customNewLabel ='';">close</mat-icon>
+                                <mat-icon class="custom-label-check" *ngIf="customNewLabel !=''"
+                                    (click)="addAndAssignCustome()">check</mat-icon>
+                            </mat-form-field>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                    <button type="button" mat-flat-button color="primary" class="custom-flat-btn"
+                        (click)="assignLabelToSelectedObjects()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div fxFlex="280px" fxFlex.gt-md="320px" fxFlex.gt-lg="360px" fxLayout="column" fxLayoutGap="16px"
+        class="ps-4 border-left">
+        <div fxFlex="none">
+            <mat-radio-group color="primary">
+                <mat-radio-button value="raw" [checked]="SegmentedPanel==false"
+                    (click)="toggleSegmentedPanel('raw')"><span class="text-sm">Raw <span
+                            class="hide-sm">images</span></span></mat-radio-button>
+                <mat-radio-button value="segmented" (click)="toggleSegmentedPanel('segemented')"
+                    [checked]="SegmentedPanel==true"><span class="text-sm">Segmented <span
+                            class="hide-sm">images</span></span></mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="8px" *ngIf="!SegmentedPanel">
+            <div fxFlex="none">
+                <div class="fw-bold pb-1">Annotation tools</div>
+                <div>
+                    <div class="annotation-tools">
+                        <div class="tool disabled" matTooltip="Polygon">
+                            <svg class="svg-icon">
+                                <use xlink:href="#icon-polygon"></use>
+                            </svg>
+                        </div>
+                        <div class="tool selected" matTooltip="Bounding Box">
+                            <svg class="svg-icon">
+                                <use xlink:href="#bounding-box"></use>
+                            </svg>
+                        </div>
+                        <div class="tool" matTooltip="Ellipsis">
+                            <svg class="svg-icon">
+                                <use xlink:href="#icon-ellipsis"></use>
+                            </svg>
+                        </div>
+                        <div class="tool" matTooltip="Scale Bar" (click)="goToCleanUpPage()">
+                            <svg class="svg-icon">
+                                <use xlink:href="#scale-bar"></use>
+                            </svg>
+                        </div>
+                        <div class="tool" matTooltip="Crop" (click)="goToCleanUpPage()">
+                            <mat-icon class="material-symbols-outlined">crop</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div fxFlex fxLayout="column" class="annotation-list">
+                <div fxFlex="none" class="header" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                    <div fxFlex>Objects ({{annotations.length}})</div>
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+                        <div class="ps-1">Label</div>
+                        <mat-icon class="global-icon-button-grey icon-20"
+                            [matMenuTriggerFor]="filterMenu">filter_list</mat-icon>
+                    </div>
+                </div>
+                <div fxFlex class="content">
+                    <ng-container *ngIf="annotations.length > 0">
+                        <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row"
+                            *ngFor="let annotation of annotations; let i = index;">
+                            <div fxFlex="50" class="text-sm text-ellipse"
+                                *ngIf="!Editing || annotation.annotation_id != selectedAnnotation.annotation_id"
+                                (click)="changeClickName(annotation)">{{annotation.annotation_name}}</div>
+
+                            <div fxFlex="50" class="text-sm text-ellipse"
+                                *ngIf="Editing && annotation.annotation_id == selectedAnnotation.annotation_id && annotation._id">
+                                <div>
+                                    <div fxFlex fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                                        <input type="text" class="rename-input" placeholder="Enter value"
+                                            [(ngModel)]="annotation.annotation_name">
+                                    </div>
+                                    <div fxFlex="none">
+                                        <mat-icon class="global-icon-button-grey icon-20"
+                                            (click)="undoChangeName(annotation)">close</mat-icon>
+                                        <mat-icon class="global-icon-button-grey icon-20"
+                                            (click)="changeAnnotationName($event,annotation.annotation_name, annotation._id);">check</mat-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <div fxFlex>
+                                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                    [matMenuTriggerFor]="selectObjectType" (click)="selectObject=annotation"
+                                    class="label-select" *ngIf="annotation.label !=''">
+                                    <div fxFlex class="text-ellipse">
+                                        <svg viewBox="0 0 24 24" class="icon-16"
+                                            [ngStyle]="{color:  getAnnotationObjectLabelColor(annotation.label, annotation.annotation_id)}">
+                                            <use xlink:href="#icon-square"></use>
+                                        </svg>
+                                        {{annotation.label}}
+                                    </div>
+                                    <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                                </div>
+
+                                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                    [class.disabled]="!annotation._id"
+                                    [matMenuTriggerFor]="annotation._id ? selectObjectType : null"
+                                    (click)="annotation._id ? selectObject = annotation : changeAnnotationLabel(annotation)"
+                                    class="label-select" *ngIf="annotation.label == ''">
+                                    <div fxFlex class="text-ellipse">Select Label</div>
+                                    <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                                </div>
+
+                            </div>
+                            <div fxFlex="none">
+                                <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                                    (click)="menuItem = annotation"
+                                    [matMenuTriggerFor]="deleteConfirm">delete</mat-icon>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <div fxFlex *ngIf="annotations.length == 0">
+                <div class="global-nodata">No annotations made</div>
+            </div>
+        </div>
+        <div fxFlex fxLayout="column" fxLayoutGap="8px" *ngIf="SegmentedPanel">
+            <div fxFlex fxLayout="column" class="annotation-list">
+                <div fxFlex="none" class="header" fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                    <div fxFlex>Objects
+                        <span *ngIf="objectLabelsExists()">
+                            ({{this.image['segmented_annotation']['object_labels'].length}})
+                        </span>
+                    </div>
+                    <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+                        <div class="ps-1">Label</div>
+                        <mat-icon class="global-icon-button-grey icon-20"
+                            [matMenuTriggerFor]="itemsSegmentedFilter">filter_list</mat-icon>
+                    </div>
+                </div>
+                <div fxFlex class="content">
+                    <ng-container *ngIf="objectLabelsExists()">
+                        <ng-container
+                            *ngFor="let row of image['segmented_annotation']['object_labels']; let rowCounter=index;">
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row"
+                                *ngIf="checkLabelExistsInFilter(row.Label)"
+                                (mouseover)="showToolTipOnHover($event,rowCounter)"
+                                (mouseout)="mouseOutRowHideTooltip($event)">
+
+                                <div fxFlex="50" class="text-sm text-ellipse"
+                                    *ngIf="!Editing || row.Unique_object_id != selectedAnnotation.Unique_object_id"
+                                    (click)="enableEditAnnotaion(row)">{{row.Object}}</div>
+                                <div fxFlex="50" class="text-sm text-ellipse"
+                                    *ngIf="Editing && row.Unique_object_id == selectedAnnotation.Unique_object_id">
+                                    <div>
+                                        <div fxFlex fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                                            <input type="text" class="rename-input" placeholder="Enter value"
+                                                [(ngModel)]="row.Object">
+                                        </div>
+                                        <div fxFlex="none">
+                                            <mat-icon class="global-icon-button-grey icon-20"
+                                                (click)="undoChangeAnnotationName(row)">close</mat-icon>
+                                            <mat-icon class="global-icon-button-grey icon-20"
+                                                (click)="updateAnnotationName(row,rowCounter)">check</mat-icon>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div fxFlex>
+                                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                        class="label-select">
+                                        <mat-select placeholder="Select label" disableOptionCentering="true"
+                                            [(ngModel)]="row.Label" panelClass="custom-segment-select"
+                                            (selectionChange)="updateLabelObject(row)">
+                                            <mat-select-trigger>
+                                                <div fxLayout="row" fxLayoutAlign="start center">
+                                                    <div fxFlex class="text-ellipse">{{ row.Label }}</div>
+                                                </div>
+                                            </mat-select-trigger>
+                                            <mat-option class="text-ellipse" [value]="'blank'"
+                                                (click)="row.Label = 'blank'">Blank</mat-option>
+                                            <mat-option *ngFor="let label of segmentedLabelsList; let i = index;"
+                                                [value]="label" (click)="row.Label = label; $event.stopPropagation()">
+                                                <div fxLayout="row" fxLayoutAlign="start center">
+                                                    <div fxFlex class="text-ellipse">{{ label }}</div>
+                                                    <div fxFlex="none" *ngIf="currentUser['server_role'] == 'Server Admin'">
+                                                        <mat-icon
+                                                            class="material-symbols-outlined global-icon-button-grey me-0 icon-20 mt-1"
+                                                            [matMenuTriggerFor]="deleteSegmentedImageLable"
+                                                            (click)="menuItem = label; $event.stopPropagation()">delete</mat-icon>
+                                                    </div>
+                                                </div>
+                                            </mat-option>
+                                            <mat-option class="text-ellipse" [value]="'Other'"
+                                                (click)="row.Label = 'Other'">Other</mat-option>
+                                            <mat-option class="text-ellipse" [value]="'Ignore'" class="text-red"
+                                                (click)="row.Label = 'Ignore'">Ignore</mat-option>
+                                        </mat-select>
+                                    </div>
+                                </div>
+                                <!-- <div fxFlex="none" *ngIf="currentUser['server_role'] == 'Server Admin'">
+                                    <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                                        [matMenuTriggerFor]="deleteSegmentedImageLable"
+                                        (click)="menuItem = row">delete</mat-icon>
+                                </div> -->
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="!objectLabelsExists()">
+                        <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                            <div fxFlex class="global-nodata">No annotations made</div>
+                        </div>
+                    </ng-container>
+                    <!-- <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">
+                            <div>
+                                <div fxFlex fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                                    <input type="text" class="rename-input" placeholder="Enter value" value="Object 1">
+                                </div>
+                                <div fxFlex="none">
+                                    <mat-icon class="global-icon-button-grey icon-20">close</mat-icon>
+                                    <mat-icon class="global-icon-button-grey icon-20">check</mat-icon>
+                                </div>
+                            </div>
+                        </div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 1</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 2</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 2</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 3</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 2</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 4</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 3</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 5</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 2</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 6</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 3</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 7</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 1</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 8</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 1</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 9</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 1</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center" class="row">
+                        <div fxFlex="50" class="text-sm text-ellipse">Object 10</div>
+                        <div fxFlex>
+                            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                                [matMenuTriggerFor]="labelMenu" class="label-select">
+                                <div fxFlex class="text-ellipse">Label 1</div>
+                                <div fxFlex="none"><mat-icon>arrow_drop_down</mat-icon></div>
+                            </div>
+                        </div>
+                        <div fxFlex="none">
+                            <mat-icon class="material-symbols-outlined global-icon-button-grey">delete</mat-icon>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div fxLayout="row" fxLayoutAlign="end center">
+    <button mat-flat-button color="primary" [disabled]="!hasUnsavedChanges"
+        (click)="saveAnnotationsForSelectedImage()">Save</button>
+</div>
+
+<mat-menu #labelMenu="matMenu" class="global-menu">
+    <button mat-menu-item>Blank</button>
+    <button mat-menu-item>Label 1</button>
+    <button mat-menu-item>Label 2</button>
+    <button mat-menu-item>Label 3</button>
+    <button mat-menu-item>Label 4</button>
+    <button mat-menu-item>Other</button>
+    <button mat-menu-item class="text-orange">Ignore</button>
+</mat-menu>
+
+
+
+<mat-menu #filterMenu="matMenu">
+    <div *ngFor="let parent of labeloptionList">
+        <div mat-menu-item>
+            <mat-checkbox color="primary" [disableRipple]="true" [(ngModel)]="parent.selected"
+                (change)="changeParentEvent(false)" (click)="$event.stopPropagation()">{{parent.title}}
+            </mat-checkbox>
+        </div>
+        <div mat-menu-item *ngFor="let child of parent.labelOptions">
+            <mat-checkbox color="primary" [disableRipple]="true" [(ngModel)]="child.selected" (change)="changeType()"
+                (click)="$event.stopPropagation()">
+                <mat-icon style="top:6px;" [ngStyle]="{color: child.style}">square</mat-icon>
+                {{child.title}}
+            </mat-checkbox>
+        </div>
+    </div>
+</mat-menu>
+
+<mat-menu #deleteConfirm="matMenu" class="global-menu">
+    <div mat-menu-item class="header">Are You Sure?</div>
+    <button mat-menu-item (click)="deleteAnnotation(menuItem)">
+        <mat-icon class="material-symbols-outlined">check</mat-icon> Yes
+    </button>
+    <button mat-menu-item>
+        <mat-icon class="material-symbols-outlined">close</mat-icon> No
+    </button>
+</mat-menu>
+
+<mat-menu #deleteSegmentedImageLable="matMenu" class="global-menu">
+    <div mat-menu-item class="header">Are You Sure?</div>
+    <button mat-menu-item (click)="deleteSegmentedImageLabel(menuItem)">
+        <mat-icon class="material-symbols-outlined">check</mat-icon> Yes
+    </button>
+    <button mat-menu-item>
+        <mat-icon class="material-symbols-outlined">close</mat-icon> No
+    </button>
+</mat-menu>
+
+
+<mat-menu #selectObjectType="matMenu">
+    <div mat-menu-item *ngFor="let option of labeloptionList[0].labelOptions">
+        <div (click)="changeAnnotationObject(option)">
+            <mat-icon style="top:6px;" [ngStyle]="{color: option.style}">square</mat-icon>
+            {{option.title}}
+        </div>
+    </div>
+    <div mat-menu-item [matMenuTriggerFor]="colorsMenu" (click)="$event.stopPropagation()">
+        <div fxLayout="row" fxLayoutAlign="start center">
+            <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined" style="top:2px;">add_circle_outline</mat-icon>
+            </div>
+            <div fxFlex>Add New</div>
+        </div>
+    </div>
+    <mat-menu #colorsMenu="matMenu">
+        <div mat-menu-item>
+            <form #colorForm="ngForm" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <div fxFlex="48px">
+                    <input type="color" [value]="colors" [style.background]="colors" [(ngModel)]="colors"
+                        [ngModelOptions]="{standalone: true}" (click)="$event.stopPropagation()" />
+                </div>
+                <div fxFlex="none">
+                    <button mat-flat-button color="primary" (click)="onChangeColor(colors)">Add Color</button>
+                </div>
+            </form>
+        </div>
+    </mat-menu>
+</mat-menu>
+
+<mat-menu #itemsSegmentedFilter="matMenu" xPosition="before" yPosition="below">
+    <div *ngFor="let row of segmentedLabelsFilterList">
+        <div mat-menu-item>
+            <mat-checkbox color="primary" [disableRipple]="true" [(ngModel)]="row.selected"
+                (change)="changeFilterSegLabelType()" (click)="$event.stopPropagation()">
+                {{row.title}}
+            </mat-checkbox>
+        </div>
+    </div>
+</mat-menu>

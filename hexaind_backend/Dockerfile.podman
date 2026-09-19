@@ -1,0 +1,54 @@
+# syntax=docker/dockerfile:1.7-labs
+FROM python:3.10-slim AS base
+
+RUN python -m venv /opt/venv
+
+ENV PATH=/opt/venv/bin:${PATH} \
+    PIP_CACHE_DIR=/var/cache/pip \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean && \
+    apt update && \
+    apt -y --no-install-recommends install \
+        curl \
+        ffmpeg \
+        gcc \
+        libcairo2-dev \
+        pkg-config \
+        python3-dev \
+        socat
+
+RUN curl -k -o /usr/local/share/ca-certificates/micron_ca.crt https://bitbucket.micron.com/bbdc/projects/KEYSTONE/repos/keystone-resources/raw/micron_ca.crt \
+    && update-ca-certificates
+
+ENV CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+    PIP_CERT=/etc/ssl/certs/ca-certificates.crt
+
+ENV http_proxy=http://proxy-web.micron.com:80 \
+    https_proxy=http://proxy-web.micron.com:80 \
+    no_proxy=.micron.com,.microsoftonline.com
+
+WORKDIR /usr/local/src/hexaind_backend
+
+FROM base AS prod
+
+RUN --mount=type=cache,id=backend-requirements,target=${PIP_CACHE_DIR},sharing=locked \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt,readonly \
+    pip install --requirement requirements.txt
+
+COPY --parents app/ tests/ integration_tests pyproject.toml README.md LICENSE ./
+
+RUN pip install --editable . --no-deps
+
+FROM base AS prod_ml
+
+RUN --mount=type=cache,id=backend-requirements,target=${PIP_CACHE_DIR},sharing=locked \
+    --mount=type=bind,source=ml_requirements.txt,target=ml_requirements.txt,readonly \
+    pip install --requirement ml_requirements.txt
+
+COPY --parents app/ tests/ integration_tests pyproject.toml README.md LICENSE ./
+# updating ray
+RUN pip install ray==2.11.0
+RUN pip install --editable . --no-deps

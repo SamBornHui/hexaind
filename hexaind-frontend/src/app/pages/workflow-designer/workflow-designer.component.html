@@ -1,0 +1,638 @@
+<div class="container">
+  <app-header></app-header>
+  <app-workflow-designer-header
+    #workflowDesignerHeader
+    (runWorkflowExecution)="OnRunWorkflow()"
+    (stopWorkflowExecution)="onStopWorkflowRun()"
+    (saveWorkflow)="saveWorkflow()"
+    (publishWorkflow)="onPublishWorkflow()"
+    (openViewRunMode)="onOpenViewRunMode()"
+    (closeViewRunMode)="onCloseViewRunMode()"
+    (openViewRunSummary)="onViewRunSummary()"
+    (onHeaderNavigateBack)="onHeaderNavigateBack()"
+    (createWorkflowTemplate)="onCreateWorkflowTemplate($event)"
+    (loadWorkflowTemplate)="onLoadWorkflowTemplate($event)"
+    [disableSaveAndRun] = "disableSaveAndRun"
+
+  ></app-workflow-designer-header>
+  <div class="content">
+    <div
+      id="left"
+      *ngIf="
+        !workflowCanvasService.IsViewingRunMode &&
+        !workflowCanvasService.IsVersionedWorkflow
+      "
+      class="left-panel"
+      [ngClass]="{ collapsed: navService.isNavCollapsed }"
+    >
+      <div class="list-view">
+        <ul class="button-list">
+          <li style="margin-top: 10px" class="px-2 pb-2">
+            <mat-form-field appearance="outline">
+              <mat-icon matPrefix>search</mat-icon>
+              <input
+                matInput
+                placeholder="Search widgets"
+                [(ngModel)]="searchTerm"
+                (keyup)="searchWidgets()"
+                (keydown)="searchWidgets()"
+              />
+            </mat-form-field>
+          </li>
+
+          <li
+            class="widget-list-collapsed"
+            [ngClass]="{ active: showDataWidgets }"
+          >
+            <button
+              (click)="toggleIngestionWidgetList()"
+              class="ingestion-activities"
+            >
+              <mat-icon
+                class="material-symbols-outlined icon"
+                [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+              >
+                <span class="material-symbols-outlined">description</span>
+              </mat-icon>
+              <span
+                *ngIf="!navService.isNavCollapsed"
+                class="widget-text"
+                style="margin-left: 10px"
+                >Data</span
+              >
+              <i
+                *ngIf="!navService.isNavCollapsed"
+                class="fa-solid fa-chevron-down"
+                [ngClass]="{ rotate180: showDataWidgets }"
+                style="position: absolute; right: 10px"
+              ></i>
+            </button>
+          </li>
+
+          <ul *ngIf="showDataWidgets" class="widget-ullist-collapsed">
+            <li
+              *ngFor="let widget of filteredDataWidgets"
+              class="widget-list"
+              [attr.data-id]="widget.urn"
+              [draggable]="true"
+              (dragstart)="
+                onExternalElementDragStart(
+                  $event,
+                  widget.type,
+                  widget.clientType
+                )
+              "
+              (mouseenter)="showTooltip(widget, $event)"
+              (mouseleave)="hideTooltipData()"
+            >
+              <div
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign=" center"
+                class="widget-block"
+                (dblclick)="
+                  AddWidgetControlToCanvas(widget.type, widget.clientType)
+                "
+              >
+                <div fxFlex="none">
+                  <mat-icon
+                    class="material-symbols-outlined icon"
+                    [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+                    >{{ widget.iconName }}</mat-icon
+                  >
+                </div>
+                <div fxFlex class="text-ellipse">{{ widget.displayName }}</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined drag-icon"
+                    >drag_indicator</mat-icon
+                  >
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <li
+            class="widget-list-collapsed"
+            [ngClass]="{ active: showMachineLearningWidgets }"
+          >
+            <button
+              (click)="toggleMachineLearningWidgetList()"
+              class="machine-activities"
+            >
+              <mat-icon
+                class="material-symbols-outlined icon"
+                [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+              >
+                <span class="material-symbols-outlined"> psychology </span>
+              </mat-icon>
+              <span
+                *ngIf="!navService.isNavCollapsed"
+                class="widget-text"
+                style="margin-left: 10px"
+              >
+                AI/ML
+              </span>
+              <i
+                *ngIf="!navService.isNavCollapsed"
+                class="fa-solid fa-chevron-down"
+                [ngClass]="{ rotate180: showMachineLearningWidgets }"
+                style="position: absolute; right: 10px"
+              ></i>
+            </button>
+          </li>
+          <ul
+            *ngIf="showMachineLearningWidgets"
+            class="widget-ullist-collapsed"
+          >
+            <li
+              *ngFor="let widget of filteredAIMLWidgets"
+              class="widget-list"
+              [draggable]="true"
+              (dragstart)="
+                onExternalElementDragStart(
+                  $event,
+                  widget.type,
+                  widget.clientType
+                )
+              "
+              (mouseenter)="showTooltip(widget, $event)"
+              (mouseleave)="hideTooltipData()"
+            >
+              <div
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign=" center"
+                class="widget-block"
+                (dblclick)="
+                  AddWidgetControlToCanvas(widget.type, widget.clientType)
+                "
+              >
+                <div fxFlex="none">
+                  <mat-icon
+                    class="material-symbols-outlined icon"
+                    [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+                    >{{ widget.iconName }}</mat-icon
+                  >
+                </div>
+                <div fxFlex class="text-ellipse">{{ widget.displayName }}</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined drag-icon"
+                    >drag_indicator</mat-icon
+                  >
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <li
+            class="widget-list-collapsed"
+            [ngClass]="{ active: showCustomCodeWidgets }"
+          >
+            <button
+              (click)="toggleCustomCodeWidgetList()"
+              class="custom-code-activities"
+            >
+              <mat-icon
+                class="material-symbols-outlined icon"
+                [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+              >
+                <span class="material-symbols-outlined"> code </span>
+              </mat-icon>
+              <span
+                *ngIf="!navService.isNavCollapsed"
+                class="widget-text"
+                style="margin-left: 10px"
+              >
+                Custom
+              </span>
+              <i
+                *ngIf="!navService.isNavCollapsed"
+                class="fa-solid fa-chevron-down"
+                [ngClass]="{ rotate180: showCustomCodeWidgets }"
+                style="position: absolute; right: 10px"
+              ></i>
+            </button>
+          </li>
+          <ul *ngIf="showCustomCodeWidgets" class="widget-ullist-collapsed">
+            <li
+              *ngFor="let widget of filteredCustomCodePythonWidgets"
+              class="widget-list"
+              [draggable]="true"
+              (dragstart)="
+                onExternalElementDragStart(
+                  $event,
+                  widget.type,
+                  widget.clientType,
+                  widget.id || '',
+                  widget.displayName || ''
+                )
+              "
+              (mouseenter)="showTooltip(widget, $event)"
+              (mouseleave)="hideTooltipData()"
+            >
+              <div
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign=" center"
+                class="widget-block"
+                (dblclick)="
+                  AddWidgetControlToCanvas(
+                    widget.type,
+                    widget.clientType,
+                    widget.id || '',
+                    widget.displayName || ''
+                  )
+                "
+              >
+                <div fxFlex="none">
+                  <mat-icon
+                    class="material-symbols-outlined icon"
+                    [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+                    >code_blocks</mat-icon
+                  >
+                </div>
+                <div  fxFlex style="overflow:auto; padding-bottom: 11px">{{ widget.displayName }}</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined drag-icon"
+                    >drag_indicator</mat-icon
+                  >
+                </div>
+              </div>
+            </li>
+            <li class="p-3" *ngIf="customCodePythonWidgets.length == 0">
+              There are no widgets available
+            </li>
+          </ul>
+          <li
+            class="widget-list-collapsed"
+            [ngClass]="{ active: showThirdPartyAPIWidgets }"
+          >
+            <button
+              (click)="toggleThirdPartyAPIsWidgetList()"
+              class="machine-activities"
+            >
+              <mat-icon
+                class="material-symbols-outlined icon"
+                [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+              >
+                <span class="material-symbols-outlined"> api </span>
+              </mat-icon>
+              <span
+                *ngIf="!navService.isNavCollapsed"
+                class="widget-text"
+                style="margin-left: 10px"
+              >
+                APIs
+              </span>
+              <i
+                *ngIf="!navService.isNavCollapsed"
+                class="fa-solid fa-chevron-down"
+                [ngClass]="{ rotate180: showThirdPartyAPIWidgets }"
+                style="position: absolute; right: 10px"
+              ></i>
+            </button>
+          </li>
+          <ul *ngIf="showThirdPartyAPIWidgets" class="widget-ullist-collapsed">
+            <li
+              *ngFor="let widget of filteredThirdPartyAPIWidgets"
+              class="widget-list"
+              [draggable]="true"
+              (dragstart)="
+                onExternalElementDragStart(
+                  $event,
+                  widget.type,
+                  widget.clientType
+                )
+              "
+              (mouseenter)="showTooltip(widget, $event)"
+              (mouseleave)="hideTooltipData()"
+            >
+              <div
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign=" center"
+                class="widget-block"
+                (dblclick)="
+                  AddWidgetControlToCanvas(widget.type, widget.clientType)
+                "
+              >
+                <div fxFlex="none">
+                  <mat-icon
+                    class="material-symbols-outlined icon"
+                    [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+                    >{{ widget.iconName }}</mat-icon
+                  >
+                </div>
+                <div fxFlex class="text-ellipse">{{ widget.displayName }}</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined drag-icon"
+                    >drag_indicator</mat-icon
+                  >
+                </div>
+              </div>
+            </li>
+            <li class="p-3" *ngIf="filteredThirdPartyAPIWidgets.length == 0">
+              There are no widgets available
+            </li>
+          </ul>
+
+          <!-- Miscellaneous Widgets -->
+          <li
+            class="widget-list-collapsed"
+            [ngClass]="{ active: showGeneralWidgets }"
+          >
+            <button
+              (click)="toggleGeneralWidgetList()"
+              class="general-activities"
+            >
+              <mat-icon
+                class="material-symbols-outlined icon"
+                [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+              >
+                <span class="material-symbols-outlined">category</span>
+              </mat-icon>
+              <span
+                *ngIf="!navService.isNavCollapsed"
+                class="widget-text"
+                style="margin-left: 10px"
+                >Miscellaneous</span
+              >
+              <i
+                *ngIf="!navService.isNavCollapsed"
+                class="fa-solid fa-chevron-down"
+                [ngClass]="{ rotate180: showGeneralWidgets }"
+                style="position: absolute; right: 10px"
+              ></i>
+            </button>
+          </li>
+          <ul *ngIf="showGeneralWidgets" class="widget-ullist-collapsed">
+            <li
+              *ngFor="let widget of filteredCustomWidgets"
+              class="widget-list"
+              [draggable]="true"
+              (dragstart)="
+                onExternalElementDragStart(
+                  $event,
+                  widget.type,
+                  widget.clientType
+                )
+              "
+              (mouseenter)="showTooltip(widget, $event)"
+              (mouseleave)="hideTooltipData()"
+            >
+              <div
+                fxLayout="row"
+                fxLayoutGap="8px"
+                fxLayoutAlign=" center"
+                class="widget-block"
+                (dblclick)="
+                  AddWidgetControlToCanvas(widget.type, widget.clientType)
+                "
+              >
+                <div fxFlex="none">
+                  <mat-icon
+                    class="material-symbols-outlined icon"
+                    [ngClass]="{ 'icon-only': navService.isNavCollapsed }"
+                    >{{ widget.iconName }}</mat-icon
+                  >
+                </div>
+                <div fxFlex class="text-ellipse">{{ widget.displayName }}</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined drag-icon"
+                    >drag_indicator</mat-icon
+                  >
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <li class="collapsed-arr">
+            <button
+              *ngIf="!navService.isNavCollapsed"
+              class="right-aligned-button"
+              (click)="toggleNav()"
+            >
+              <img src="assets/chevron_left.png" alt="Data" />
+            </button>
+          </li>
+          <li class="collapsed-arr">
+            <button
+              style="opacity: 0.5"
+              *ngIf="navService.isNavCollapsed"
+              (click)="toggleNav()"
+            >
+              <img src="assets/chevron_right.png" alt="Data" />
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- <div
+      *ngIf="!navService.isNavCollapsed"
+      class="resizer-vertical"
+      (mousedown)="initResizeVertical($event)"
+    ></div> -->
+    <div id="designer">
+      <div id="top" [style.height.px]="isExpanded ? '100%' : '0'">
+        <div class="wf-toolbar" fxLayout="column" fxLayoutAlign=" center">
+          <button
+            mat-icon-button
+            disableRipple
+            (click)="zoomIn()"
+            [disabled]="isZoomInDisabled()"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+          <div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="50"
+              class="vertical-slider"
+              [(ngModel)]="zoomLevel"
+              orient="vertical"
+              (input)="handleSliderChange($event)"
+            />
+          </div>
+
+          <button
+            mat-icon-button
+            disableRipple
+            (click)="zoomOut()"
+            [disabled]="isZoomOutDisabled()"
+          >
+            <mat-icon>remove</mat-icon>
+          </button>
+        </div>
+
+        <div class="wf-fit-btn">
+          <button mat-icon-button disableRipple (click)="fitToScreen()">
+            <mat-icon class="material-symbols-outlined">fit_screen</mat-icon>
+          </button>
+        </div>
+        <!-- <div [(colorPicker)]="color" [cpPosition]="'bottom'" [style.background]="color"
+          (ngModelChange)=" onColorChange($event)" [ngModel]="color" class="global-color-picker"></div>
+        <div></div> -->
+
+        <div style="height: 20px; width: 20px; border-radius: 7px;" [style.border]="showArrowColorSlider? '4px solid black' : 'none'" [style.backgroundColor]="this.arrowColor" (click)="toggleSlider()" class="arrow-color-icon">  
+        </div>
+        <button *ngIf="!isWidgetsAligned" style="height: 20px; width: 60px; right: 12px;" (click)="alignWidgets()" class="align-button-icon" >
+          Align
+        </button>
+        <button *ngIf="isWidgetsAligned" style="height: 20px; width: 90px; right: 4px;" (click)="undoAlignmentChanges()" class="align-button-icon" >
+          Undo Align
+        </button>
+        <div *ngIf="showArrowColorSlider" class="custom-color-picker">
+          <color-sketch [color]="arrowColor" (onChangeComplete)="onColorChange($event)"></color-sketch>
+        </div>
+
+        <div
+          *ngIf="
+            !workflowCanvasService.IsViewingRunMode &&
+            !workflowCanvasService.IsVersionedWorkflow
+          "
+          class="wf-play-toolbar"
+          fxLayout="row"
+          fxLayoutAlign="center"
+        >
+          <div style="margin-right: 1px">
+            <input
+              type="checkbox"
+              id="exampleCheckbox"
+              [(ngModel)]="snapToGrid"
+            />
+            <label for="exampleCheckbox">Snap Grid</label>
+          </div>
+        </div>
+        <div id="canvasContainer" style="width: 100%; height: 100%">
+          <canvas
+            tabindex="0"
+            class="canvas"
+            (keydown)="handleCanvasKeyDown($event)"
+            (mousedown)="onCanvasMouseDown($event)"
+            (mouseup)="onCanvasMouseUp()"
+            (mousemove)="onCanvasMouseMove($event)"
+            #myCanvas
+            (dragover)="onCanvasDragOver($event)"
+            (drop)="onCanvasDrop($event)"
+            (wheel)="onMouseWheel($event)"
+            id="myCanvas"
+          >
+          </canvas>
+          <div
+            id="tooltip"
+            style="
+              position: absolute;
+              display: none;
+              background: transparent;
+              border: 0px solid black;
+              padding: 5px;
+              pointer-events: none;
+              font-weight: 500;
+            "
+          >
+            Tooltip content
+          </div>
+        </div>
+        <!-- <div
+          class="context-menu"
+          [ngStyle]="{
+            display: showCanvasContextMenu ? 'block' : 'none',
+            'left.px': contextMenuPosition.x,
+            'top.px': contextMenuPosition.y
+          }"
+        >
+          <button class="context-menu-btn" (click)="onMoveToFrontClicked()">
+            <i class="fa-solid fa-up-long" style="margin-right: 10px"></i>
+            Move to Front
+          </button>
+          <button class="context-menu-btn" (click)="onMoveToBackClicked()">
+            <i class="fa-solid fa-down-long" style="margin-right: 10px"></i>
+            Move to Back
+          </button>
+          <button class="context-menu-btn">
+            <i class="fa-solid fa-trash-can" style="margin-right: 10px"></i>
+            Delete
+          </button>
+        </div> -->
+        <!-- <div
+          class="context-menu"
+          [ngStyle]="{
+            display: showArrowContextMenu ? 'block' : 'none',
+            'left.px': contextMenuPosition.x,
+            'top.px': contextMenuPosition.y
+          }"
+        >
+          <button class="context-menu-btn" (click)="onSuccessArrowClicked()">
+            <i class="fa-solid fa-check" style="margin-right: 10px"></i>
+            On Success
+          </button>
+          <button class="context-menu-btn" (click)="onCompletedArrowClicked()">
+            <i
+              class="fa-solid fa-flag-checkered"
+              style="margin-right: 10px"
+            ></i>
+            On Completed
+          </button>
+          <button class="context-menu-btn" (click)="onFailureArrowClicked()">
+            <i
+              class="fa-solid fa-circle-exclamation"
+              style="margin-right: 10px"
+            ></i>
+            On Failure
+          </button>
+        </div> -->
+        <!-- <div
+          class="context-menu"
+          [ngStyle]="{
+            display: showLoopArrowContextMenu ? 'block' : 'none',
+            'left.px': contextMenuPosition.x,
+            'top.px': contextMenuPosition.y
+          }"
+        >
+          <button class="context-menu-btn" (click)="onLoopArrowClicked()">
+            <i class="fa-solid fa-check" style="margin-right: 10px"></i>
+            On Loop
+          </button>
+          <button
+            class="context-menu-btn"
+            (click)="onLoopTerminateArrowClicked()"
+          >
+            <i
+              class="fa-solid fa-flag-checkered"
+              style="margin-right: 10px"
+            ></i>
+            On Terminate
+          </button>
+        </div> -->
+      </div>
+
+      <div id="resizer" (mousedown)="initResize($event)"></div>
+      <div id="bottom" [style.height.px]="isExpanded ? '100%' : '100%'">
+        <span
+          class="arrow-btn material-symbols-outlined"
+          *ngIf="isExpanded"
+          (click)="expandToFullPage(); resizeCanvas()"
+          (mousedown)="initResize($event)"
+          matTooltip="Expand"
+        >
+          <mat-icon>expand_less</mat-icon>
+        </span>
+        <span
+          class="arrow-btn material-symbols-outlined"
+          *ngIf="!isExpanded"
+          (click)="collapseToFullPage()"
+          matTooltip="Collapse"
+        >
+          <mat-icon>expand_more</mat-icon>
+        </span>
+        <ng-container #widgetConfigContainer></ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+<app-notification #notification></app-notification>
+<!-- Container for tooltip -->
+<app-custom-tooltip #tooltipContainer></app-custom-tooltip>

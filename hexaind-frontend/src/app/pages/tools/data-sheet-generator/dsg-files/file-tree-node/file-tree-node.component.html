@@ -1,0 +1,63 @@
+<div [style.paddingLeft.px]="level * 20">
+  <div (click)="onToggle()" class="border-bottom tree-node-row" fxLayout="row" fxLayoutAlign="start center"
+    fxLayoutGap="8px">
+    <div fxFlex="none">
+      <mat-icon *ngIf="hasChildren || !isFilePath(path)">{{
+        isExpanded ? "expand_more" : "chevron_right"
+        }}</mat-icon>
+    </div>
+    <div fxFlex="none">
+      <mat-icon class="material-symbols-outlined text-grey">
+        <ng-container *ngIf="!isFilePath(path); else templateName">folder</ng-container>
+        <ng-template #templateName> draft </ng-template>
+      </mat-icon>
+    </div>
+    <div fxFlex>
+      {{ path.split("/").pop() }}
+    </div>
+    <div fxFlex="none">
+      <button *ngIf="!isFilePath(path)" mat-icon-button [matMenuTriggerFor]="actionsMenu"
+        #actionsMenuTrigger="matMenuTrigger" (click)="stopPropagation($event)">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div *ngIf="isExpanded">
+    <app-file-tree-node *ngFor="let child of children; trackBy: trackByFn" [path]="path + '/' + child"
+      [level]="level + 1" [children]="childrenData[path + '/' + child]" [isExpanded]="expandedNodes[path + '/' + child]"
+      (toggle)="toggle.emit($event)" [isLocked]="isLocked" (delete)="delete.emit($event)"
+      (download)="download.emit($event)" (upload)="upload.emit($event)" [expandedNodes]="expandedNodes"
+      [childrenData]="childrenData" [isFilePath]="isFilePath"></app-file-tree-node>
+  </div>
+</div>
+
+<!-- ACTIONS MENU -->
+<mat-menu class="global-menu" #actionsMenu="matMenu">
+  <button mat-menu-item (click)="folderInput.click()" [disabled]="isLocked">
+    <mat-icon class="material-symbols-outlined">upload</mat-icon>
+    <span>Upload</span>
+  </button>
+  <input type="file" webkitdirectory multiple hidden #folderInput (change)="onDirectorySelected($event)" />
+
+  <button mat-menu-item (click)="downloadDataset($event)" [disabled]="isLocked">
+    <mat-icon class="material-symbols-outlined">download</mat-icon>
+    <span>Download</span>
+  </button>
+  <button mat-menu-item (click)="openDeleteConfirmation()" [disabled]="isLocked">
+    <mat-icon class="material-symbols-outlined">delete</mat-icon>
+    <span>Delete</span>
+  </button>
+</mat-menu>
+
+<!-- DELETE CONFIRMATION MENU -->
+<mat-menu class="global-menu" #deleteMenu="matMenu">
+  <div mat-menu-item class="header">Are you sure?</div>
+  <button mat-menu-item (click)="confirmDelete()">
+    <mat-icon>check</mat-icon>
+    <span>Yes</span>
+  </button>
+  <button mat-menu-item (click)="closeDeleteMenu()">
+    <mat-icon>close</mat-icon>
+    <span>No</span>
+  </button>
+</mat-menu>

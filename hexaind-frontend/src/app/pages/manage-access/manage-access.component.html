@@ -1,0 +1,169 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex fxLayout="column" fxLayoutGap="24px" class="p-8">
+    <div fxFlex="none">
+      <h1 class="global-main-title">
+        Project Members
+        <mat-icon
+          class="material-symbols-outlined global-info-icon"
+          matTooltip="On this page, you can grant and edit access to users. This includes assigning users as administrators and assigning roles per project."
+          >info</mat-icon
+        >
+      </h1>
+    </div>
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+      <div
+        fxLayout="row"
+        fxLayoutGap="16px"
+        fxLayoutAlign="start center"
+        fxHide.lt-sm
+      >
+        <div fxFlex="300px" fxFlex.lt-md="150px">
+          <mat-form-field appearance="outline">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              placeholder="Search"
+              (input)="applyFilter($event)"
+            />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="grantAccess(selectedOption, 'Add')"
+          *ngIf=" (server_role_value !== 4 && role_name === 'PROJECT ADMINISTRATOR') || server_role_value === 1 "
+        >
+          <mat-icon>add</mat-icon>
+          {{
+            role_id === "1" && selectedOption === "server"
+              ? "Grant Access"
+              : "Grant Access"
+          }}
+        </button>
+      </div>
+    </div>
+    <div fxFlex *ngIf="!isUsersLoaded" fxLayout="column" fxLayoutAlign="center center" style="align-items: center">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+    <div fxFlex class="y-auto">
+      <ng-container *ngIf="dataSource?.data?.length ?? 0 > 0">
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+          (matSortChange)="sortData($event)"
+        >
+          <ng-container matColumnDef="user">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Project Member
+            </th>
+            <td mat-cell *matCellDef="let element">{{ element.user_name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="created_by">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Invited By
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.created_by_name }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Date Created <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1" matTooltip="User's local time">info</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.created_at | date: "d-MMM-yyyy h:mm a" }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="last_modified_at">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Last Modified <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1" matTooltip="User's local time">info</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.last_modified_at | date: "d-MMM-yyyy h:mm a" }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="server_role">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Project Access
+            </th>
+            <td mat-cell *matCellDef="let element">{{ element.role_name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef width="40">&nbsp;</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-icon
+                *ngIf=" (server_role_value === 1 || role_name === 'PROJECT ADMINISTRATOR') && element.server_role_value !== 1 "
+                (click)="deleteConfirmation = false"
+                [matMenuTriggerFor]="actionsMenu"
+                [matMenuTriggerData]="{ rowData: element }"
+                >more_vert</mat-icon
+              >
+            </td>
+          </ng-container>
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </ng-container>
+      <ng-template #noProjects>
+        <div class="global-nodata">No users assigned to this project.</div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<mat-menu #actionsServerMenu="matMenu" class="global-menu">
+  <ng-template matMenuContent let-rowData="rowData">
+    <ng-container *ngIf="!deleteConfirmation">
+      <button
+        mat-menu-item
+        (click)="deleteConfirmation = true; $event.stopPropagation()"
+      >
+        <mat-icon class="material-symbols-outlined">remove</mat-icon>
+        <span>Remove</span>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="deleteConfirmation">
+      <div mat-menu-item class="header">Are You Sure?</div>
+      <button mat-menu-item (click)="removeServerAccess(rowData)">
+        <mat-icon>check</mat-icon> Yes
+      </button>
+      <button mat-menu-item><mat-icon>close</mat-icon> No</button>
+    </ng-container>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #actionsMenu="matMenu" class="global-menu">
+  <ng-template matMenuContent let-rowData="rowData">
+    <ng-container *ngIf="!deleteConfirmation">
+      <button
+        mat-menu-item
+        (click)="grantAccess(rowData, 'Edit'); $event.stopPropagation()"
+      >
+        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <span>Edit</span>
+      </button>
+      <button
+        mat-menu-item
+        (click)="deleteConfirmation = true; $event.stopPropagation()"
+      >
+        <mat-icon class="material-symbols-outlined">remove</mat-icon>
+        <span>Remove</span>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="deleteConfirmation">
+      <div mat-menu-item class="header">Are You Sure?</div>
+      <button mat-menu-item (click)="deleteProjectAccess(rowData)">
+        <mat-icon>check</mat-icon> Yes
+      </button>
+      <button mat-menu-item><mat-icon>close</mat-icon> No</button>
+    </ng-container>
+  </ng-template>
+</mat-menu>

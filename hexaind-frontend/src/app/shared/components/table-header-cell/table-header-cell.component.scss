@@ -1,0 +1,31 @@
+:host {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+  &.has-sort {
+    cursor: pointer;
+  }
+}
+
+.mst-table-header-cell {
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    &__text {
+      flex: 1;
+    }
+  }
+  &__sort-arrow {
+    transition: transform 0.3s ease;
+    &.desc {
+      transform: rotate(180deg);
+    }
+  }
+}

@@ -1,0 +1,66 @@
+.column-editor {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px;
+  background-color: var(--secondary-surface);
+
+  input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 4px;
+    background: transparent;
+  }
+}
+
+.search-form {
+  width: 90% !important;
+}
+
+/* styles.css or component-specific CSS */
+.mat-paginator {
+  display: flex;
+  justify-content: center;
+}
+
+.mat-paginator-range-label {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.mat-paginator-navigation {
+  display: flex;
+  justify-content: center;
+}
+
+.mat-paginator-page {
+  margin: 0 4px;
+}
+
+.error-text {
+  color: red;
+  font-size: large;
+}
+
+.rows-limit-exceeded, .cols-limit-exceeded {
+  float: right;
+  color: #FFC107;
+  align-items: center;
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.rows-limit-exceeded > mat-icon {
+  margin-right: 5px;
+}
+
+.cols-limit-exceeded > mat-icon {
+  margin-right: 5px;
+}
+
+.no-data { 
+  font-size: medium;
+  color: #757575;
+}

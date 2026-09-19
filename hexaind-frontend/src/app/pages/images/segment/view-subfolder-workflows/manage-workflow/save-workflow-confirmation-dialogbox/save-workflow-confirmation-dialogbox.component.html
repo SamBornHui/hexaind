@@ -1,0 +1,80 @@
+<div fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>{{ data.title }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="closeSaveDialog('cancel')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="p-6">
+    {{ data.message }}
+  </div>
+  <div fxFlex="none" class="p-6">
+    <div
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      fxLayoutGap="16px"
+      *ngIf="
+        data['assignedtoOtherImages'] != undefined &&
+        data['assignedtoOtherImages']
+      "
+    >
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="closeSaveDialog('cancel')"
+      >
+        Cancel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="closeSaveDialog('save_anyway')" *ngIf="!data.maskApplied"
+      >
+        Save for all assigned images
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="closeSaveDialog('save_as_new')"
+      >
+        Save only for this image
+      </button>
+    </div>
+    <div
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      fxLayoutGap="16px"
+      *ngIf="
+        data['assignedtoOtherImages'] == undefined ||
+        !data['assignedtoOtherImages']
+      "
+    >
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="closeDialog(false, false)"
+      >
+        Cancel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="closeDialog(false, true)"
+      >
+        Don't Save
+      </button>
+      <button mat-flat-button color="primary" (click)="closeDialog(true, true)">
+        Save
+      </button>
+    </div>
+  </div>
+</div>

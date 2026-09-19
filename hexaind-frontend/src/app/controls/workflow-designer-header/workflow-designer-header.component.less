@@ -1,0 +1,87 @@
+.global-header {
+  height: 60px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: var(--white);
+  border-bottom: 1px solid var(--stroke-lite);
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.pill-button {
+  background-color: #f7f8f9;
+  /* Light gray background */
+  color: #007c80;
+  /* Cyan-like text color */
+  border-radius: 10px;
+  /* This creates the pill shape */
+  // padding: 0 25px; /* Adjust horizontal padding to suit */
+  font-size: 14px;
+  /* Adjust based on your design */
+  border: none;
+  /* Remove default border */
+  box-shadow: none;
+  /* Removes the shadow */
+  height: 15px;
+}
+
+.vertical-line-separator {
+  border-left: 1.5px solid #aaa;
+  /* Change the color as per your theme */
+  height: 20px;
+  /* Adjust the height according to your button size */
+  margin: 0 10px;
+  /* Adds spacing around the separator. Adjust as needed. */
+}
+
+.last-run {
+  color: #222222;
+  /* Light gray background */
+  font-weight: 500;
+}
+
+::ng-deep .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+  background-color: darken(
+    #007c80,
+    10%
+  ) !important; // Adjust the color if necessary
+}
+
+::ng-deep .mat-slide-toggle:not(.mat-checked) .mat-slide-toggle-bar {
+  background-color: #007c80 !important; // This targets the toggle bar when not checked
+}
+
+::ng-deep .mat-slide-toggle-thumb {
+  background-color: #fff !important; // Keeps the thumb color
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .toggle-label {
+    white-space: nowrap;
+  }
+
+  .mat-slide-toggle {
+    margin: 0;
+  }
+}
+
+.custom-button {
+  max-height: 38px;
+  font-size: 16px;
+  color: white !important;
+  background-color: #2c10e0;
+  box-shadow: none !important;
+}
+
+.custom-button[disabled],
+.custom-button.mat-button-disabled {
+  color: #999;
+  /* Lighter text color for disabled state */
+  background-color: #ccc;
+  /* Lighter background for disabled state */
+  box-shadow: none;
+}

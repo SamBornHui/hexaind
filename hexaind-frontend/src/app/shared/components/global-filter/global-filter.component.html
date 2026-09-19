@@ -1,0 +1,40 @@
+<header>
+  <b>Global Filters</b
+  ><mst-button
+    styleName="icon"
+    iconName="settings"
+    (click)="onEditClick()"
+  ></mst-button>
+</header>
+<ng-template #itemTemplate let-item="item" let-index="index">
+  <div class="mst-global-filter__item">
+    <span
+      class="mst-global-filter__item__field mst-shared-truncate"
+      [title]="item.data.field"
+      >{{ item.data.field }}</span
+    ><span>{{ item.data.type }}</span
+    ><span>"{{ item.data.value }}"</span>
+  </div>
+</ng-template>
+<mst-list
+  [items]="filterItems"
+  [itemTemplate]="itemTemplate"
+  [rightIconNames]="['settings']"
+  emptyMessage="No Filters"
+  (iconClick)="onIconClick($event)"
+/>
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title>Apply Filter</h2>
+  <mat-dialog-content>
+    <mst-select-viz-items
+      [global]="filter?.global"
+      [items]="vizItems"
+      [selectedIds]="filter?.targetIds || []"
+      (change)="onSelectedIdsChange($event)"
+    />
+  </mat-dialog-content>
+  <mat-dialog-actions class="mst-global-filter__dialog__actions">
+    <mst-button styleName="flat" (click)="onDialogAction()">Save</mst-button>
+    <mst-button mat-dialog-close>Close</mst-button>
+  </mat-dialog-actions>
+</ng-template>

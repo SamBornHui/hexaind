@@ -1,0 +1,370 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom p-6">
+    <div>
+      <h1>Model Preview</h1>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <div fxFlex="none" *ngIf="data.type != 'SingleModelPreview'">
+        Workflow: <strong>{{ workflow_name }}</strong>
+      </div>
+      <div fxFlex="none" class="ps-2">
+        <mat-slide-toggle matTooltip="Toggle Scientific Notation" color="primary"
+          [(ngModel)]="isScientificNotationEnabled"></mat-slide-toggle>
+      </div>
+      <div fxFlex="none">
+        <button *ngIf="!downloadLoder" mat-icon-button (click)="downloadModels()">
+          <mat-icon class="material-symbols-outlined">download</mat-icon>
+        </button>
+        <mat-spinner *ngIf="downloadLoder" diameter="24"></mat-spinner>
+      </div>
+      <div fxFlex="none" *ngIf="data.type != 'SingleModelPreview'">
+        <button mat-icon-button (click)="saveAllModels()">
+          <mat-icon class="material-symbols-outlined">save</mat-icon>
+        </button>
+      </div>
+      <div fxFlex="none">
+        <button mat-icon-button [mat-dialog-close]="true">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" class="y-auto">
+    <div fxFlex="200px" class="p-4 border-right">
+      <div class="nav-link" (click)="onTabClick(0)" [ngClass]="{ active: selectedTabIndex === 0 }">
+        Summary
+      </div>
+      <div class="nav-link" *ngIf="data.type != 'SingleModelPreview' && models.length>1" (click)="onTabClick(1)"
+        [ngClass]="{ active: selectedTabIndex === 1 }">
+        <!-- [class.disabled]="loading || disabledTabIndex === 0" -->
+        <!-- [class.disabled]="loading || disabledTabIndex === 1" -->
+        <!-- [class.disabled]="loading || disabledTabIndex === 2" -->
+        <!-- [class.disabled]="loading || disabledTabIndex === 3" -->
+        Compare Models
+      </div>
+      <div class="nav-link" (click)="onTabClick(2); showVisualization()" [ngClass]="{ active: selectedTabIndex === 2 }">
+        Model Visualizations
+      </div>
+      <div class="nav-link" (click)="onTabClick(3); featureImpotance()" [ngClass]="{ active: selectedTabIndex === 3 }">
+        Feature Importance
+      </div>
+    </div>
+
+    <div fxFlex class="p-6 y-auto p-relative">
+      <ng-container *ngIf="selectedTabIndex === 0">
+        <app-models-summary *ngIf="models.length > 0" [models]="models"
+          [isScientificNotationEnabled]="isScientificNotationEnabled" [type]="type" [data]="data"
+          (loaded)="onTabLoaded()"></app-models-summary>
+      </ng-container>
+      <ng-container *ngIf="selectedTabIndex === 1">
+        <app-preview-model-comparision [run_id]="run_id" [project_id]="project_id" [site_id]="site_id"
+          [isScientificNotationEnabled]="isScientificNotationEnabled" (loaded)="onTabLoaded()"
+          [models]="models"></app-preview-model-comparision>
+      </ng-container>
+
+      <ng-container *ngIf="selectedTabIndex === 2">
+        <!-- classification -->
+        <div class="h-100" *ngIf="existsVisualization()">
+          <mat-accordion class="global-accordion">
+            <mat-expansion-panel *ngFor="
+                let group of confusionMetricsVizGrouped | keyvalue;
+                let index = index
+              " (opened)="onAccordionExpanded($event, group.key)" [expanded]="index === 0">
+              <mat-expansion-panel-header>
+                <mat-panel-title>{{ group.key }}
+                  <mat-spinner *ngIf="group.value.loader" diameter="24"></mat-spinner></mat-panel-title>
+              </mat-expansion-panel-header>
+              <ng-container *ngIf="group.value.data.length == 0">
+                No graph(s) available
+              </ng-container>
+              <ng-container *ngIf="group.value.data.length > 0">
+                <div fxLayout="column" fxLayoutGap="16px">
+                  <div fxFlex>
+                    <div fxLayout="row" fxLayoutGap="4px" *ngFor="let file of group.value.data">
+                      <div fxFlex fxLayoutAlign="center center">
+                        <img *ngIf="file.imageUrl != ''" [src]="file.imageUrl" class="global-image-fit" />
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="isClassificationModel(selectedModelObject.model)" fxFlex="200px" fxLayout="column">
+                    <div fxFlex="none" class="fw-bold pb-1">Metrics</div>
+                    <div fxFlex class="y-auto">
+                      <table class="custom-table-sm">
+                        <thead>
+                          <tr>
+                            <th>Metric</th>
+                            <th *ngFor="let column of columns">
+                              {{ column | replaceAndCapitalize }}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let key of keys(selectedModelObject.model.metrics)">
+                            <td>{{ key }}</td>
+                            <td *ngFor="let column of columns">
+                              {{
+                              isObj(selectedModelObject.model.metrics[key])
+                              ? isDecimal(selectedModelObject.model.metrics[key][column])
+                              ? (selectedModelObject.model.metrics[key][column]
+                              | scientificNumber:isScientificNotationEnabled)
+                              : selectedModelObject.model.metrics[key][column]
+                              : column === "accuracy"
+                              ? selectedModelObject.model.metrics[key]
+                              : "-"
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+        <!-- Regression -->
+        <div fxLayout="column" fxLayoutGap="24px" class="h-100" *ngIf="!existsVisualization()">
+          <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="border-bottom pb-2">
+            <div fxFlex>
+              <div class="fw-bold pb-1">Select Model</div>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select Model" [(ngModel)]="selectedModel" (ngModelChange)="onModelSelection()">
+                  <mat-option *ngFor="let model of models" [value]="model.model.name"
+                    matTooltip="{{ model.model.name }}">
+                    {{ truncateModelName(model.model.name) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold pb-1">Select Data Type</div>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select value" [(ngModel)]="selectedData" #dataSelect="ngModel"
+                  (ngModelChange)="onSelectionChange()">
+                  <mat-option *ngIf="isNotExcludedModelType(modelType)" value="test">Test Set</mat-option>
+                  <mat-option *ngIf="isNotExcludedModelType(modelType)" value="train">Train Set</mat-option>
+                  <mat-option value="all">All Data</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold pb-1">Select Input Column:</div>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select value" [(ngModel)]="selectedInputColumn" #inputSelect="ngModel"
+                  (ngModelChange)="onSelectionChange()">
+                  <mat-option *ngFor="let column of selectedModelInputs" [value]="column">
+                    {{ column }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <!-- *ngIf="isIncludedModelType(modelType)" -->
+            <div fxFlex>
+              <div class="fw-bold pb-1">Select Output Column:</div>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select value" [(ngModel)]="selectedOutputColumn" #outputSelect="ngModel"
+                  (ngModelChange)="onSelectionChange()">
+                  <mat-option *ngFor="let column of selectedModelOutputs" [value]="column">
+                    {{ column }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px"
+            *ngIf="this.modelType === 'GPR' || this.modelType === 'MOGPR'">
+            <div fxFlex="none" class="fw-bold">Std Dev:</div>
+            <div fxFlex="none" *ngIf="this.selectedData == 'all' || this.selectedData == 'train'">
+              <mat-slide-toggle [(ngModel)]="isTrainErrorVisible" (change)="onTrainErrorToggleChange()" color="primary">
+                Train set
+              </mat-slide-toggle>
+            </div>
+            <div fxFlex="none" *ngIf="this.selectedData == 'all' || this.selectedData == 'test'">
+              <mat-slide-toggle [(ngModel)]="isTestErrorVisible" (change)="onTestErrorToggleChange()" color="primary">
+                Test set
+              </mat-slide-toggle>
+            </div>
+          </div>
+          <div fxFlex fxLayout="row" fxLayoutGap="24px">
+            <div fxFlex fxLayout="column" fxLayoutGap="24px">
+              <div fxFlex fxLayout="row" fxLayoutGap="24px">
+                <div fxFlex>
+                  <div id="graph1" class="global-graph-fit"></div>
+                </div>
+                <div fxFlex>
+                  <div id="graph2" class="global-graph-fit"></div>
+                </div>
+              </div>
+              <ng-container *ngIf="isRegressionModel(selectedModelObject.model)">
+                <div fxFlex="180px" class="y-auto" *ngIf="multipleOutputs(selectedModelObject.model)">
+                  <table class="custom-table-sm">
+                    <thead>
+                      <tr>
+                        <th>Metric</th>
+                        <th *ngFor="let column of selectedModelObject.model.configs.output_cols">
+                          {{ column | replaceAndCapitalize }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let key of keys(selectedModelObject.model.metrics)">
+                        <td>{{ key }}</td>
+                        <td *ngFor="let column of selectedModelObject.model.configs.output_cols">
+                          <!-- {{selectedModelObject.model.metrics[key][column] | number: "1.4-4"}} -->
+                          {{
+                          isObj(selectedModelObject.model.metrics[key])
+                          ? isDecimal(selectedModelObject.model.metrics[key][column])
+                          ? (selectedModelObject.model.metrics[key][column]
+                          | scientificNumber:isScientificNotationEnabled)
+                          : selectedModelObject.model.metrics[key][column]
+                          : column === "accuracy"
+                          ? selectedModelObject.model.metrics[key]
+                          : "-"
+                          }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div fxFlex class="y-auto" *ngIf="!multipleOutputs(selectedModelObject.model)">
+                  <ng-container *ngIf="selectedmetrics === 'test'">
+                    <table class="custom-table-sm">
+                      <thead>
+                        <tr>
+                          <th>Metric</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let key of getMetricsKeys(selectedModelObject.model.metrics)">
+                          <td>{{ formatKey(key) }}</td>
+                          <td>
+                            <ng-container *ngIf="isNumeric(selectedModelObject.model.metrics[key]); else stringValue">
+                              {{ selectedModelObject.model.metrics[key] | scientificNumber:isScientificNotationEnabled
+                              }}
+                            </ng-container>
+                            <ng-template #stringValue>
+                              {{ selectedModelObject.model.metrics[key] | scientificNumber:isScientificNotationEnabled
+                              }}
+                            </ng-template>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </ng-container>
+
+                  <ng-container *ngIf="selectedmetrics === 'cv'">
+                    <table class="custom-table-sm">
+                      <thead>
+                        <tr>
+                          <th>Metric</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let key of getMetricsKeys(selectedModelObject.model.cv_metrics)">
+                          <td>{{ formatKey(key) }}</td>
+                          <td>
+                            <ng-container
+                              *ngIf="isNumeric(selectedModelObject.model.cv_metrics[key]); else stringValue">
+                              {{ selectedModelObject.model.cv_metrics[key] |
+                              scientificNumber:isScientificNotationEnabled }}
+                            </ng-container>
+                            <ng-template #stringValue>
+                              {{ selectedModelObject.model.cv_metrics[key] |
+                              scientificNumber:isScientificNotationEnabled }}
+                            </ng-template>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </div>
+            <div fxFlex="32%" fxLayout="column" fxLayoutGap="16px">
+              <div fxFlex fxLayout="column" fxLayoutGap="8px" *ngIf="highlightedData">
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom pb-2">
+                  <div class="fw-bold">Highlighted Point</div>
+                  <div><span class="text-grey">Datatype</span>: {{getTheDataTypeForClickedPoints()}}</div>
+                </div>
+                <div fxFlex class="y-auto">
+                  <table class="custom-table-sm">
+                    <tbody>
+                      <tr *ngFor="let item of highlightedData">
+                        <td>{{ item.key }}</td>
+                        <td>{{ item.value | scientificNumber:isScientificNotationEnabled }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div fxFlex="none">
+                <div class="fw-bold pb-1">
+                  Error values
+                </div>
+                <mat-form-field appearance="outline">
+                  <mat-select [(value)]="selectedmetrics" (selectionChange)="metricsOnChange($event.value)">
+                    <mat-option value="test">Test data</mat-option>
+                    <mat-option *ngIf="selectedModelObject.model.cv_metrics != null" value="cv">Cross
+                      validation</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div fxFlex fxLayout="column"> -->
+        <!-- </div> -->
+
+        <!-- Loader -->
+        <div *ngIf="loader" fxLayout="column" fxLayoutAlign="center center" class="floating-preloader">
+          <mat-spinner diameter="24"></mat-spinner>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="selectedTabIndex === 3">
+        <mat-accordion *ngIf="!loader" class="global-accordion">
+          <mat-expansion-panel *ngFor="let file of files; let index = index"
+            [expanded]="files.length === 1 || index === 0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>{{ file.name }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column">
+              <!-- Feature Importance Plot -->
+              <div *ngFor="let image of file.imageUrl; let index = index" class="global-image-container"
+                style="height: 750px; display: flex; justify-content: center; align-items: center; margin: auto; position: relative;">
+                <iframe *ngIf="image" [src]="image.url" style="width: 70%; height: 100%; border: none;"></iframe>
+                <div *ngIf="!image" style="text-align: center; width: 100%;">
+                  <p>Feature Importance graph is under development.</p>
+                </div>
+              </div>
+              <!-- Feature Importance Plot Violin -->
+              <div *ngIf="file.voilenUrlData?.voilenUrl?.length > 0; else noViolenPlot">
+                <div *ngIf="loadingContent; else plotsLoaded" style="text-align: center; margin: 20px;">
+                  <p>Loading violen plots, please wait...</p>
+                </div>
+                <ng-template #plotsLoaded>
+                  <div *ngFor="let voilen of file.voilenUrlData.voilenUrl; let index = index"
+                    style="height: 635px; width: 1010px; display: flex; justify-content: center; align-items: center; margin: auto;"
+                    class="global-image-container">
+                    <iframe [src]="voilen.interactivePlot" style="width: 100%; height: 100%; border: none;"></iframe>
+                  </div>
+                </ng-template>
+              </div>
+              <ng-template #noViolenPlot>
+                <p style="text-align: center; margin: 20px;">Violen plots are not available for this file.</p>
+              </ng-template>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <div *ngIf="loader" fxLayout="column" fxLayoutAlign="center center" class="h-100">
+          <mat-spinner diameter="24"></mat-spinner>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

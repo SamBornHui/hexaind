@@ -1,0 +1,141 @@
+<div class="global-header" fxLayout="row" fxLayoutAlign="space-between center">
+  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <mat-icon style="color: white">apps</mat-icon>
+      <!-- <button style="color: white" mat-icon-button matBadgeSize="small" matBadgeColor="warn" matBadgeOverlap="true"
+        >
+      </button> -->
+    </div>
+    <div>
+      <div class="logo" (click)="onSitesButtonClicked()">Databrick Hexaind</div>
+    </div>
+    <div style="padding-left: 70px">
+      <button *ngIf="projectButtonVisibilityService.projectsButtonShown$ | async" style="
+          font-size: 16px;
+          color: white;
+          background-color: #005054;
+          box-shadow: none;
+        " mat-button [matMenuTriggerFor]="projectsMenu">
+        {{ getSelectedProjectName() }}
+      </button>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="15px">
+    <button matTooltip="Help" style="color: white" mat-icon-button matBadgeSize="small" matBadgeColor="warn"
+      matBadgeOverlap="true">
+      <mat-icon class="material-symbols-outlined">help</mat-icon>
+    </button>
+    <ng-container *ngIf="project_id">
+      <button matTooltip="Jobs" style="color: white" mat-icon-button matBadge="" matBadgeSize="small"
+        matBadgeColor="accent" matBadgeOverlap="true" (click)="openJobsDialog(project_id)">
+        <mat-icon class="material-symbols-outlined">schedule</mat-icon>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="project_id">
+      <button matTooltip="Notifications" style="color: white" mat-icon-button (click)="openNotificationDialog()">
+        <mat-icon class="material-symbols-outlined">notifications</mat-icon>
+        <span *ngIf="notificationCount > 0" matBadge="{{ notificationCount }}" matBadgeSize="small"
+          matBadgeColor="accent" matBadgeOverlap="true"></span>
+      </button>
+    </ng-container>
+    <div class="user-block" fxLayout="row" fxLayoutAlign="center" fxLayoutGap="8px" (click)="toggleUserPanel()">
+      <div class="initials">{{ initials }}</div>
+    </div>
+  </div>
+</div>
+<div class="global-user-panel" fxLayout="column" fxLayoutGap="24px" *ngIf="showUserPanel"
+  (click)="onUserPanelClick($event)">
+  <div fxLayout="column" fxLayoutGap="16px">
+    <div fxLayout="row" fxLayoutGap="8px">
+      <div fxFlex="none">
+        <div class="initials">{{ initials }}</div>
+      </div>
+      <div fxFlex>
+        <br>
+        <div class="name">{{ fullName }}</div>
+        <!-- <div class="company">Databrick</div> -->
+      </div>
+      <div fxFlex="none">
+        <mat-icon class="close" (click)="toggleUserPanel()">close</mat-icon>
+      </div>
+    </div>
+    <div>
+      <button mat-stroked-button color="primary" class="w-100" (click)="openManageAccountDialog()">
+        <mat-icon class="material-symbols-outlined">settings</mat-icon>
+        Manage Account
+      </button>
+    </div>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px" class="w-100">
+    <button mat-stroked-button color="primary" (click)="GetProjects()" *ngIf="
+        userInfo['server_role'] === 'Server Admin' || userInfo['server_role'] === 'Project Admin'
+      ">
+      <mat-icon class="material-symbols-outlined">topic</mat-icon>
+      Manage Projects
+    </button>
+    <button mat-stroked-button color="primary" (click)="GetProjects()" *ngIf="
+       userInfo['server_role'] != 'Server Admin' && userInfo['server_role'] != 'Project Admin'
+      ">
+      <mat-icon class="material-symbols-outlined">topic</mat-icon>
+      View Projects
+    </button>
+    <button *ngIf="userInfo['server_role'] === 'Server Admin'" mat-stroked-button color="primary" class="w-100"
+      (click)="manageUsers()">
+      <mat-icon class="material-symbols-outlined">group</mat-icon>
+      Manage Users
+    </button>
+    <button *ngIf="userInfo['server_role'] === 'Server Admin'" mat-stroked-button color="primary" class="w-100"
+      (click)="manageRoles()">
+      <mat-icon class="material-symbols-outlined">supervisor_account</mat-icon>
+      Manage Roles
+    </button>
+    <!-- <button mat-stroked-button color="primary" class="w-100" (click)="ManageAccess(role_id)"
+      *ngIf="userInfo['server_role'] === 'Server Admin'">
+      <mat-icon class="material-symbols-outlined">lock_person</mat-icon>
+      Manage Access
+    </button>
+    <button mat-stroked-button color="primary" class="w-100" (click)="ManageAccess(role_id)"
+      *ngIf="isProjectAdministrator()">
+      <mat-icon class="material-symbols-outlined">lock_person</mat-icon>
+      Manage Access
+    </button> -->
+    <button mat-button (click)="logOut()">
+      <mat-icon class="material-symbols-outlined">logout</mat-icon>
+      Signout
+    </button>
+  </div>
+</div>
+<app-notification #notification></app-notification>
+
+<mat-menu #headerMenu="matMenu" class="header-menu">
+  <a (click)="navigate_url()">
+    <div mat-menu-item><span class="fw-bold">HEXAIND</span>Legacy</div>
+  </a>
+</mat-menu>
+
+<mat-menu #projectsMenu="matMenu" class="global-menu">
+  <div fxLayout="column">
+    <div fxFlex="none" (click)="$event.stopPropagation()">
+      <mat-form-field appearance="outline">
+        <input #searchInput matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+          placeholder="Search projects" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="y-auto" style="max-height: 198px;">
+      <ng-container *ngIf="filteredProjects.length > 0; else noProjectsFound">
+        <button *ngFor="let project of filteredProjects" (click)="onProjectSelected(project); searchTerm = ''"
+          mat-menu-item>
+          <span>{{ getProjectName(project) }}</span>
+        </button>
+      </ng-container>
+
+      <ng-template #noProjectsFound>
+        <button mat-menu-item disabled>
+          <span>Project not found</span>
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</mat-menu>

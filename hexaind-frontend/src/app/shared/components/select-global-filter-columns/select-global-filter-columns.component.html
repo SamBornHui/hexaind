@@ -1,0 +1,43 @@
+<header class="mst-select-global-filter-columns__header">
+  <h2>Global filters</h2>
+  <div class="mst-select-global-filter-columns__header__actions">
+    <mst-button styleName="flat" style="height: 100%" (click)="onApply()"
+      >Apply</mst-button
+    ><mst-button style="height: 100%" (click)="onCancel()">Cancel</mst-button>
+  </div>
+</header>
+<div class="mst-select-global-filter-columns__body">
+  <div class="mst-select-global-filter-columns__select">
+    <mst-select-dataset
+      [hasMore]="hasMoreDatasets"
+      [sourceItems]="sourceItems"
+      [selectedSourceId]="selectedSourceId"
+      [items]="datasetItems"
+      (sourceChange)="onDataSourceChange($event)"
+      (loadMore)="onDataSourceLoad($event)"
+      (itemClick)="onDatasetItemClick($event)"
+    />
+    <mst-select-column
+      class="mst-select-global-filter-columns__select__field"
+      [items]="columnItems"
+    />
+    <mst-select-filter-columns
+      class="mst-select-global-filter-columns__select__field"
+      [columnItems]="columnItems"
+      [targetItems]="vizItems"
+      [items]="filters"
+      (change)="onFilterColumnChange($event)"
+    />
+  </div>
+  <div class="mst-select-global-filter-columns__table">
+    <div class="mst-select-global-filter-columns__table__title">
+      <b>Results </b
+      ><span>({{ rowCount }} {{ rowCount > 0 ? "rows" : "row" }})</span>
+    </div>
+    <mst-table
+      class="mst-select-global-filter-columns__table__table"
+      [columns]="columns"
+      [items]="filteredRows"
+    />
+  </div>
+</div>

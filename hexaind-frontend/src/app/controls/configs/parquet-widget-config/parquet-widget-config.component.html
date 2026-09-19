@@ -1,0 +1,113 @@
+<div fxLayout="column" class="p-relative h-100">
+    <div fxFlex class="y-auto">
+      <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+        <mat-tab label="Information">
+          <div class="global-widget-area">
+            <app-configs-information [widgetData]="data"></app-configs-information>
+          </div>
+        </mat-tab>
+        <mat-tab label="Inputs">
+          <div class="global-widget-area">
+            <div fxLayout="column" fxLayoutGap="16px">
+              <div fxFlex="none">
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                  <div class="fw-bold pb-1">Choose upload source</div>
+                  <div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Choose upload source">info</mat-icon>
+                  </div>
+                </div>
+                <mat-radio-group [disabled]="workflowCanvasService.IsViewingRunMode" color="primary" class="radio-group"
+                  [(ngModel)]="selectedOption">
+                  <mat-radio-button value="mounted">Mounted Drive</mat-radio-button>
+                  <mat-radio-button value="local">Local Drive</mat-radio-button>
+                  <mat-radio-button value="platform">HEXAIND Platform</mat-radio-button>
+                </mat-radio-group>
+                <input type="file" accept=".parquet" #fileInput style="display: none" (change)="onFileSelected($event)" />
+              </div>
+              <div fxFlex="none" fxLayout="column" fxLayoutGap="16px">
+                <div class="filename-background" *ngIf="progress > 0">
+                  <div fxFlex fxLayout="row" fxLayoutGap="40px" fxLayoutAlign=" center">
+                    <div fxFlex matTooltip="{{ fileName }}">{{ fileName }}</div>
+                    <div fxFlex>
+                      <div fxFlex fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="16px">
+                        <div fxFlex="none">{{ size }}</div>
+                        <div fxFlex>
+                          <mat-progress-bar [color]="color" [mode]="mode" [value]="progress" [bufferValue]="bufferValue">
+                          </mat-progress-bar>
+                        </div>
+                        <div fxFlex="none">{{ progress + "%" }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="!getDatasetID() && !isUpload" class="filename-background">
+                  No file has been selected
+                </div>
+                <div *ngIf="!getDatasetID() && isUpload" class="filename-background">
+                  File upload is in progress
+                </div>
+                <div *ngIf="getDatasetID()" class="filename-background">
+                  <div fxLayout="row" fxLayoutAlign="space-between end">
+                    <div fxFlex>Dataset id: {{ getDatasetID() }}</div>
+                    <div fxFlex matTooltip="{{ fileName }}" *ngIf="!progress">
+                      <mat-spinner diameter="24" *ngIf="!fileName"></mat-spinner>
+                      <span *ngIf="fileName">Dataset Name: {{ fileName }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div fxFlex="none">
+                <button *ngIf="selectedOption" mat-flat-button color="primary" (click)="onContinue()">
+                  Upload
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Outputs">
+          <div class="global-widget-area">
+            <div fxLayout="row">
+              <div fxFlex="50" fxLayout="column" fxLayoutGap="8px">
+                <div fxFlex="none">
+                  This widget generate 1 output: Tabular data
+                </div>
+                <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                  <div class="fw-bold pb-1">Select Output</div>
+                  <div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Select Output">info</mat-icon>
+                  </div>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                      placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event" />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Parameters">
+          <div class="global-widget-area">This tab is empty for this widget</div>
+        </mat-tab>
+        <mat-tab label="Settings">
+          <div class="global-widget-area">
+            <app-settings (notifyParent)="onAppSettingsUpdated()" />
+          </div>
+        </mat-tab>
+        <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+          <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+    <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+      <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+        Cancel
+      </button>
+      <button [disabled]="!changeMade" mat-flat-button color="primary" (click)="onSave()" id="createBeutton">
+        Save
+      </button>
+    </div>
+  </div>
+  <app-config-action-bar widgetName="Parquet Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

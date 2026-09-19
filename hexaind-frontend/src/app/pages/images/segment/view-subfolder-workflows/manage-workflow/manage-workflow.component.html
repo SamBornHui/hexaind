@@ -1,0 +1,2160 @@
+<div class="segmentation_block" fxLayout="row" fxLayoutGap="16px" [ngClass]="{ 'no-events': apiCall }">
+  <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="segAndCropTabSelected == 1">
+    <div fxFlex fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="fw-bold">Original Image</div>
+      <div fxFlex class="global-image-container">
+        <ng-container *ngIf="!imageCropTabObj['imageLoaded']">
+          <div class="loader_container crop_load_container">
+            <div class="seg_img_loader">
+              <!-- <mat-spinner [diameter]="24"></mat-spinner> -->
+            </div>
+          </div>
+        </ng-container>
+        <canvas #maskCanvasElement style="max-width: 100%; max-height: 100%;" class="global-graph-fit"></canvas>
+      </div>
+    </div>
+
+    <div fxFlex fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" class="fw-bold">Masked Image</div>
+      <div fxLayout="column" fxLayoutAlign="center center" fxFlex="none" class="global-graph-fit"
+        *ngIf="segmentedImageDetails['selectedSegmentedImage']['image_masks'].length == 0"
+        style="position: relative; z-index: 10; text-align: center;">
+        Mask not available for this image. Please create one in
+        <span class="clickable-link" (click)="goToCleanUpPage()">Cleanup</span>.
+      </div>
+
+      <div fxFlex class="global-image-container" *ngIf="imageCropTabObj['tempImage_url']">
+        <img [src]="imageCropTabObj['tempImage_url']" class="masked-image global-graph-fit">
+      </div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px"
+    *ngIf="segmentedImageDetails['inputImageForSegmentation'] !='' && segAndCropTabSelected == 0">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+      [class.translate_images]="newInnerLayer">
+      <div fxFlex>
+        <mat-form-field appearance="outline">
+          <mat-label>Base Layer</mat-label>
+          <mat-select disableOptionCentering="true" name="filter_later" [value]="originalImagedropDownLayer['mainVal']"
+            (selectionChange)="changeLayerView($event.value,'original_image')">
+            <mat-select-trigger
+              *ngIf="originalImagedropDownLayer['type']!=undefined && originalImagedropDownLayer['type']!=''">
+              <ng-container *ngIf="originalImagedropDownLayer['type']==''">Original Image</ng-container>
+              <ng-container *ngIf="originalImagedropDownLayer['type']=='masked_image'">Masked Image</ng-container>
+              <ng-container *ngIf="originalImagedropDownLayer['type']=='pre-processing'">
+                {{'Pre-processing - Layer '+ (originalImagedropDownLayer['val'])}}
+              </ng-container>
+              <ng-container *ngIf="originalImagedropDownLayer['type']=='segmentation'">
+                {{'Segmentation - Layer '+ (originalImagedropDownLayer['val'])}}
+              </ng-container>
+              <ng-container *ngIf="originalImagedropDownLayer['type']=='post-processing'">
+                {{'Post-processing - Layer '+ (originalImagedropDownLayer['val'])}}
+              </ng-container>
+            </mat-select-trigger>
+            <mat-option [value]="''">Original Image</mat-option>
+            <mat-option *ngIf="!isOriginalMaskedSelected()" [value]="'masked_image'">Masked Image</mat-option>
+            <ng-container *ngIf="displayPreprocessing()">
+              <mat-optgroup label="Pre-processing">
+                <ng-container
+                  *ngFor="let segArray of getBelowLayers('preprocessingWorkflowFeatures',false); let layIndex = index;">
+                  <mat-option *ngIf="segArray['selected']==true" [value]="'pre-processing_'+layIndex">
+                    {{'Layer '+(layIndex+1)+' - '+segArray['Name']}}
+                  </mat-option>
+                </ng-container>
+              </mat-optgroup>
+            </ng-container>
+            <ng-container *ngIf="displaySegmentedOptions()">
+              <mat-optgroup label="Segmentation">
+                <ng-container
+                  *ngFor="let segArray of getBelowLayers('segmentationWorkflowFeatures',false); let layIndex = index;">
+                  <mat-option *ngIf="segArray['selected']==true" [value]="'segmentation_'+layIndex">
+                    {{'Layer '+(layIndex+1)+' - '+segArray['Name']}}
+                  </mat-option>
+                </ng-container>
+              </mat-optgroup>
+            </ng-container>
+            <ng-container *ngIf="displayPostProcessingOptions()">
+              <mat-optgroup label="Post-processing">
+                <ng-container
+                  *ngFor="let segArray of getBelowLayers('postprocessingWorkflowFeatures',false); let layIndex = index;">
+                  <mat-option *ngIf="segArray['selected']==true" [value]="'post-processing_'+layIndex">
+                    {{'Layer '+(layIndex+1)+' - '+segArray['Name']}}
+                  </mat-option>
+                </ng-container>
+              </mat-optgroup>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div fxFlex fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <mat-label>Filter Layer</mat-label>
+            <mat-select disableOptionCentering="true" [value]="dropDownLayer['mainVal']" name="filter_later"
+              (selectionChange)="changeLayerView($event.value,'segmented_image')">
+              <mat-option [value]="'original'">Original Image</mat-option>
+              <mat-option [value]="'masked'">Masked Image</mat-option>
+              <mat-select-trigger *ngIf="(dropDownLayer['type']!=undefined && dropDownLayer['type']!='')">
+                <ng-container *ngIf="dropDownLayer['mainVal'] === 'original'">
+                  Original Image
+                </ng-container>
+                <ng-container *ngIf="dropDownLayer['mainVal'] === 'masked'">
+                  Masked Image
+                </ng-container>
+
+                <ng-container *ngIf="dropDownLayer['type']=='pre-processing'">
+                  {{'Pre-processing - Layer '+ (dropDownLayer['val'])}}
+                </ng-container>
+                <ng-container *ngIf="dropDownLayer['type']=='segmentation'">
+                  {{'Segmentation - Layer '+ (dropDownLayer['val'])}}
+                </ng-container>
+                <ng-container *ngIf="dropDownLayer['type']=='post-processing'">
+                  {{'Post-processing - Layer '+ (dropDownLayer['val'])}}
+                </ng-container>
+              </mat-select-trigger>
+              <ng-container
+                *ngIf="segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowSelected']==true && getFeaturesCount('preprocessingWorkflowFeatures')>0">
+                <mat-optgroup label="Pre-processing">
+                  <ng-container
+                    *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures']; let layIndex = index;">
+                    <mat-option *ngIf="segArray['selected']==true" [value]="'pre-processing_'+layIndex">
+                      {{'Layer '+(layIndex+1)+' - '+segArray['Name']}}
+                    </mat-option>
+                  </ng-container>
+                </mat-optgroup>
+              </ng-container>
+              <ng-container
+                *ngIf="segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected']==true && getFeaturesCount('segmentationWorkflowFeatures')>0">
+                <mat-optgroup label="Segmentation">
+                  <ng-container
+                    *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowFeatures']; let layIndex = index;">
+                    <mat-option *ngIf="segArray['selected']==true" [value]="'segmentation_'+layIndex">
+                      {{'Layer '+(layIndex+1)+' - '+segArray['Name']}}
+                    </mat-option>
+                  </ng-container>
+                </mat-optgroup>
+              </ng-container>
+              <ng-container
+                *ngIf="segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected']==true && getFeaturesCount('segmentationWorkflowFeatures')>0 && segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowSelected']==true && getFeaturesCount('postprocessingWorkflowFeatures')>0">
+                <mat-optgroup label="Post-processing">
+                  <ng-container
+                    *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowFeatures']; let layIndex = index;">
+                    <mat-option *ngIf="segArray['selected']==true" [value]="'post-processing_'+layIndex">
+                      {{'Layer '+(layIndex+1)+' - '+segArray['Name']}}
+                    </mat-option>
+                  </ng-container>
+                </mat-optgroup>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex="240px"
+          *ngIf="segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected']==true && 
+                        getFeaturesCount('segmentationWorkflowFeatures')>0 && 
+                        getFeaturesCount('tempPreprocessingWorkflowFeatures')==0 && 
+                        getFeaturesCount('tempSegmentationWorkflowFeatures')==0 && dropDownLayer['type']!='bubble-analysis' && dropDownLayer['type']!='pillar-c2c-analysis'">
+          <mat-form-field appearance="outline">
+            <mat-label>Visualization</mat-label>
+            <mat-select disableOptionCentering="true" [value]="dropDownVisualization['mainVal']"
+              (selectionChange)="changeVisualization($event)">
+              <!-- <mat-select-trigger>
+                        Segmentation visualization
+                      </mat-select-trigger> -->
+              <mat-optgroup label="Solid colors">
+                <mat-option value="solid,Black/white (default),Black/white (default)">Black/White (default)</mat-option>
+                <mat-option value="solid,,Blue & Yellow">Parula</mat-option>
+              </mat-optgroup>
+              <mat-optgroup label="Outline">
+                <mat-option value="outline_segmented,magenta,Magenta">Magenta</mat-option>
+                <mat-option value="outline_segmented,red,Red">Red</mat-option>
+                <mat-option value="outline_segmented,yellow,Yellow">Yellow</mat-option>
+              </mat-optgroup>
+              <mat-optgroup label="Overlay">
+                <mat-option value="overlay_segmented,label segmented,Label segmented">Label Segmented</mat-option>
+                <mat-option value="overlay_segmented,magenta,Magenta">Magenta</mat-option>
+                <mat-option value="overlay_segmented,red,Red">Red</mat-option>
+                <mat-option value="overlay_segmented,yellow,Yellow">Yellow</mat-option>
+              </mat-optgroup>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div fxFlex="none" *ngIf="
+                        newInnerLayer && 
+                        (segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected']==true && 
+                        getFeaturesCount('segmentationWorkflowFeatures')>0)
+                      ">
+          <mat-checkbox color="primary" [disabled]="apiCall" (change)="showPrevImage($event)">
+            Compare
+          </mat-checkbox>
+        </div>
+      </div>
+    </div>
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" class="image-comparison modified-image y-auto"
+      [class.translate_images]="newInnerLayer">
+      <div fxFlex class="original_image_block seg-image-width"
+        *ngIf="segmentedImageDetails['inputImageForSegmentation'] !=''">
+        <div class="custom_zoom_container" [class.reg_props]="(getSegmentatedImageURL()['region_properties']!=undefined && returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length>0) || (getTempRegionProps()!=undefined && 
+                returnKeysFromObject(getTempRegionProps()).length>0)">
+          <div class="loader_container" *ngIf="!getOriginalImageUrl() || apiCall">
+            <div class="seg_img_loader">
+              <mat-spinner [diameter]="24"></mat-spinner>
+              <span class="seg_img_loader_msg">Loading image...</span>
+            </div>
+          </div>
+
+          <div class="original_image">
+            <div class="loader_container" *ngIf="changeOriginalLayerView  || apiCall">
+              <div class="seg_img_loader">
+                <mat-spinner [diameter]="24"></mat-spinner>
+                <span class="seg_img_loader_msg">Loading image...</span>
+              </div>
+            </div>
+
+            <img loading="lazy" class="originalImageTag"
+              [class.hideSegImg]="segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1]>segInputImageSizeLimit"
+              src="{{getOriginalImageUrl()}}" (load)="calculateScalbarForModifiedImage()" />
+            <lib-ngx-image-zoom #originalImageMagnifier class="custom-ngx-zoom"
+              *ngIf="segmentedImageDetails['inputImageForSegmentation'] !='' && segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1]>segInputImageSizeLimit && !apiCall"
+              [thumbImage]="getOriginalImageUrl()" [fullImage]="getOriginalImageUrl()" [magnification]="1"
+              [enableScrollZoom]="true" [enableLens]="true" [lensWidth]="150" [lensHeight]="150"
+              [isInsideStaticContainer]="false" (imagesLoaded)="zoomImageLoaded($event,'original')"
+              (zoomPosition)="checkPosition($event,'original_image',['filtered_image','preview_image'])">
+              <!-- (onZoomPosition)="checkPosition($event,'original_image',['filtered_image','preview_image'])"> -->
+            </lib-ngx-image-zoom>
+          </div>
+        </div>
+        <!-- Object Metrics of Original Image -->
+        <div class="original_image_block object-metrics-container" [class.margin-top]="apiCall">
+          <ng-container *ngIf="getOriginalImageUrl()">
+            <div *ngFor="let props of getSegmentatedImageRegionProperties() | keyvalue;" fxLayout="column">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="py-1">
+                <div fxFlex="50" fxLayout="row" fxLayoutGap="8px">
+                  <div fxFlex class="text-grey">Image size (px):</div>
+                  <div fxFlex>{{segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1] + ' x ' +
+                    segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][0]}}</div>
+                </div>
+                <div fxFlex fxLayout="row" fxLayoutGap="8px"
+                  *ngIf="segmentedImageDetails['selectedSegmentedImage']['scalebar']['scalebar'] != undefined && segmentedImageDetails['selectedSegmentedImage']['scalebar']['scalebar'] != ''"
+                  class="scalebar-micron legends-container seg-scalebar">
+                  <div fxFlex class="text-grey">
+                    Scale:
+                  </div>
+                  <div fxFlex>
+                    {{segmentedImageDetails['selectedSegmentedImage']['scalebar']['scalebar']}}
+                    {{segmentedImageDetails['selectedSegmentedImage']['scalebarByPhysicalUnit']}}
+                    <div class="scalebar"
+                      [ngStyle]="{'width': segmentedImageDetails['selectedSegmentedImage']['scalebar']['disp_width_px'] + 'px'}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container
+            *ngIf="!showPreviewImage && getSegmentatedImageURL()['region_properties']!=undefined && 
+        returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length>0 && returnKeysFromObject(getTempRegionProps()).length>0">
+            <div fxLayout="column" class="text-sm" *ngFor="let props of getTempRegionPropsFormatted() | keyvalue;">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="fw-bold border-bottom py-1">
+                <div fxFlex>Descriptor</div>
+                <div fxFlex>Avg.</div>
+                <div fxFlex>Min.</div>
+                <div fxFlex>Max.</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Area <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_area"]}}</div>
+                <div fxFlex>{{props.value["min_object_area"]}}</div>
+                <div fxFlex>{{props.value["max_object_area"]}}</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Length <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_length"]}}</div>
+                <div fxFlex>{{props.value["min_object_length"]}}</div>
+                <div fxFlex>{{props.value["max_object_length"]}}</div>
+              </div>
+
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Aspect Ratio</div>
+                <div fxFlex>{{props.value["avg_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["min_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["max_object_aspect_ratio"]}}</div>
+              </div>
+            </div>
+
+          </ng-container>
+          <div
+            *ngIf="!showPreviewImage && getSegmentatedImageURL()['region_properties']!=undefined && 
+                returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length>0 && returnKeysFromObject(getTempRegionProps()).length>0">
+
+          </div>
+        </div>
+      </div>
+      <!-- {{getSegmentatedImageURL() | json}} -->
+      <!-- {{segmentedImageUrl}} -->
+      <div fxFlex class="segemented_image_block seg-image-width">
+        <div class="custom_zoom_container" [class.reg_props]="(getSegmentatedImageURL()['region_properties']!=undefined && returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length>0) || (getTempRegionProps()!=undefined && 
+                returnKeysFromObject(getTempRegionProps()).length>0)">
+          <div class="filtered_image">
+            <div class="loader_container"
+              *ngIf="apiCall && (!newInnerLayer || (newInnerLayer && (newInnerLayerDetails['fid']==14 || newInnerLayerDetails['fid']==15)))">
+              <div class="seg_img_loader">
+                <mat-spinner [diameter]="24"></mat-spinner>
+                <ng-container *ngIf="!newInnerLayer && currentLayerData['type']=='scratch'">
+                  <span class="seg_img_loader_msg">Loading image...</span>
+                </ng-container>
+                <ng-container *ngIf="!newInnerLayer && currentLayerData['changedObj']['key']=='visualization'">
+                  <span class="seg_img_loader_msg">Applying visualization...</span>
+                </ng-container>
+                <ng-container *ngIf="newInnerLayer">
+                  <span class="seg_img_loader_msg">Previewing image...</span>
+                </ng-container>
+
+                <!-- <ng-container *ngIf="apiCall && currentLayerData['type']=='scratch'">
+                  <span class="seg_img_loader_msg">Loading image...</span>
+                </ng-container> -->
+              </div>
+              <div class="seg_progress_bar" *ngIf="segmentedWorkflowProgress != 0">
+                <mat-progress-bar class="segmentation_prog_bar" mode="determinate"
+                  value="{{segmentedWorkflowProgress}}"></mat-progress-bar>
+              </div>
+            </div>
+            <ng-container *ngIf="!editTemplateMatching">
+              <div fxFlex class="global-image-container">
+                <div class="loader_container" *ngIf="changeFilterLayerView">
+                  <div class="seg_img_loader">
+                    <mat-spinner [diameter]="24"></mat-spinner>
+                    <span class="seg_img_loader_msg">Loading image...</span>
+                  </div>
+                </div>
+                <img
+                  *ngIf="segInputImageSizeLimit >= segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1] && !apiCall"
+                  loading="lazy" class="global-image-fit" [src]="segmentedImageUrl" />
+
+                <lib-ngx-image-zoom
+                  *ngIf="segmentedImageDetails['segmentedImage'] && segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1] > segInputImageSizeLimit && !apiCall"
+                  class="custom-ngx-zoom" #filteredImageMagnifier [thumbImage]="segmentedImageUrl"
+                  [fullImage]="segmentedImageUrl" [magnification]="1" [enableScrollZoom]="true" [enableLens]="true"
+                  [lensWidth]="150" [lensHeight]="150" [isInsideStaticContainer]="false"
+                  (imagesLoaded)="zoomImageLoaded($event,'segmented')"
+                  (zoomPosition)="checkPosition($event,'filtered_image',['original_image','preview_image'])">
+                </lib-ngx-image-zoom>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="editTemplateMatching">
+              <div #templateCanvasWrap style="position: relative;width: 100%;height: 100%;">
+                <img loading="lazy" (load)="loadTemplateCanvas()" [src]="getSegmentatedImageURL()['url']"
+                  style="max-width: 100%;max-height:100%;visibility: hidden;" />
+                <canvas #templateCanvas style="position: absolute;left: 0;height: 100%;width: 100%;"></canvas>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        <!-- Object Metrics of Segmentated Image -->
+        <div class="segemented_image_block object-metrics-container" [class.margin-top]="apiCall">
+          <div *ngIf="!showPreviewImage && !newInnerLayer && getSegmentatedImageURL()['region_properties']!=undefined && 
+        returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length>0">
+            <div *ngFor="let props of getSegmentatedImageRegionProperties() | keyvalue;" fxLayout="column">
+              <div fxLayout="row" fxLayoutGap="4px" class="py-1 border-bottom">
+                <div fxFlex="50" fxLayout="row" fxLayoutGap="8px">
+                  <div fxFlex class="fw-bold">Fraction</div>
+                  <div fxFlex>{{props.value["fraction"]}}</div>
+                </div>
+                <div fxFlex fxLayout="row" fxLayoutGap="8px">
+                  <div fxFlex class="fw-bold">No. of objects</div>
+                  <div fxFlex>{{props.value["no_of_objects"]}}</div>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="column" class="text-sm"
+              *ngFor="let props of getSegmentatedImageRegionProperties() | keyvalue;">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="fw-bold border-bottom py-1">
+                <div fxFlex>Descriptor</div>
+                <div fxFlex>Avg.</div>
+                <div fxFlex>Min.</div>
+                <div fxFlex>Max.</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Area <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_area"]}}</div>
+                <div fxFlex>{{props.value["min_object_area"]}}</div>
+                <div fxFlex>{{props.value["max_object_area"]}}</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Length <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_length"]}}</div>
+                <div fxFlex>{{props.value["min_object_length"]}}</div>
+                <div fxFlex>{{props.value["max_object_length"]}}</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Aspect Ratio</div>
+                <div fxFlex>{{props.value["avg_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["min_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["max_object_aspect_ratio"]}}</div>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="!showPreviewImage && !newInnerLayer && getTempRegionProps()!=undefined && returnKeysFromObject(getTempRegionProps()).length>0 && 
+                      (getSegmentatedImageURL()['region_properties']==undefined || returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length==0) && !apiCall">
+            <div fxLayout="column" class="text-sm" *ngFor="let props of getTempRegionPropsFormatted() | keyvalue;">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="fw-bold border-bottom py-1">
+                <div fxFlex>Descriptor</div>
+                <div fxFlex>Avg.</div>
+                <div fxFlex>Min.</div>
+                <div fxFlex>Max.</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Area <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_area"]}}</div>
+                <div fxFlex>{{props.value["min_object_area"]}}</div>
+                <div fxFlex>{{props.value["max_object_area"]}}</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Length <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_length"]}}</div>
+                <div fxFlex>{{props.value["min_object_length"]}}</div>
+                <div fxFlex>{{props.value["max_object_length"]}}</div>
+              </div>
+
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Aspect Ratio</div>
+                <div fxFlex>{{props.value["avg_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["min_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["max_object_aspect_ratio"]}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scalebar-micron legends-container" style="visibility:hidden"
+            *ngIf="(showPreviewImage && getLatesPreviewImage()!='')">
+            <!-- <span class="legends" style="background: var(--orange);"></span> Added pixels
+            <span class="legends" style="background: var(--blue);margin-left: 25px;"></span> Removed pixels -->
+            <span class="legends" style="background:rgb(255,0,255);"></span> Added pixels
+            <span class="legends" style="background:rgb(0,255,255);margin-left: 25px;"></span> Removed pixels
+          </div>
+        </div>
+      </div>
+      <div fxFlex class="preview_image_block seg-image-width">
+        <div class="custom_zoom_container" [class.reg_props]="(getSegmentatedImageURL()['region_properties']!=undefined && returnKeysFromObject(getSegmentatedImageURL()['region_properties']).length>0) || (getTempRegionProps()!=undefined && 
+                returnKeysFromObject(getTempRegionProps()).length>0)">
+          <div class="preview_image">
+            <div class="loader_container" *ngIf="apiCall">
+              <div class="seg_img_loader">
+                <mat-spinner [diameter]="24"></mat-spinner>
+                <ng-container>
+                  <span class="seg_img_loader_msg">Previewing image...</span>
+                </ng-container>
+              </div>
+              <div class="seg_progress_bar" *ngIf="segmentedWorkflowProgress != 0">
+                <mat-progress-bar class="segmentation_prog_bar" mode="determinate"
+                  value="{{segmentedWorkflowProgress}}"></mat-progress-bar>
+              </div>
+            </div>
+            <img loading="lazy" class="global-image-fit"
+              *ngIf="segmentedImageDetails['segmentedImage'] !='' &&  segInputImageSizeLimit>=segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1] && !apiCall"
+              [src]="getPreviewImage()" />
+
+            <lib-ngx-image-zoom #previewImageMagnifier class="custom-ngx-zoom"
+              *ngIf="segmentedImageDetails['segmentedImage'] !='' && segmentedImageDetails['selectedSegmentedImage']['cropimgShape'][1]>segInputImageSizeLimit && !apiCall"
+              [thumbImage]="getPreviewImage()" [fullImage]="getPreviewImage()" [magnification]="1"
+              [enableScrollZoom]="true" [enableLens]="true" [lensWidth]="150" [lensHeight]="150"
+              [isInsideStaticContainer]="false" (imagesLoaded)="zoomImageLoaded($event,'preview')"
+              (zoomPosition)="checkPosition($event,'preview_image',['original_image','filtered_image'])">
+            </lib-ngx-image-zoom>
+          </div>
+        </div>
+        <!-- Object Metrics of Preview Image -->
+        <div class="preview_image_block object-metrics-container" [class.margin-top]="apiCall">
+          <div *ngIf="!showPreviewImage && getTempRegionProps()!=undefined && 
+        returnKeysFromObject(getTempRegionProps()).length>0">
+            <div class="fw-bold py-2 border-bottom">Segmented object metrics</div>
+            <div fxLayout="column" class="text-sm" *ngFor="let props of getTempRegionPropsFormatted() | keyvalue;">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="fw-bold border-bottom py-1">
+                <div fxFlex>Descriptor</div>
+                <div fxFlex>Avg.</div>
+                <div fxFlex>Min.</div>
+                <div fxFlex>Max.</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Area <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_area"]}}</div>
+                <div fxFlex>{{props.value["min_object_area"]}}</div>
+                <div fxFlex>{{props.value["max_object_area"]}}</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Length <span *ngIf="isymUnit()">({{getScalebarUnit()}})</span>
+                  <span *ngIf="!isymUnit()">({{getScalebarUnit()}})</span>
+                </div>
+                <div fxFlex>{{props.value["avg_object_length"]}}</div>
+                <div fxFlex>{{props.value["min_object_length"]}}</div>
+                <div fxFlex>{{props.value["max_object_length"]}}</div>
+              </div>
+
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom py-1">
+                <div fxFlex class="fw-bold">Aspect Ratio</div>
+                <div fxFlex>{{props.value["avg_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["min_object_aspect_ratio"]}}</div>
+                <div fxFlex>{{props.value["max_object_aspect_ratio"]}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="scalebar-micron legends-container" *ngIf="(showPreviewImage && getLatesPreviewImage()!='')">
+            <span class="legends" style="background:rgb(255,0,255);"></span> Added pixels
+            <span class="legends" style="background:rgb(0,255,255);margin-left: 25px;"></span> Removed pixels
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div fxFlex="320px" fxLayout="column" fxLayoutGap="16px" class="ps-4 border-left"
+    [ngClass]="{ 'no-events': !checkImageLoaded() }">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="border-bottom pb-2">
+      <div fxFlex class="text-ellipse">{{(!newWorkflow)?editWorkflowName:'New Workflow'}}</div>
+      <div fxFlex="none"><mat-icon class="material-symbols-outlined global-icon-button-grey icon-20"
+          *ngIf="!newWorkflow && !apiCall" (click)="openWorkflowNameDialog('existing','save');">edit</mat-icon></div>
+    </div>
+    <div fxFlex="none" *ngIf="!addNewWorkflowLayer && segAndCropTabSelected==0">
+      <mat-form-field appearance="outline">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search filter function" (keyup)="searchFilters($event)" />
+      </mat-form-field>
+    </div>
+    <div fxFlex class="ind-block-right-body new_workflow layers-block y-auto">
+      <ng-container *ngIf="showSearchFilters">
+        <ng-container *ngIf="searchFiltersList.length>0">
+          <p class="layers_sub_head" *ngIf="checkFiltersInSearch(preprocessingLayers['total'])>0">Pre-processing</p>
+          <mat-list class="layers_list">
+            <ng-container *ngFor="let feature of preprocessingLayers['total']">
+              <ng-container *ngIf="features[feature] && searchFiltersList.includes(feature)">
+                <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="layer_list"
+                  fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                  (click)="(!apiCall)?selectSearchedlayer('pre-processing',features[feature]):''">
+                  <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                    <div class="text-sm">{{features[feature]['Name']}}</div>
+                    <label class="filters_list_icon"
+                      *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                      <span class="help-icon material-symbols-outlined" matTooltip="{{features[feature]['info']}}"
+                        matTooltipPosition="above">info</span>
+                    </label>
+                  </div>
+                  <div fxFlex="none">
+                    <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                  </div>
+                </mat-list-item>
+              </ng-container>
+            </ng-container>
+          </mat-list>
+          <p class="layers_sub_head" *ngIf="checkFiltersInSearch(segmentationLayers['total'])>0">
+            Segmentation</p>
+          <mat-list class="layers_list">
+            <ng-container *ngFor="let feature of segmentationLayers['total']">
+              <ng-container *ngIf="features[feature] && searchFiltersList.includes(feature)">
+                <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="layer_list"
+                  (click)="(!apiCall)?selectSearchedlayer('segmentation',features[feature]):''">
+                  <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                    <div class="text-sm">{{features[feature]['Name']}}</div>
+                    <label class="filters_list_icon"
+                      *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                      <span class="help-icon material-symbols-outlined" matTooltip="{{features[feature]['info']}}"
+                        matTooltipPosition="above">info</span>
+                    </label>
+                  </div>
+                  <div fxFlex="none">
+                    <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                  </div>
+                </mat-list-item>
+              </ng-container>
+            </ng-container>
+          </mat-list>
+          <p class="layers_sub_head" *ngIf="checkFiltersInSearch(postprocessingLayers['total'])>0">Post-processing</p>
+          <mat-list fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="layers_list">
+            <ng-container *ngFor="let feature of postprocessingLayers['total']">
+              <ng-container *ngIf="features[feature] && searchFiltersList.includes(feature)">
+                <mat-list-item class="layer_list"
+                  (click)="(!apiCall)?selectSearchedlayer('post-processing',features[feature]):''">
+                  <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                    <div class="text-sm">{{features[feature]['Name']}}</div>
+                    <label class="filters_list_icon"
+                      *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                      <span class="help-icon material-symbols-outlined" matTooltip="{{features[feature]['info']}}"
+                        matTooltipPosition="above">info</span>
+                    </label>
+                  </div>
+                  <div fxFlex="none">
+                    <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                  </div>
+                </mat-list-item>
+              </ng-container>
+            </ng-container>
+          </mat-list>
+        </ng-container>
+        <ng-container *ngIf="searchFiltersList.length==0">
+          <div class="global-nodata">No results found</div>
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="!showSearchFilters">
+        <ng-container *ngIf="!addNewWorkflowLayer">
+          <mat-expansion-panel #cropImageExp class="layer_expansion" hideToggle [disabled]="isCropImageView()"
+            (opened)="openCropImageTab(false);">
+            <mat-expansion-panel-header class="border-bottom" expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title class="main-expansion-title">
+                <span class="fw-bold">Image Masking</span>
+              </mat-panel-title>
+              <mat-panel-description style="visibility: hidden;">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="histogram_block" fxLayout="column" fxLayoutGap="16px">
+              <div fxLayout="row" fxLayoutGap="16px"
+                *ngFor="let mask of this.segmentedImageDetails!['selectedSegmentedImage']['image_masks']">
+                <mat-radio-group [(ngModel)]="selectedMask" (change)="changeSelectedMask(mask)">
+                  <mat-radio-button [value]="mask">
+                    {{mask.mask_name}}
+                  </mat-radio-button>
+                </mat-radio-group>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+              <button mat-stroked-button color="primary" [disabled]="apiCall"
+                (click)="closeCropTab(false);cropImageExp.close();">Back</button>
+              <button mat-flat-button color="primary" [disabled]="!applySelectedMask"
+                (click)="updateImageMasking(true);">Apply</button>
+            </div>
+          </mat-expansion-panel>
+        </ng-container>
+
+        <ng-container
+          *ngIf="(!addNewWorkflowLayer || (addNewWorkflowLayer && newLayerFor=='pre-processing')) && segAndCropTabSelected==0">
+          <mat-expansion-panel hideToggle [disabled]="true" [expanded]="true"
+            [style.height]="(!addNewWorkflowLayer)?'auto':'100%'"
+            [style.margin-bottom]="(!addNewWorkflowLayer)?'16px':'0'">
+            <mat-expansion-panel-header class="layerTypeHeader border-bottom" expandedHeight="40px"
+              collapsedHeight="40px">
+              <mat-panel-title class="main-expansion-title">
+                <mat-checkbox *ngIf="!addNewWorkflowLayer"
+                  [(ngModel)]="segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowSelected']"
+                  (change)="checkAllLayers('pre-processing',$event)" class="select-all-images layer_selection"
+                  color="primary" [disableRipple]="true"
+                  [disabled]="(apiCall || segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures'].length==0)"></mat-checkbox>
+                1. Pre-processing
+              </mat-panel-title>
+              <mat-panel-description style="visibility: hidden;">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" *ngIf="!addNewWorkflowLayer">
+              <div class="layers-block" dragula="PRE_PROCESSING_LAYERS"
+                [(dragulaModel)]="segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures']">
+                <ng-container
+                  *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures']; let layIndex =index">
+                  <ng-container *ngIf="preprocessingLayers['total'].includes(segArray.fid)">
+                    <mat-expansion-panel class="layer_expansion" #matPanel hideToggle
+                      [expanded]="expandedPanelIndex === layIndex">
+                      <mat-expansion-panel-header #panelH class="border-bottom" expandedHeight="48px"
+                        collapsedHeight="48px" (click)="toggleLayer(layIndex)">
+                        <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
+                          <mat-icon class="layer_arrow_icon">arrow_right</mat-icon>
+                          <span class="add_layer_icon drag_icon"><mat-icon>drag_indicator</mat-icon></span>
+                          <mat-checkbox class="layer_selection" color="primary" [disableRipple]="true"
+                            [(ngModel)]="segArray.selected"
+                            [disabled]="apiCall || !segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowSelected']"
+                            (change)="togglePanel();(!apiCall)?layerSelection($event,layIndex,'pre-processing'):''"></mat-checkbox>
+                          <div fxFlex class="text-sm">Layer {{layIndex+1}} - {{segArray.Name}}</div>
+                        </mat-panel-title>
+                        <mat-panel-description>
+                          <mat-icon class="deletelayer material-symbols-outlined"
+                            (click)="togglePanel();(!apiCall)?(!segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowSelected'])?showMsg('pre-processing'):deleteLayer(layIndex,'pre-processing'):''">delete</mat-icon>
+                        </mat-panel-description>
+                      </mat-expansion-panel-header>
+                      <div class="histogram_block" fxLayout="column" fxLayoutGap="16px">
+                        <div *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                          {{features[segArray.fid]['info']}}</div>
+                        <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params']);">
+                          <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                            <div fxFlex>
+                              <label>
+                                {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                <span class="help-icon material-symbols-outlined"
+                                  *ngIf="features[segArray.fid]['slider'][objKeys]['info']!='' && features[segArray.fid]['slider'][objKeys]['info']!=undefined"
+                                  matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                  matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="80px">
+                              <mat-form-field appearance="outline">
+                                <input matInput type="number" class="slider_input_value"
+                                  value="{{segArray['Params'][objKeys]}}"
+                                  (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'pre-processing',$event)" />
+                              </mat-form-field>
+                            </div>
+                          </div>
+                          <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                            <div fxFlex="none">
+                              {{segArray['slider'][objKeys]['range']['min']}}</div>
+                            <div fxFlex>
+                              <mat-slider class="slider-width" [disabled]="(apiCall || !segArray['selected'])"
+                                [max]="segArray['slider'][objKeys]['range']['max']"
+                                [min]="segArray['slider'][objKeys]['range']['min']"
+                                [step]="segArray['slider'][objKeys]['step']" [discrete]="false"
+                                [(value)]="segArray['Params'][objKeys]"
+                                (change)="slideFilterWorkflow($event,layIndex,objKeys,'pre-processing')">
+                                <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                              </mat-slider>
+
+                            </div>
+                            <div fxFlex="none">
+                              {{segArray['slider'][objKeys]['range']['max']}}</div>
+                          </div>
+                          <div class="text-center" *ngIf="segArray['fid']==3">
+                            <button mat-flat-button color="primary" [disabled]="apiCall"
+                              (click)="resetToDefaultGuasian(layIndex,segArray)">
+                              Recommended Sigma
+                            </button>
+                          </div>
+                        </ng-container>
+                        <div class="text-center"
+                          *ngIf="segArray['result']!=undefined && segArray['result']['histogram_path']!=undefined && segArray['result']['histogram_path']!=''">
+                          <img loading="lazy" class="histogram_image" [class.shadowClass]="(segArray.fid==1)"
+                            src="{{segArray['result']['histogram_path_url']}}" />
+                        </div>
+                      </div>
+                    </mat-expansion-panel>
+                  </ng-container>
+                </ng-container>
+              </div>
+              <div class="border-bottom">
+                <div class="add-layer-button" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+                  (click)="changeLayerSettings('add', 'pre-processing')" [class.disabled]="(apiCall)">
+                  <mat-icon>add</mat-icon>
+                  <div>Add Layer</div>
+                </div>
+              </div>
+            </div>
+            <ng-container *ngIf="addNewWorkflowLayer">
+              <ng-container *ngIf="!newInnerLayer">
+                <div fxFill fxLayout="column">
+                  <div fxFlex class="layer-selection-block">
+                    <div class="layers_main_head pt-2">Select New Pre-processing Layer</div>
+                    <mat-list class="layers_list">
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line>Image noise reduction</p>
+                      </mat-list-item>
+                      <ng-container *ngFor="let feature of preprocessingLayers['imageNoise']">
+                        <ng-container *ngIf="features[feature]">
+                          <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                            class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                              <div class="text-sm">{{features[feature]['Name']}}</div>
+                              <label class="filters_list_icon"
+                                *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                            </div>
+                          </mat-list-item>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list>
+                    <mat-list class="layers_list">
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line>Contrast enhancement</p>
+                      </mat-list-item>
+                      <ng-container *ngFor="let feature of preprocessingLayers['contrastEnhance']">
+                        <ng-container *ngIf="features[feature]">
+                          <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                            class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                              <div class="text-sm">{{features[feature]['Name']}}</div>
+                              <label class="filters_list_icon"
+                                *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                            </div>
+                          </mat-list-item>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list>
+                  </div>
+                  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                    <button mat-stroked-button color="primary" [disabled]="apiCall"
+                      (click)="closeLayerSettings()">Back</button>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newInnerLayer">
+                <div fxFill fxLayout="column">
+                  <div fxFlex class="layer-selection-block">
+                    <mat-list>
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line *ngIf="preprocessingLayers['imageNoise'].includes(newInnerLayerDetails['fid'])">
+                          Image noise reduction</p>
+                        <p mat-line
+                          *ngIf="preprocessingLayers['contrastEnhance'].includes(newInnerLayerDetails['fid'])">
+                          Contrast enhancement</p>
+                      </mat-list-item>
+                    </mat-list>
+                    <ng-container
+                      *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['tempPreprocessingWorkflowFeatures']; let layIndex=index">
+                      <ng-container *ngIf="segArray.fid==newInnerLayerDetails['fid']">
+                        <div class="histogram_block" fxLayout="column" fxLayoutGap="16px">
+                          <div>
+                            <h3 class="new-inner-layer-header">
+                              {{newInnerLayerDetails['Name']}}
+                              <label class="filters_list_icon"
+                                *ngIf="features[segArray.fid]['info']!=undefined && features[segArray.fid]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[segArray.fid]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </h3>
+                            <div
+                              *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                              {{features[segArray.fid]['info']}}</div>
+                          </div>
+                          <div *ngIf="returnKeysFromObject(segArray['Params']).length>0" fxFlex fxLayout="column"
+                            fxLayoutGap="8px">
+                            <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params'])">
+                              <div *ngIf="segArray['Params'][objKeys] !=-1" fxFlex fxLayout="column" fxLayoutGap="8px">
+                                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                  <div fxFlex>
+                                    <label>
+                                      {{features[segArray.fid]['slider'][objKeys]['name']}}:
+                                    </label>
+                                  </div>
+                                  <div fxFlex="80px">
+                                    <mat-form-field appearance="outline">
+                                      <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                        (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'pre-processing',$event)" />
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                  <div fxFlex>
+                                    <mat-slider class="slider-width" [disabled]="apiCall"
+                                      [max]="segArray['slider'][objKeys]['range']['max']"
+                                      [min]="segArray['slider'][objKeys]['range']['min']"
+                                      [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                      [(value)]="segArray['Params'][objKeys]"
+                                      (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'pre-processing')">
+                                      <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                    </mat-slider>
+                                  </div>
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['max']}}
+                                  </div>
+                                </div>
+                                <div class="text-center" *ngIf="segArray['fid']==3">
+                                  <button mat-flat-button color="primary" [disabled]="apiCall"
+                                    (click)="resetToDefaultGuasian(layIndex,segArray)">
+                                    Recommended Sigma
+                                  </button>
+                                </div>
+                              </div>
+                            </ng-container>
+                          </div>
+                          <div class="text-center"
+                            *ngIf="segArray['result']!=undefined && segArray['result']['histogram_path']!=undefined && segArray['result']['histogram_path']!=''">
+                            <img loading="lazy" class="histogram_image" [class.shadowClass]="(segArray.fid==1)"
+                              src="{{segArray['result']['histogram_path_url']}}" />
+                          </div>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                    <button mat-stroked-button color="primary" [disabled]="apiCall"
+                      (click)="(searchFiltersList.length>0)?closeSearchInnerLayerSettings():closeinnerLayerSettings(true)">Back
+                    </button>
+                    <button mat-flat-button color="primary" [disabled]="apiCall"
+                      (click)="applyinnerLayerSettings()">Apply</button>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </mat-expansion-panel>
+        </ng-container>
+
+        <ng-container
+          *ngIf="(!addNewWorkflowLayer || (addNewWorkflowLayer && newLayerFor=='segmentation')) && segAndCropTabSelected==0">
+          <mat-expansion-panel hideToggle [disabled]="true" [expanded]="true"
+            [style.height]="(!addNewWorkflowLayer)?'auto':'100%'"
+            [style.margin-bottom]="(!addNewWorkflowLayer)?'16px':'0'">
+            <mat-expansion-panel-header class="layerTypeHeader border-bottom" expandedHeight="40px"
+              collapsedHeight="40px">
+              <mat-panel-title class="main-expansion-title">
+                <mat-checkbox *ngIf="!addNewWorkflowLayer"
+                  [(ngModel)]="segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected']"
+                  (change)="checkAllLayers('segmentation',$event)" class="select-all-images  layer_selection"
+                  color="primary" [disableRipple]="true"
+                  [disabled]="(apiCall || segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowFeatures'].length==0)"></mat-checkbox>
+                2. Segmentation
+              </mat-panel-title>
+              <mat-panel-description style="visibility: hidden;">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" *ngIf="!addNewWorkflowLayer">
+              <div class="layers-block" dragula="SEGMENTATION_LAYERS"
+                [(dragulaModel)]="segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowFeatures']">
+                <ng-container
+                  *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowFeatures']; let layIndex =index">
+                  <ng-container *ngIf="segmentationLayers['total'].includes(segArray.fid)">
+                    <mat-expansion-panel class="layer_expansion" #matPanel hideToggle
+                      [expanded]="expandedPanelIndex === layIndex + segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures'].length">
+                      <mat-expansion-panel-header #panelH class="border-bottom" expandedHeight="48px"
+                        collapsedHeight="48px"
+                        (click)="toggleLayer(layIndex + segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures'].length)">
+                        <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
+                          <mat-icon class="layer_arrow_icon">arrow_right</mat-icon>
+                          <span class="add_layer_icon drag_icon"><mat-icon>drag_indicator</mat-icon></span>
+                          <mat-checkbox class="layer_selection" color="primary" [disableRipple]="true"
+                            [(ngModel)]="segArray.selected"
+                            [disabled]="apiCall || !segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected']"
+                            (change)="togglePanel();(!apiCall)?layerSelection($event,layIndex,'segmentation'):''"></mat-checkbox>
+                          <div fxFlex class="text-sm">Layer {{layIndex+1}} - {{segArray.Name}}</div>
+                        </mat-panel-title>
+                        <mat-panel-description>
+                          <mat-icon class="deletelayer material-symbols-outlined"
+                            (click)="togglePanel();(!apiCall)?(!segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected'])?showMsg('segmentation'):deleteLayer(layIndex,'segmentation'):''">delete</mat-icon>
+                        </mat-panel-description>
+                      </mat-expansion-panel-header>
+                      <div class="histogram_block" fxLayout="column" fxLayoutGap="16px">
+                        <div *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                          <p>{{features[segArray.fid]['info']}}</p>
+                        </div>
+                        <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params'])">
+                          <ng-container
+                            *ngIf="objKeys=='block_size' || objKeys=='offset' || 
+                                objKeys=='threshold_value' || objKeys=='compactness' || objKeys=='classes' || objKeys=='n_segments'">
+                            <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                              <ng-container *ngIf="objKeys=='block_size' || objKeys=='offset' || 
+                                    objKeys=='threshold_value' || objKeys=='compactness'">
+                                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                                  <div fxFlex>
+                                    <label>
+                                      {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                      <span class="help-icon material-symbols-outlined"
+                                        *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                        matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                        matTooltipPosition="above">info</span>
+                                    </label>
+                                  </div>
+                                  <div fxFlex="80px">
+                                    <mat-form-field appearance="outline">
+                                      <input matInput type="number" [min]="segArray['slider'][objKeys]['range']['min']"
+                                        [max]="segArray['slider'][objKeys]['range']['max']"
+                                        [value]="segArray['Params'][objKeys]"
+                                        (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                    </mat-form-field>
+
+
+                                  </div>
+                                </div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+                                  *ngIf="(objKeys=='threshold_value' && segArray['Params'][objKeys]>-1) || objKeys!='threshold_value'">
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                  <div fxFlex>
+                                    <mat-slider class="slider-width"
+                                      [disabled]="(apiCall || !segArray['selected'] || (objKeys=='compactness' && !editBinarization))"
+                                      [max]="segArray['slider'][objKeys]['range']['max']"
+                                      [min]="segArray['slider'][objKeys]['range']['min']"
+                                      [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                      [(value)]="segArray['Params'][objKeys]"
+                                      (change)="slideFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                      <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                    </mat-slider>
+                                  </div>
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                </div>
+                              </ng-container>
+                              <ng-container *ngIf="objKeys=='classes'">
+                                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                  <div fxFlex>
+                                    <label>
+                                      {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                      <span class="help-icon material-symbols-outlined"
+                                        *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                        matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                        matTooltipPosition="above">info</span>
+                                    </label>
+                                  </div>
+                                  <div fxFlex="80px">
+                                    <mat-form-field appearance="outline">
+                                      <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                        (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                  <div fxFlex>
+                                    <mat-slider class="slider-width"
+                                      [disabled]="(apiCall || !segArray['selected'] || !editBinarization)"
+                                      [max]="segArray['slider'][objKeys]['range']['max']"
+                                      [min]="segArray['slider'][objKeys]['range']['min']"
+                                      [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                      [(value)]="segArray['Params'][objKeys]"
+                                      (change)="slideFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                      <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                    </mat-slider>
+                                  </div>
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                </div>
+                              </ng-container>
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                        <div fxFlex
+                          *ngIf="segArray['result']!=undefined && segArray['result']['histogram_path']!=undefined && segArray['result']['histogram_path']!=''">
+                          <img loading="lazy" class="histogram_image" [class.shadowClass]="(segArray.fid==1)"
+                            src="{{segArray['result']['histogram_path_url']}}" />
+                        </div>
+                        <ng-container *ngIf="segArray['Params']['template_cord']!=undefined">
+                          <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="5px" fxLayoutAlign="start start">
+                            <div>
+                              <button mat-flat-button color="primary" [disabled]="apiCall || !segArray['selected']"
+                                (click)="editTemplateImage(layIndex)">
+                                Edit Template
+                              </button>
+                            </div>
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="segArray['Params']['selected_layers']!=undefined">
+                          <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="5px" fxLayoutAlign="center start"
+                            *ngIf="editBinarization && segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected'] && segArray.selected">
+                            <div fxFlex="50%">
+                              <label>Make local state 0</label>
+                              <mat-list class="multithreshold_layers" role="list">
+                                <!-- <ng-container
+                                    *ngFor="let state of getLocalStates(segArray['Params']['classes']);let ind=index;">
+                                    <mat-list-item role="listitem" class="mat-list-item">
+                                      <mat-checkbox color="primary" [value]="state"
+                                        [checked]="segArray['Params']['selected_layers']['local_state_0'].includes(state)"
+                                        [disabled]="apiCall || !editBinarization"
+                                        (change)="(!apiCall && editBinarization)?binarySelection($event,layIndex,'local_state_0'):''"></mat-checkbox>
+                                      <span class="local-states local-state-{{ind+1}}"></span>
+                                      Layer {{ind+1}}
+                                    </mat-list-item>
+                                  </ng-container> -->
+                              </mat-list>
+                            </div>
+                            <div fxFlex="50%">
+                              <label>Make local state 1</label>
+                              <mat-list class="multithreshold_layers" role="list">
+                                <!-- <ng-container
+                                    *ngFor="let state of getLocalStates(segArray['Params']['classes']);let ind=index;">
+                                    <mat-list-item role="listitem" class="mat-list-item">
+                                      <mat-checkbox color="primary" [value]="state"
+                                        [checked]="segArray['Params']['selected_layers']['local_state_1'].includes(state)"
+                                        [disabled]="apiCall || !editBinarization"
+                                        (change)="(!apiCall && editBinarization)?binarySelection($event,layIndex,'local_state_1'):''"></mat-checkbox>
+                                      <span class="local-states local-state-{{ind+1}}"></span>
+                                      Layer {{ind+1}}
+                                    </mat-list-item>
+                                  </ng-container> -->
+                              </mat-list>
+                            </div>
+                          </div>
+                          <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="5px" fxLayoutAlign="start start">
+                            <div fxFlex="50%"
+                              *ngIf="editBinarization && segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected'] && segArray.selected">
+                              <button mat-flat-button color="primary"
+                                [disabled]="apiCall || !editBinarization || segArray['Params']['selected_layers']['local_state_1'].length==0"
+                                (click)="applyBinarization(layIndex,'selected_layers','segmentation')">
+                                Apply Binarization
+                              </button>
+                            </div>
+                            <div fxFlex="50%">
+                              <button mat-flat-button color="primary"
+                                [disabled]="apiCall || editBinarization || !segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected'] || !segArray.selected"
+                                (click)="onEditBinarization(layIndex,'selected_layers')">
+                                Edit Binarization
+                              </button>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </mat-expansion-panel>
+                  </ng-container>
+                </ng-container>
+              </div>
+              <div class="border-bottom">
+                <div class="add-layer-button" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+                  (click)="changeLayerSettings('add', 'segmentation')" [class.disabled]="(apiCall)">
+                  <mat-icon>add</mat-icon>
+                  <div>Add Layer</div>
+                </div>
+              </div>
+            </div>
+            <ng-container *ngIf="addNewWorkflowLayer">
+              <ng-container *ngIf="!newInnerLayer && !segmentationUsingThresholding">
+                <div fxFill fxLayout="column">
+                  <div fxFlex class="layer-selection-block">
+                    <div class="layers_main_head pt-2">Select New Segmentation Layer</div>
+                    <mat-list class="layers_list">
+                      <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                        class="layer_list layers_sub_head">
+                        <p mat-line>Segmentation of two local states</p>
+                      </mat-list-item>
+                      <ng-container>
+                        <mat-list-item class="layer_list" (click)="selectSegmentationUsingThresholding()">
+                          <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                            <div class="text-sm">Segmentation using thresholding</div>
+                          </div>
+                          <div fxFlex="none">
+                            <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                          </div>
+                        </mat-list-item>
+                      </ng-container>
+                    </mat-list>
+                    <!-- <div class="layers_sub_head pt-2">Segmentation of two or more local states</div>
+                    <mat-list fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="layers_list">
+                      <ng-container *ngFor="let feature of segmentationLayers['more_localstates']">
+                        <ng-container *ngIf="features[feature]">
+                          <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                            class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                              <div class="text-sm">{{features[feature]['Name']}}</div>
+                              <label class="filters_list_icon"
+                                *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                            </div>
+                          </mat-list-item>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list> -->
+                    <!-- <mat-list class="layers_list">
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line>Segmentation using a template</p>
+                      </mat-list-item>
+                      <ng-container *ngFor="let feature of segmentationLayers['using_template']">
+                        <ng-container *ngIf="features[feature]">
+                          <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                            class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                              <div class="text-sm">{{features[feature]['Name']}}</div>
+                              <label class="filters_list_icon"
+                                *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                            </div>
+                          </mat-list-item>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list> -->
+                  </div>
+                  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                    <button mat-stroked-button color="primary" [disabled]="apiCall"
+                      (click)="closeLayerSettings()">Back</button>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="segmentationUsingThresholding">
+                <div fxFill fxLayout="column">
+                  <div fxFlex class="layer-selection-block">
+                    <div class="layers_main_head pt-2" *ngIf="!checkFidExists()">Segmentation using thresholding</div>
+                    <ng-container *ngIf="!checkFidExists()">
+                      <mat-list class="layers_list">
+                        <ng-container *ngFor="let feature of segmentationLayers['two_localstates']">
+                          <ng-container *ngIf="features[feature] && features[feature]['fid'] != 13">
+                            <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                              class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                              <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                                <div class="text-sm">{{features[feature]['Name']}}</div>
+                                <label class="filters_list_icon"
+                                  *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                  <span class="help-icon material-symbols-outlined"
+                                    matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                                </label>
+                              </div>
+                              <div fxFlex="none">
+                                <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                              </div>
+                            </mat-list-item>
+                          </ng-container>
+                        </ng-container>
+                      </mat-list>
+                    </ng-container>
+                    <ng-container *ngIf="checkFidExists()">
+                      <mat-list>
+                        <mat-list-item class="layer_list layers_sub_head">
+                          <p mat-line>Segmentation of two local states</p>
+                        </mat-list-item>
+                      </mat-list>
+                      <ng-container
+                        *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['tempSegmentationWorkflowFeatures']; let layIndex=index">
+                        <ng-container *ngIf="segArray.fid==newInnerLayerDetails['fid']">
+                          <div class="histogram_block" fxLayout="column" fxLayoutGap="16px">
+                            <div>
+                              <h3 class="new-inner-layer-header" *ngIf="newInnerLayerDetails['fid'] !=13">
+                                {{newInnerLayerDetails['Name']}}
+                                <label class="filters_list_icon"
+                                  *ngIf="features[segArray.fid]['info']!=undefined && features[segArray.fid]['info']!=''">
+                                  <span class="help-icon material-symbols-outlined"
+                                    matTooltip="{{features[segArray.fid]['info']}}"
+                                    matTooltipPosition="above">info</span>
+                                </label>
+                              </h3>
+                              <h3 class="new-inner-layer-header" *ngIf="newInnerLayerDetails['fid'] ==13">
+                                Global threshold
+                                <label class="filters_list_icon"
+                                  *ngIf="features[13]['info']!=undefined && features[13]['info']!=''">
+                                  <span class="help-icon material-symbols-outlined"
+                                    matTooltip="{{features[13]['info']}}" matTooltipPosition="above">info</span>
+                                </label>
+                              </h3>
+                              <p
+                                *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                                {{features[segArray.fid]['info']}}</p>
+                            </div>
+                            <div
+                              *ngIf="segArray['result']!=undefined && segArray['result']['histogram_path']!=undefined && segArray['result']['histogram_path']!=''">
+                              <img loading="lazy" class="histogram_image" [class.shadowClass]="(segArray.fid==1)"
+                                src="{{segArray['result']['histogram_path_url']}}" />
+                            </div>
+                            <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params'])">
+                              <ng-container
+                                *ngIf="objKeys=='block_size' || objKeys=='offset' || 
+                                    objKeys=='threshold_value' || objKeys=='compactness' || objKeys=='classes' || objKeys=='n_segments'">
+                                <div fxLayout="column" fxLayoutGap="8px">
+                                  <ng-container *ngIf="objKeys=='block_size' || objKeys=='offset' || 
+                                      objKeys=='threshold_value' || objKeys=='compactness'">
+                                    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                      <div fxFlex>
+                                        <label>
+                                          {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                          <span class="help-icon material-symbols-outlined"
+                                            *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                            matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                            matTooltipPosition="above">info</span>
+                                        </label>
+                                      </div>
+                                      <div fxFlex="90px"
+                                        *ngIf="(objKeys=='threshold_value' && segArray['Params'][objKeys]>-1) || objKeys!='threshold_value'">
+                                        <mat-form-field appearance="outline">
+                                          <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                            (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                        </mat-form-field>
+                                      </div>
+                                    </div>
+                                    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+                                      *ngIf="(objKeys=='threshold_value' && segArray['Params'][objKeys]>-1) || objKeys!='threshold_value'">
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                      <div fxFlex>
+                                        <mat-slider class="slider-width" [disabled]="apiCall"
+                                          [max]="segArray['slider'][objKeys]['range']['max']"
+                                          [min]="segArray['slider'][objKeys]['range']['min']"
+                                          [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                          [(value)]="segArray['Params'][objKeys]"
+                                          (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                          <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                        </mat-slider>
+                                      </div>
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngIf="objKeys=='classes'">
+                                    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                      <div fxFlex>
+                                        <label>
+                                          {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                          <span class="help-icon material-symbols-outlined"
+                                            *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                            matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                            matTooltipPosition="above">info</span>
+                                        </label>
+                                      </div>
+                                      <div fxFlex="90px">
+                                        <mat-form-field appearance="outline">
+                                          <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                            (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                        </mat-form-field>
+                                      </div>
+                                    </div>
+                                    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                      <div fxFlex>
+                                        <mat-slider class="slider-width" [disabled]="apiCall"
+                                          [max]="segArray['slider'][objKeys]['range']['max']"
+                                          [min]="segArray['slider'][objKeys]['range']['min']"
+                                          [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                          [(value)]="segArray['Params'][objKeys]"
+                                          (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                          <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                        </mat-slider>
+                                      </div>
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngIf="objKeys=='n_segments'">
+                                    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                      <div fxFlex>
+                                        <label>
+                                          {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                          <span class="help-icon material-symbols-outlined"
+                                            *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                            matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                            matTooltipPosition="above">info</span>
+                                        </label>
+                                      </div>
+                                      <div fxFlex="80px">
+                                        <mat-form-field appearance="outline">
+                                          <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                            (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                        </mat-form-field>
+                                      </div>
+                                    </div>
+                                    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                      <div fxFlex>
+                                        <mat-slider class="slider-width" [disabled]="apiCall"
+                                          [max]="segArray['slider'][objKeys]['range']['max']"
+                                          [min]="segArray['slider'][objKeys]['range']['min']"
+                                          [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                          [(value)]="segArray['Params'][objKeys]"
+                                          (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                          <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                        </mat-slider>
+                                      </div>
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                    </div>
+                                  </ng-container>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="newInnerLayerDetails['fid']==11 || newInnerLayerDetails['fid']==13">
+                              <div *ngIf="newInnerLayerDetails['fid']==11">
+                                <mat-checkbox class="layer_selection" color="primary" [(ngModel)]="segArray.manual"
+                                  (change)="selectManualThreshold(segArray)">
+                                  Set threshold value manually
+                                </mat-checkbox>
+                              </div>
+                              <div *ngIf="newInnerLayerDetails['fid']==13">
+                                <button mat-flat-button color="primary" *ngIf="checkFidExists()" [disabled]="apiCall"
+                                  (click)="selectManualThreshold(segArray)">Reset to Otsu's Threshold
+                                </button>
+                              </div>
+                            </ng-container>
+
+                            <ng-container *ngIf="segArray['Params']['selected_layers']!=undefined">
+                              <div>
+                                <mat-form-field appearance="outline">
+                                  <mat-label>Layers</mat-label>
+                                  <mat-select multiple placeholder="Select layer"
+                                    [value]="segArray['Params']['selected_layers']" [disabled]="apiCall"
+                                    (selectionChange)="changeTempWorkflowOnDropDown($event,layIndex,'selected_layers','segmentation')">
+                                    <mat-option *ngFor="let count of segArray['layers']" [value]="count">layer
+                                      {{count}}</mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                            </ng-container>
+                            <div>
+                              <mat-form-field appearance="outline">
+                                <mat-label>Visualization</mat-label>
+                                <mat-select #visualization [value]="segArray['Params']['visualization']"
+                                  [disabled]="apiCall"
+                                  (selectionChange)="changeTempWorkflowOnDropDown($event,layIndex,'visualization','segmentation')">
+                                  <ng-container *ngIf="segArray['Params']['selected_layers']!=undefined">
+                                    <mat-option value="Black/white (default)"
+                                      *ngIf="segArray['Params']['selected_layers'].length==0">Black/white
+                                      (default)</mat-option>
+                                    <mat-option value=""
+                                      *ngIf="segArray['Params']['selected_layers'].length==0">Parula</mat-option>
+                                    <mat-option value="outline_segmented"
+                                      *ngIf="segArray['Params']['selected_layers'].length>0">Outline
+                                      segmented</mat-option>
+                                    <mat-option value="overlay_segmented"
+                                      *ngIf="segArray['Params']['selected_layers'].length>0">Overlay
+                                      segmented</mat-option>
+                                    <mat-option value="label segmented"
+                                      *ngIf="segArray['Params']['selected_layers'].length>0">Label
+                                      segmented</mat-option>
+                                  </ng-container>
+                                  <ng-container *ngIf="segArray['Params']['selected_layers']==undefined">
+                                    <mat-option value="Black/white (default)">Black/white (default)</mat-option>
+                                    <mat-option value="">Parula</mat-option>
+                                    <mat-option value="outline_segmented">Outline segmented</mat-option>
+                                    <mat-option value="overlay_segmented">Overlay segmented</mat-option>
+                                    <mat-option value="label segmented">Label segmented</mat-option>
+                                  </ng-container>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                            <ng-container
+                              *ngIf="visualization.value=='outline_segmented' || visualization.value=='overlay_segmented'">
+                              <div>
+                                <mat-form-field appearance="outline">
+                                  <mat-label>Color</mat-label>
+                                  <mat-select [value]="segArray['Params']['color']" [disabled]="apiCall"
+                                    (selectionChange)="changeTempWorkflowOnDropDown($event,layIndex,'color','segmentation')">
+                                    <mat-option value="magenta">Magenta</mat-option>
+                                    <mat-option value="red">Red</mat-option>
+                                    <mat-option value="yellow">Yellow</mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                            </ng-container>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                    <button mat-stroked-button color="primary" *ngIf="checkFidExists()" [disabled]="apiCall"
+                      (click)="(searchFiltersList.length>0)?closeSearchInnerLayerSettings():closeinnerLayerSettings(true)">Back</button>
+                    <button mat-stroked-button color="primary" *ngIf="!checkFidExists()" [disabled]="apiCall"
+                      (click)="(searchFiltersList.length>0)?closeSearchInnerLayerSettings():closeSegmentationThreshold()">Back</button>
+                    <button mat-flat-button color="primary" *ngIf="checkFidExists()" [disabled]="apiCall"
+                      (click)="applyinnerLayerSettings()">Apply</button>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="!segmentationUsingThresholding">
+                <ng-container *ngIf="newInnerLayer">
+                  <div fxFill fxLayout="column">
+                    <div fxFlex class="layer-selection-block">
+                      <mat-list>
+                        <mat-list-item class="layer_list layers_sub_head">
+                          <p mat-line>Segmentation using a template</p>
+                        </mat-list-item>
+                      </mat-list>
+                      <ng-container
+                        *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['tempSegmentationWorkflowFeatures']; let layIndex=index">
+                        <ng-container *ngIf="segArray.fid==newInnerLayerDetails['fid']">
+                          <div class="histogram_block" fxLayout="column" fxLayoutGap="20px"
+                            fxLayoutAlign="start stretch">
+                            <div fxFlex>
+                              <h3 class="new-inner-layer-header">
+                                {{features[segArray.fid]['Name']}}
+                                <label class="filters_list_icon"
+                                  *ngIf="features[segArray.fid]['info']!=undefined && features[segArray.fid]['info']!=''">
+                                  <span class="help-icon material-symbols-outlined"
+                                    matTooltip="{{features[segArray.fid]['info']}}"
+                                    matTooltipPosition="above">info</span>
+                                </label>
+                              </h3>
+                              <p
+                                *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                                {{features[segArray.fid]['info']}}</p>
+                            </div>
+                            <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params'])">
+                              <ng-container
+                                *ngIf="objKeys=='block_size' || objKeys=='offset' || 
+                                    objKeys=='threshold_value' || objKeys=='compactness' || objKeys=='classes' || objKeys=='n_segments'">
+                                <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                                  <ng-container *ngIf="objKeys=='block_size' || objKeys=='offset' || 
+                                      objKeys=='threshold_value' || objKeys=='compactness'">
+                                    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                      <div fxFlex>
+                                        <label>
+                                          {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                          <span class="help-icon material-symbols-outlined"
+                                            *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                            matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                            matTooltipPosition="above">info</span>
+                                        </label>
+                                      </div>
+                                      <div fxFlex="80px"
+                                        *ngIf="(objKeys=='threshold_value' && segArray['Params'][objKeys]>-1) || objKeys!='threshold_value'">
+                                        <mat-form-field appearance="outline">
+                                          <input matInput type="number"
+                                            [min]="segArray['slider'][objKeys]['range']['min']"
+                                            [max]="segArray['slider'][objKeys]['range']['max']"
+                                            [value]="segArray['Params'][objKeys]"
+                                            (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                        </mat-form-field>
+                                      </div>
+                                    </div>
+                                    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center"
+                                      *ngIf="(objKeys=='threshold_value' && segArray['Params'][objKeys]>-1) || objKeys!='threshold_value'">
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                      <div fxFlex>
+                                        <mat-slider class="slider-width" [disabled]="apiCall"
+                                          [max]="segArray['slider'][objKeys]['range']['max']"
+                                          [min]="segArray['slider'][objKeys]['range']['min']"
+                                          [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                          [(value)]="segArray['Params'][objKeys]"
+                                          (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                          <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                        </mat-slider>
+                                      </div>
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngIf="objKeys=='classes'">
+                                    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                      <div fxFlex>
+                                        <label>
+                                          {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                          <span class="help-icon material-symbols-outlined"
+                                            *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                            matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                            matTooltipPosition="above">info</span>
+                                        </label>
+                                      </div>
+                                      <div fxFlex="80px">
+                                        <mat-form-field appearance="outline">
+                                          <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                            (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'segmentation',$event)" />
+                                        </mat-form-field>
+                                      </div>
+                                    </div>
+                                    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                      <div fxFlex>
+                                        <mat-slider class="slider-width" [disabled]="apiCall"
+                                          [max]="segArray['slider'][objKeys]['range']['max']"
+                                          [min]="segArray['slider'][objKeys]['range']['min']"
+                                          [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                          [(value)]="segArray['Params'][objKeys]"
+                                          (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'segmentation')">
+                                          <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                        </mat-slider>
+                                      </div>
+                                      <div fxFlex="none">
+                                        {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                    </div>
+                                  </ng-container>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                            <div fxFlex
+                              *ngIf="segArray['result']!=undefined && segArray['result']['histogram_path']!=undefined && segArray['result']['histogram_path']!=''">
+                              <img loading="lazy" class="histogram_image" [class.shadowClass]="(segArray.fid==1)"
+                                src="{{segArray['result']['histogram_path_url']}}" />
+                            </div>
+                            <ng-container *ngIf="segArray['Params']['template_cord']!=undefined">
+                              <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="5px"
+                                fxLayoutAlign="start start">
+                                <ng-container *ngIf="!editTemplateMatching">
+                                  <div>
+                                    <button mat-flat-button color="primary" [disabled]="apiCall"
+                                      (click)="openTemplateImage(layIndex)">
+                                      Draw Template
+                                    </button>
+                                  </div>
+                                </ng-container>
+                                <ng-container *ngIf="editTemplateMatching">
+                                  <div *ngIf="editTemplateMatching">
+                                    <button mat-flat-button color="primary" [disabled]="apiCall"
+                                      (click)="applyTemplateMatching(layIndex)">
+                                      Use Template
+                                    </button>
+                                  </div>
+                                  <div *ngIf="editTemplateMatching">
+                                    <button mat-flat-button color="primary" [disabled]="apiCall"
+                                      (click)="cancelTemplateMatching(layIndex)">
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </ng-container>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngIf="segArray['Params']['selected_layers']!=undefined">
+                              <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="5px"
+                                fxLayoutAlign="center start">
+                                <div fxFlex="50%">
+                                  <label>Make local state 0</label>
+                                  <mat-list class="multithreshold_layers" role="list">
+                                    <!-- <ng-container
+                                        *ngFor="let state of getLocalStates(segArray['Params']['classes']);let ind=index;">
+                                        <mat-list-item role="listitem" class="mat-list-item">
+                                          <mat-checkbox color="primary" [value]="state"
+                                            [checked]="segArray['Params']['selected_layers']['local_state_0'].includes(state)"
+                                            [disabled]="apiCall || !editTempBinarization"
+                                            (change)="(!apiCall && editTempBinarization)?tempBinarySelection($event,layIndex,'local_state_0'):''"></mat-checkbox>
+                                          <span class="local-states local-state-{{ind+1}}"></span>
+                                          Layer {{ind+1}}
+                                        </mat-list-item>
+                                      </ng-container> -->
+                                  </mat-list>
+                                </div>
+                                <div fxFlex="50%">
+                                  <label>Make local state 1</label>
+                                  <mat-list class="multithreshold_layers" role="list">
+                                    <!-- <ng-container
+                                        *ngFor="let state of getLocalStates(segArray['Params']['classes']);let ind=index;">
+                                        <mat-list-item role="listitem" class="mat-list-item">
+                                          <mat-checkbox color="primary" [value]="state"
+                                            [checked]="segArray['Params']['selected_layers']['local_state_1'].includes(state)"
+                                            [disabled]="apiCall || !editTempBinarization"
+                                            (change)="(!apiCall && editTempBinarization)?tempBinarySelection($event,layIndex,'local_state_1'):''"></mat-checkbox>
+                                          <span class="local-states local-state-{{ind+1}}"></span>
+                                          Layer {{ind+1}}
+                                        </mat-list-item>
+                                      </ng-container> -->
+                                  </mat-list>
+                                </div>
+                              </div>
+                              <div fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="5px"
+                                fxLayoutAlign="center start">
+                                <div fxFlex="50%">
+                                  <button mat-flat-button color="primary"
+                                    [disabled]="apiCall || !editTempBinarization || segArray['Params']['selected_layers']['local_state_1'].length==0"
+                                    (click)="applyTempBinarization(layIndex,'selected_layers','segmentation')">
+                                    Apply Binarization
+                                  </button>
+                                </div>
+                                <div fxFlex="50%">
+                                  <button mat-flat-button color="primary" [disabled]="apiCall || editTempBinarization"
+                                    (click)="onEditTempBinarization(layIndex,'selected_layers')">
+                                    Edit Binarization
+                                  </button>
+                                </div>
+                              </div>
+                            </ng-container>
+                            <div>
+                              <mat-form-field appearance="outline">
+                                <mat-label>Visualization</mat-label>
+                                <mat-select #visualization [value]="segArray['Params']['visualization']"
+                                  [disabled]="apiCall || editTempBinarization"
+                                  (selectionChange)="changeTempWorkflowOnDropDown($event,layIndex,'visualization','segmentation')">
+                                  <mat-option value="Black/white (default)">Black/white (default)</mat-option>
+                                  <mat-option value="">Parula</mat-option>
+                                  <mat-option value="outline_segmented">Outline segmented</mat-option>
+                                  <mat-option value="overlay_segmented">Overlay segmented</mat-option>
+                                  <mat-option value="label segmented">Label segmented</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                            <ng-container
+                              *ngIf="visualization.value=='outline_segmented' || visualization.value=='overlay_segmented'">
+                              <div>
+                                <mat-form-field appearance="outline">
+                                  <mat-label>Color</mat-label>
+                                  <mat-select [value]="segArray['Params']['color']"
+                                    [disabled]="apiCall || editTempBinarization"
+                                    (selectionChange)="changeTempWorkflowOnDropDown($event,layIndex,'color','segmentation')">
+                                    <mat-option value="magenta">Magenta</mat-option>
+                                    <mat-option value="red">Red</mat-option>
+                                    <mat-option value="yellow">Yellow</mat-option>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                            </ng-container>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                    </div>
+                    <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                      <button mat-stroked-button color="primary" [disabled]="apiCall"
+                        (click)="(searchFiltersList.length>0)?closeSearchInnerLayerSettings():(templateMatchingId>=0)?closeLayerSettings():closeinnerLayerSettings(true)">Back
+                      </button>
+                      <button mat-flat-button color="primary"
+                        [disabled]="apiCall || editTempBinarization || editTemplateMatching || (newLayerFor=='segmentation' && returnKeysFromObject(segmentedImageDetails['selectedSegmentedImage']['tempSegmentationWorkflowFeatures'][0]['Params']['template_cord']).length==0)"
+                        (click)="applyinnerLayerSettings()">Apply</button>
+                    </div>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </mat-expansion-panel>
+        </ng-container>
+
+        <ng-container
+          *ngIf="(!addNewWorkflowLayer || (addNewWorkflowLayer && newLayerFor=='post-processing')) && segAndCropTabSelected==0">
+          <mat-expansion-panel hideToggle [disabled]="true" [expanded]="true"
+            [style.height]="(!addNewWorkflowLayer)?'auto':'100%'"
+            [style.margin-bottom]="(!addNewWorkflowLayer)?'16px':'0'">
+            <mat-expansion-panel-header class="layerTypeHeader border-bottom" expandedHeight="40px"
+              collapsedHeight="40px">
+              <mat-panel-title class="main-expansion-title">
+                <mat-checkbox *ngIf="!addNewWorkflowLayer"
+                  [checked]="segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowSelected']"
+                  (change)="checkAllLayers('post-processing',$event)" class="select-all-images layer_selection"
+                  color="primary" [disableRipple]="true"
+                  [disabled]="(apiCall || segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowFeatures'].length==0 || !segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected'] || getFeaturesCount('segmentationWorkflowFeatures')==0)"></mat-checkbox>
+                3. Post-processing
+              </mat-panel-title>
+              <mat-panel-description style="visibility: hidden;">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" *ngIf="!addNewWorkflowLayer">
+              <div class="layers-block" dragula="POST_PROCESSING_LAYERS"
+                [(dragulaModel)]="segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowFeatures']">
+                <ng-container
+                  *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowFeatures']; let layIndex =index">
+                  <ng-container *ngIf="postprocessingLayers['total'].includes(segArray.fid)">
+                    <mat-expansion-panel class="layer_expansion" #matPanel hideToggle
+                      [expanded]="expandedPanelIndex === layIndex + segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures'].length + segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowFeatures'].length">
+                      <mat-expansion-panel-header #panelH class="border-bottom" expandedHeight="48px"
+                        collapsedHeight="48px"
+                        (click)="toggleLayer(layIndex + segmentedImageDetails['selectedSegmentedImage']['preprocessingWorkflowFeatures'].length + segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowFeatures'].length)">
+                        <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
+                          <mat-icon class="layer_arrow_icon">arrow_right</mat-icon>
+                          <span class="add_layer_icon drag_icon"><mat-icon>drag_indicator</mat-icon></span>
+                          <mat-checkbox class="layer_selection" color="primary" [disableRipple]="true"
+                            [checked]="segArray.selected"
+                            [disabled]="apiCall || !segmentedImageDetails['selectedSegmentedImage']['segmentationWorkflowSelected'] || getFeaturesCount('segmentationWorkflowFeatures')==0 || !segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowSelected']"
+                            (change)="togglePanel();(!apiCall)?layerSelection($event,layIndex,'post-processing'):''"></mat-checkbox>
+                          <div fxFlex class="text-sm">Layer {{layIndex+1}} - {{segArray.Name}}</div>
+                        </mat-panel-title>
+                        <mat-panel-description>
+                          <mat-icon class="material-symbols-outlined deletelayer"
+                            (click)="togglePanel();(!apiCall)?(!segmentedImageDetails['selectedSegmentedImage']['postprocessingWorkflowSelected'])?showMsg('post-processing'):deleteLayer(layIndex,'post-processing'):''">delete</mat-icon>
+                        </mat-panel-description>
+                      </mat-expansion-panel-header>
+                      <div class="histogram_block" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
+                        <div fxFlex
+                          *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                          <p>{{features[segArray.fid]['info']}}</p>
+                        </div>
+                        <ng-container
+                          *ngIf="segArray['Params']['structure_element']!=undefined && segArray['Params']['structure_element']!=''">
+                          <div fxFlex *ngIf="segArray['fid']=='26'">
+                            <strong>1. Create mask using dilation of objects in segmented image.</strong>
+                          </div>
+                          <div>
+                            <mat-form-field appearance="outline">
+                              <mat-label>Element Shape</mat-label>
+                              <mat-select placeholder="Select shape" [value]="segArray['Params']['structure_element']"
+                                [disabled]="(apiCall || !segArray['selected'])"
+                                (selectionChange)="changeWorkflowOnDropDown($event,layIndex,'structure_element','post-processing')">
+                                <mat-option *ngFor="let shape of returnKeysFromObject(segArray['shapes'])"
+                                  [value]="shape">{{segArray['shapes'][shape]}}</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                        </ng-container>
+                        <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params'])">
+                          <ng-container *ngIf="objKeys=='minimum size to be removed' || objKeys=='Equivalent diameter (µm)' || 
+                                                (objKeys=='width' && segArray['Params']['structure_element']=='rectangle') || 
+                                                (objKeys=='height' && (segArray['Params']['structure_element']=='rectangle' || segArray['Params']['structure_element']=='square')) || 
+                                                (objKeys=='radius' && segArray['Params']['structure_element']=='disk') || 
+                                                objKeys=='size_removed'">
+                            <div *ngIf="segArray['fid']=='26' && objKeys=='size_removed'">
+                              <strong>2. Remove cluster below a specified size.</strong>
+                            </div>
+                            <div fxLayout="column" fxLayoutGap="8px">
+                              <ng-container
+                                *ngIf="objKeys=='minimum size to be removed' || objKeys=='Equivalent diameter (µm)'">
+                                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                  <div fxFlex>
+                                    <label>
+                                      {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                      <span class="help-icon material-symbols-outlined"
+                                        *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                        matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                        matTooltipPosition="above">info</span>
+                                    </label>
+                                  </div>
+                                  <div fxFlex="80px">
+                                    <mat-form-field appearance="outline">
+                                      <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                        (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'post-processing',$event)" />
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                  <div fxFlex>
+                                    <mat-slider class="slider-width" [disabled]="(apiCall || !segArray['selected'])"
+                                      [max]="segArray['slider'][objKeys]['range']['max']"
+                                      [min]="segArray['slider'][objKeys]['range']['min']"
+                                      [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                      [(value)]="segArray['Params'][objKeys]"
+                                      (change)="slideFilterWorkflow($event,layIndex,objKeys,'post-processing')">
+                                      <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                    </mat-slider>
+                                  </div>
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                </div>
+                              </ng-container>
+                              <ng-container *ngIf="objKeys=='size_removed' && segArray['Params'][objKeys]>-1">
+                                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                  <div fxFlex>
+                                    <label>
+                                      {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                      <span class="help-icon material-symbols-outlined"
+                                        *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                        matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                        matTooltipPosition="above">info</span>
+                                    </label>
+                                  </div>
+                                  <div fxFlex="80px">
+                                    <mat-form-field appearance="outline">
+                                      <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                        (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'post-processing',$event)" />
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                  <div fxFlex="none">{{segArray['slider'][objKeys]['range']['min']}}</div>
+                                  <div fxFlex>
+                                    <mat-slider class="slider-width" [disabled]="(apiCall || !segArray['selected'])"
+                                      [max]="segArray['slider'][objKeys]['range']['max']"
+                                      [min]="segArray['slider'][objKeys]['range']['min']"
+                                      [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                      [(value)]="segArray['Params'][objKeys]"
+                                      (change)="slideFilterWorkflow($event,layIndex,objKeys,'post-processing')">
+                                      <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                    </mat-slider>
+                                  </div>
+                                  <div fxFlex="none">{{segArray['slider'][objKeys]['range']['max']}}
+                                  </div>
+                                </div>
+                              </ng-container>
+                              <ng-container
+                                *ngIf="(objKeys=='width' && segArray['Params']['structure_element']=='rectangle') || 
+                                                    (objKeys=='height' && (segArray['Params']['structure_element']=='rectangle' || segArray['Params']['structure_element']=='square')) || 
+                                                    (objKeys=='radius' && segArray['Params']['structure_element']=='disk')">
+                                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                  <div fxFlex>
+                                    <label>
+                                      {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                      <span class="help-icon material-symbols-outlined"
+                                        *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                        matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                        matTooltipPosition="above">info</span>
+                                    </label>
+                                  </div>
+                                  <div fxFlex="80px">
+                                    <mat-form-field appearance="outline">
+                                      <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                        (keyup.enter)="onEnterSliderInput(segArray,layIndex,objKeys,'post-processing',$event)" />
+                                    </mat-form-field>
+                                  </div>
+                                </div>
+                                <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                  <div fxFlex>
+                                    <mat-slider class="slider-width" [disabled]="(apiCall || !segArray['selected'])"
+                                      [max]="segArray['slider'][objKeys]['range']['max']"
+                                      [min]="segArray['slider'][objKeys]['range']['min']"
+                                      [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                      [(value)]="segArray['Params'][objKeys]"
+                                      (change)="slideFilterWorkflow($event,layIndex,objKeys,'post-processing')">
+                                      <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                    </mat-slider>
+                                  </div>
+                                  <div fxFlex="none">
+                                    {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                </div>
+                              </ng-container>
+                            </div>
+                          </ng-container>
+                        </ng-container>
+                      </div>
+                    </mat-expansion-panel>
+                  </ng-container>
+                </ng-container>
+              </div>
+              <div class="border-bottom">
+                <div class="add-layer-button" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+                  (click)="changeLayerSettings('add', 'post-processing')" [class.disabled]="(apiCall)">
+                  <mat-icon>add</mat-icon>
+                  <div>Add Layer</div>
+                </div>
+              </div>
+            </div>
+            <ng-container *ngIf="addNewWorkflowLayer">
+              <ng-container *ngIf="!newInnerLayer">
+                <div fxFill fxLayout="column">
+                  <div fxFlex class="layer-selection-block">
+                    <p class="layers_main_head">Select New Post-Processing Layer</p>
+                    <mat-list class="layers_list">
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line>Segmentation cleanup</p>
+                      </mat-list-item>
+                      <ng-container *ngFor="let feature of postprocessingLayers['segmentaionCleanup']">
+                        <ng-container *ngIf="features[feature]">
+                          <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                            class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                              <div class="text-sm">{{features[feature]['Name']}}</div>
+                              <label class="filters_list_icon"
+                                *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                            </div>
+                          </mat-list-item>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list>
+                    <mat-list class="layers_list">
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line>Morphological operations</p>
+                      </mat-list-item>
+                      <ng-container *ngFor="let feature of postprocessingLayers['morphologicalOperations']">
+                        <ng-container *ngIf="features[feature]">
+                          <mat-list-item fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                            class="layer_list" (click)="(!apiCall)?selectNewlayer(features[feature],true):''">
+                            <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" mat-line>
+                              <div class="text-sm">{{features[feature]['Name']}}</div>
+                              <label class="filters_list_icon"
+                                *ngIf="features[feature]['info']!=undefined && features[feature]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[feature]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-icon class="layers-arrow-icon">keyboard_arrow_right</mat-icon>
+                            </div>
+                          </mat-list-item>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list>
+                  </div>
+                  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                    <button mat-stroked-button color="primary" [disabled]="apiCall" (click)="closeLayerSettings()">Back
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="newInnerLayer">
+                <div fxFill fxLayout="column">
+                  <div fxFlex class="layer-selection-block">
+                    <mat-list>
+                      <mat-list-item class="layer_list layers_sub_head">
+                        <p mat-line
+                          *ngIf="postprocessingLayers['segmentaionCleanup'].includes(newInnerLayerDetails['fid'])">
+                          Segmentation cleanup</p>
+                        <p mat-line
+                          *ngIf="postprocessingLayers['morphologicalOperations'].includes(newInnerLayerDetails['fid'])">
+                          Morphological operations</p>
+                      </mat-list-item>
+                    </mat-list>
+                    <ng-container
+                      *ngFor="let segArray of segmentedImageDetails['selectedSegmentedImage']['tempPostprocessingWorkflowFeatures']; let layIndex=index">
+                      <ng-container *ngIf="segArray.fid==newInnerLayerDetails['fid']">
+                        <div class="histogram_block" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
+                          <div fxFlex>
+                            <h3 class="new-inner-layer-header">
+                              {{newInnerLayerDetails['Name']}}
+                              <label class="filters_list_icon"
+                                *ngIf="features[segArray.fid]['info']!=undefined && features[segArray.fid]['info']!=''">
+                                <span class="help-icon material-symbols-outlined"
+                                  matTooltip="{{features[segArray.fid]['info']}}" matTooltipPosition="above">info</span>
+                              </label>
+                            </h3>
+                            <p *ngIf="features[segArray.fid]['info']!='' && features[segArray.fid]['info']!=undefined">
+                              {{features[segArray.fid]['info']}}</p>
+                          </div>
+                          <ng-container
+                            *ngIf="segArray['Params']['structure_element']!=undefined && segArray['Params']['structure_element']!=''">
+                            <div fxFlex *ngIf="segArray['fid']=='26'">
+                              <strong>1. Create mask using dilation of objects in segmented image.</strong>
+                            </div>
+                            <div>
+                              <mat-form-field appearance="outline">
+                                <mat-label>Element Shape</mat-label>
+                                <mat-select placeholder="Select shape" [value]="segArray['Params']['structure_element']"
+                                  [disabled]="apiCall"
+                                  (selectionChange)="changeTempWorkflowOnDropDown($event,layIndex,'structure_element','post-processing')">
+                                  <mat-option *ngFor="let shape of returnKeysFromObject(segArray['shapes'])"
+                                    [value]="shape">{{segArray['shapes'][shape]}}</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                          </ng-container>
+                          <ng-container *ngFor="let objKeys of returnKeysFromObject(segArray['Params'])">
+                            <ng-container *ngIf="objKeys=='minimum size to be removed' || objKeys=='Equivalent diameter (µm)' || 
+                                                  (objKeys=='width' && segArray['Params']['structure_element']=='rectangle') || 
+                                                  (objKeys=='height' && (segArray['Params']['structure_element']=='rectangle' || segArray['Params']['structure_element']=='square')) || 
+                                                  (objKeys=='radius' && segArray['Params']['structure_element']=='disk') || 
+                                                  objKeys=='size_removed'">
+                              <div *ngIf="segArray['fid']=='26' && objKeys=='size_removed'">
+                                <strong>2. Remove cluster below a specified size.</strong>
+                              </div>
+                              <div fxLayout="column" fxLayoutGap="8px">
+                                <ng-container
+                                  *ngIf="objKeys=='minimum size to be removed' || objKeys=='Equivalent diameter (µm)'">
+                                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                    <div fxFlex>
+                                      <label>
+                                        {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                        <span class="help-icon material-symbols-outlined"
+                                          *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                          matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                          matTooltipPosition="above">info</span>
+                                      </label>
+                                    </div>
+                                    <div fxFlex="80px">
+                                      <mat-form-field appearance="outline">
+                                        <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                          (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'post-processing',$event)" />
+                                      </mat-form-field>
+                                    </div>
+                                  </div>
+                                  <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                    <div fxFlex="none">
+                                      {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                    <div fxFlex>
+                                      <mat-slider class="slider-width" [disabled]="apiCall"
+                                        [max]="segArray['slider'][objKeys]['range']['max']"
+                                        [min]="segArray['slider'][objKeys]['range']['min']"
+                                        [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                        [(value)]="segArray['Params'][objKeys]"
+                                        (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'post-processing')">
+                                        <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                      </mat-slider>
+                                    </div>
+                                    <div fxFlex="none">{{segArray['slider'][objKeys]['range']['max']}}</div>
+                                  </div>
+                                </ng-container>
+                                <ng-container *ngIf="objKeys=='size_removed' && segArray['Params'][objKeys]>-1">
+                                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                    <div fxFlex>
+                                      <label>
+                                        {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                        <span class="help-icon material-symbols-outlined"
+                                          *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                          matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                          matTooltipPosition="above">info</span>
+                                      </label>
+                                    </div>
+                                    <div fxFlex="80px">
+                                      <mat-form-field appearance="outline">
+                                        <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                          (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'post-processing',$event)" />
+                                      </mat-form-field>
+                                    </div>
+                                  </div>
+                                  <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                    <div fxFlex="none">{{segArray['slider'][objKeys]['range']['min']}}</div>
+                                    <div fxFlex>
+                                      <mat-slider class="slider-width" [disabled]="apiCall"
+                                        [max]="segArray['slider'][objKeys]['range']['max']"
+                                        [min]="segArray['slider'][objKeys]['range']['min']"
+                                        [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                        [(value)]="segArray['Params'][objKeys]"
+                                        (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'post-processing')">
+                                        <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                      </mat-slider>
+                                    </div>
+                                    <div fxFlex="none">{{segArray['slider'][objKeys]['range']['max']}}
+                                    </div>
+                                  </div>
+                                </ng-container>
+                                <ng-container
+                                  *ngIf="(objKeys=='width' && segArray['Params']['structure_element']=='rectangle') || 
+                                                      (objKeys=='height' && (segArray['Params']['structure_element']=='rectangle' || segArray['Params']['structure_element']=='square')) || 
+                                                      (objKeys=='radius' && segArray['Params']['structure_element']=='disk')">
+                                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                                    <div fxFlex>
+                                      <label>
+                                        {{features[segArray.fid]['slider'][objKeys]['name']}}
+                                        <span class="help-icon material-symbols-outlined"
+                                          *ngIf="features[segArray.fid]['slider'][objKeys]['info']!=undefined && features[segArray.fid]['slider'][objKeys]['info']!=''"
+                                          matTooltip="{{features[segArray.fid]['slider'][objKeys]['info']}}"
+                                          matTooltipPosition="above">info</span>
+                                      </label>
+                                    </div>
+                                    <div fxFlex="80px">
+                                      <mat-form-field appearance="outline">
+                                        <input matInput type="number" value="{{segArray['Params'][objKeys]}}"
+                                          (keyup.enter)="onEnterTempSliderInput(segArray,layIndex,objKeys,'post-processing',$event)" />
+                                      </mat-form-field>
+                                    </div>
+                                  </div>
+                                  <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                                    <div fxFlex="none">
+                                      {{segArray['slider'][objKeys]['range']['min']}}</div>
+                                    <div fxFlex>
+                                      <mat-slider class="slider-width" [disabled]="apiCall"
+                                        [max]="segArray['slider'][objKeys]['range']['max']"
+                                        [min]="segArray['slider'][objKeys]['range']['min']"
+                                        [step]="segArray['slider'][objKeys]['step']" [discrete]="true"
+                                        [(value)]="segArray['Params'][objKeys]"
+                                        (change)="slideTempFilterWorkflow($event,layIndex,objKeys,'post-processing')">
+                                        <input matSliderThumb [ngModel]="segArray['Params'][objKeys]" />
+                                      </mat-slider>
+                                    </div>
+                                    <div fxFlex="none">
+                                      {{segArray['slider'][objKeys]['range']['max']}}</div>
+                                  </div>
+                                </ng-container>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center" class="action_btns">
+                    <button mat-stroked-button color="primary" [disabled]="apiCall"
+                      (click)="(searchFiltersList.length>0)?closeSearchInnerLayerSettings():closeinnerLayerSettings(true)">
+                      Back
+                    </button>
+                    <button mat-flat-button color="primary" [disabled]="apiCall"
+                      (click)="applyinnerLayerSettings()">Apply</button>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </mat-expansion-panel>
+        </ng-container>
+
+
+      </ng-container>
+    </div>
+    <div *ngIf="segAndCropTabSelected != 1" fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <button mat-stroked-button color="primary" (click)="backToFolders()">
+        Back
+      </button>
+      <button mat-flat-button color="primary" [disabled]="((apiCall || !saveWorkflowBtn) && !maskApplied)"
+        (click)="saveWorkFlow('save')">
+        Save
+      </button>
+      <button mat-flat-button color="primary" [disabled]="(apiCall || !saveWorkflowBtn || newWorkflow)"
+        (click)="openWorkflowNameDialog('new','saveas');">
+        Save As
+      </button>
+    </div>
+  </div>
+</div>

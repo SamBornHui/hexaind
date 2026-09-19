@@ -1,0 +1,73 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none"><app-header></app-header></div>
+  <div fxFlex fxLayout="column" fxLayoutGap="24px" class="h-100 p-8">
+    <div fxFlex="none">
+      <h1 class="global-main-title">Manage Roles
+        <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="This page describes the access levels for each of the four roles that exist on HEXAIND (Server Admin, Project Admin, Full Project Member, Limited Project Member)">info</mat-icon>
+      </h1>
+    </div>
+    <div fxFlex class="y-auto">
+      <table mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="entity">
+          <th mat-header-cell *matHeaderCellDef class="border-right">Entity</th>
+          <td mat-cell *matCellDef="let element" [attr.colspan]="columns.length" class="border-right">
+            {{element.entity}} </td>
+        </ng-container>
+        <ng-container matColumnDef="serverAdmin">
+          <th mat-header-cell *matHeaderCellDef class="border-right">
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div>Server Admin</div>
+              <div><mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Server Admin">info</mat-icon>
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="border-right">
+            <mat-icon *ngIf="element.serverAdmin" class="text-green">check_circle_outline</mat-icon>
+            <mat-icon *ngIf="!element.serverAdmin" class="material-symbols-outlined text-red">cancel</mat-icon>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="ProjectAdmin">
+          <th mat-header-cell *matHeaderCellDef class="border-right">
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div>Project Admin</div>
+              <div><mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Project Admin">info</mat-icon>
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="border-right">
+            <mat-icon *ngIf="element.ProjectAdmin" class="text-green">check_circle_outline</mat-icon>
+            <mat-icon *ngIf="!element.ProjectAdmin" class="material-symbols-outlined text-red">cancel</mat-icon>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="fullMember">
+          <th mat-header-cell *matHeaderCellDef class="border-right">
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div>Full Member</div>
+              <div><mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Full Member">info</mat-icon>
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="border-right">
+            <mat-icon *ngIf="element.fullMember" class="text-green">check_circle_outline</mat-icon>
+            <mat-icon *ngIf="!element.fullMember" class="material-symbols-outlined text-red">cancel</mat-icon>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="limitedMember">
+          <th mat-header-cell *matHeaderCellDef>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div>Limited Member</div>
+              <div><mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Limited Member">info</mat-icon>
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="center-cell">
+            <mat-icon *ngIf="element.limitedMember" class="text-green">check_circle_outline</mat-icon>
+            <mat-icon *ngIf="!element.limitedMember" class="material-symbols-outlined text-red">cancel</mat-icon>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: display;"></tr>
+      </table>
+    </div>
+  </div>
+</div>

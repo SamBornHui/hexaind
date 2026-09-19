@@ -1,0 +1,114 @@
+<mat-form-field
+  appearance="outline"
+  *ngIf="type !== 'checkbox' && type !== 'toggle'"
+>
+  <mat-label *ngIf="label">{{ label }}</mat-label>
+  <mat-select
+    *ngIf="type === 'select'"
+    [value]="value"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [required]="required"
+    (selectionChange)="onSelectionChange($event)"
+    (blur)="onBlur($event)"
+    (keydown)="onKeyDown($event)"
+  >
+    <mat-option *ngFor="let item of items" [value]="item?.id">
+      {{ item.name }}
+    </mat-option>
+  </mat-select>
+  <input
+    *ngIf="type !== 'select' && type !== 'textarea'"
+    matInput
+    #inputEl
+    [class]="'mst-input__type--' + type"
+    [value]="value || ''"
+    [placeholder]="placeholder"
+    [type]="type === 'color' ? 'text' : type"
+    [disabled]="disabled"
+    [required]="required"
+    [style.background]="type === 'color' ? value : undefined"
+    [readonly]="type === 'color'"
+    (change)="onValueChange($event)"
+    (click)="type === 'color' && onClick()"
+    (input)="onInput($event)"
+    (blur)="onBlur($event)"
+    (keydown)="onKeyDown($event)"
+  />
+  <textarea
+    *ngIf="type === 'textarea'"
+    matInput
+    #inputEl
+    [class]="'mst-input__type--' + type"
+    [value]="value || ''"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [required]="required"
+    (change)="onValueChange($event)"
+    (blur)="onBlur($event)"
+    (keydown)="onKeyDown($event)"
+  ></textarea>
+  <span *ngIf="prefix" matTextPrefix>{{ prefix }}&nbsp;</span>
+  <span *ngIf="suffix" matTextSuffix>{{ suffix }}</span>
+  <mst-button
+    *ngIf="prefixIconName"
+    matPrefix
+    styleName="icon"
+    [iconName]="prefixIconName"
+    (click)="onPrefixIconClick()"
+  />
+  <mst-button
+    *ngIf="suffixIconName"
+    matSuffix
+    styleName="icon"
+    [iconName]="suffixIconName"
+    (click)="onSuffixIconClick()"
+  />
+  <mat-hint *ngIf="hint">{{ hint }}</mat-hint>
+</mat-form-field>
+<mat-checkbox
+  *ngIf="type === 'checkbox'"
+  #inputEl
+  [disabled]="disabled"
+  [checked]="value"
+  (change)="onCheckedChange($event)"
+  (blur)="onBlur($event)"
+  (keydown)="onKeyDown($event)"
+  >{{ label }}</mat-checkbox
+>
+<mat-slide-toggle
+  *ngIf="type === 'toggle'"
+  #inputEl
+  [disabled]="disabled"
+  [checked]="value"
+  (change)="onCheckedChange($event)"
+  (blur)="onBlur($event)"
+  (keydown)="onKeyDown($event)"
+  >{{ label }}</mat-slide-toggle
+>
+<div
+  class="mst-input__error"
+  *ngIf="
+    ngControl && ngControl.invalid && (ngControl.dirty || ngControl.touched)
+  "
+>
+  {{ errorMessage || getErrorMessage() }}
+</div>
+<ng-template #dialogTemplate>
+  <div class="mst-input__dialog__title">
+    <h2>Color</h2>
+    <mst-button styleName="icon" iconName="close" (click)="onCloseClick()" />
+  </div>
+  <mat-dialog-content class="mst-input__dialog__content"
+    ><span
+      [style.background]="value"
+      [cpToggle]="true"
+      [cpDialogDisplay]="'inline'"
+      [colorPicker]="value"
+      (colorPickerChange)="onColorChange($event)"
+    ></span
+  ></mat-dialog-content>
+  <mat-dialog-actions class="mst-input__dialog__actions">
+    <mst-button mat-dialog-close>Close</mst-button>
+  </mat-dialog-actions>
+</ng-template>

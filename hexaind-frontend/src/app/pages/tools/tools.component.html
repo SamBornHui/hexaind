@@ -1,0 +1,103 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px">
+  <div fxFlex="none">
+    <h1 class="global-main-title">Apps
+      <mat-icon class="material-symbols-outlined global-info-icon"
+        matTooltip="Databrick can develop custom applications for our customers and they will be listed here.">
+        info
+      </mat-icon>
+    </h1>    
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="fixed-header"
+  >
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="220px" fxFlex.lt-md="150px">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Search"
+            [(ngModel)]="searchText"
+            (ngModelChange)="onSearchTextChange()"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <div *ngIf="isEditPermission && searchResults.length > 0">
+        <button mat-flat-button color="primary" style="margin-right: 10px;" (click)="enableEdit()">
+          Edit Permission
+        </button>
+        <button mat-flat-button color="primary" *ngIf="isEditPermissionEnabled" (click)="updateRbac()" [disabled]="isSavingPermission">
+          Update Permission
+        </button>
+      </div>
+    </div>
+
+  </div>
+  <div fxFlex *ngIf="showLoader" fxLayout="column" fxLayoutAlign="center center" style="align-items: center">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+  <div fxFlex class="global-grid-container" *ngIf="!showLoader">
+    <div fxLayout="row wrap" fxLayoutGap="32px grid" *ngIf="searchResults.length > 0">
+      <!-- Search Results -->
+      <div fxFlex="0 0 calc(33.33% - 32px)" fxFlex.lt-md="0 0 calc(50% - 32px)" fxFlex.lt-sm="100%" 
+           *ngFor="let row of searchResults">
+        <div class="app-card"  (click)="navigateTo(row.name)" [ngClass]="{'highlight': row.default_user}">
+          <div class="app-card-content">
+            <div class="app-card-header">
+              <h3 class="app-title">{{ row.name }}</h3>
+              <mat-checkbox *ngIf="isEditPermission && isEditPermissionEnabled" 
+                           [(ngModel)]="row.default_user" 
+                           (click)="updateStatus()"
+                           color="primary"
+                           >
+              </mat-checkbox>
+            </div>
+            <div class="app-card-body">
+              <div class="app-description" *ngIf="row.description">
+                {{ row.description | slice:0:120 }}{{ row.description.length > 120 ? '...' : '' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- App Hub Applications -->
+      <div fxFlex="0 0 calc(33.33% - 32px)" fxFlex.lt-md="0 0 calc(50% - 32px)" fxFlex.lt-sm="100%"
+           *ngFor="let app of appHubApplicationsList">
+        <div class="app-card external-app" (click)="openUrlInNewTab(app.ingress_url)">
+          <div class="app-card-content">
+            <div class="app-card-header">
+              <h3 class="app-title">{{ app.name }}</h3>
+              <mat-icon class="external-icon">open_in_new</mat-icon>
+            </div>
+            <div class="app-card-body" >
+              <div class="app-description" *ngIf="app.description">
+                {{ app.description | slice:0:120 }}{{ app.description.length > 120 ? '...' : '' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="searchResults.length === 0">
+      <mat-icon class="empty-icon">apps</mat-icon>
+      <h2>No Apps Available</h2>
+      <p>There are currently no applications in this project.</p>
+    </div>
+  </div>
+</div>
+
+<app-create-new-workflow-session
+  *ngIf="IsCreatingNewWorkflowSession"
+  (closeDialogClicked)="onCloseCreateNewWorkflowSessionDialog()"
+  (workflowSessionCreatedEvent)="OnWorkflowSessionCreated($event)"
+>
+</app-create-new-workflow-session>

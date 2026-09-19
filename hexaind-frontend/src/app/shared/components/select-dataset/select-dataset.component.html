@@ -1,0 +1,19 @@
+<ng-template #itemWithParentNamesTemplate let-item="item">
+  <mst-list-item-parent-names
+    *ngIf="item.parentNames"
+    [item]="item"
+  /><ng-container *ngIf="!item.parentNames">{{ item.name }}</ng-container>
+</ng-template>
+<mst-select-list
+  [hasMore]="hasMore"
+  [title]="'Data Sources'"
+  [sourceItems]="sourceItems"
+  [selectedSourceId]="selectedSourceId"
+  [itemTemplate]="itemWithParentNamesTemplate"
+  [items]="items"
+  [draggable]="draggable"
+  [selectedItemHighlight]="selectedItemHighlight"
+  (sourceChange)="onSourceChange($event)"
+  (loadMore)="onLoadMore($event)"
+  (itemClick)="onItemClick($event)"
+/>

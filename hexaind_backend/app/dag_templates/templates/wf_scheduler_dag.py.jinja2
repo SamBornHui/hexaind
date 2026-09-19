@@ -1,0 +1,87 @@
+import datetime
+
+from airflow import DAG
+from airflow.providers.docker.operators.docker import DockerOperator
+from docker.types import Mount
+from airflow.operators.dummy import DummyOperator
+from airflow.operators.python import BranchPythonOperator
+
+SCHEDULE_INTERVAL = {{ schedule_interval_minutes }}
+START_DATE = {{ start_date }}
+DAG_TASK_ID = "dag_{{ task_id }}"
+REPEAT_TYPE = "{{ repeat_type }}"
+REPEAT_VAL =  {{ repeat_val }}
+
+def is_eligible_to_exe(execution_date):
+    if SCHEDULE_INTERVAL == "@once" or REPEAT_TYPE == "Days" or REPEAT_VAL == 1:
+        return  DAG_TASK_ID
+    else:
+        execution_date = execution_date.replace(tzinfo=None)
+        if REPEAT_TYPE == "Weeks":
+            diff_days = (execution_date - START_DATE).days
+            rem = diff_days % (REPEAT_VAL * 7)
+            if rem == 0:
+                return DAG_TASK_ID
+            else:
+                return "skip_task"
+
+        else:
+            if REPEAT_TYPE == "Months":
+                diff = (execution_date.month - START_DATE.month)
+            else:
+                diff = (execution_date.year - START_DATE.year)
+            if diff % REPEAT_VAL == 0:
+                    return DAG_TASK_ID
+            else:
+                return "skip_task"
+
+default_args = {
+    "owner": "airflow",
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 1,
+    "retry_delay": datetime.timedelta(minutes=5),
+}
+
+with DAG(
+    dag_id="{{ dag_id }}",
+    default_args=default_args,
+    description="A dynamically generated dag to trigger run",
+    schedule_interval=SCHEDULE_INTERVAL,
+    start_date=START_DATE,
+    end_date={{ end_date }},
+    tags={{ tags }},
+    catchup=False,
+) as dag:
+
+    check_eligibility = BranchPythonOperator(
+        task_id='is_eligible_to_exe',
+        python_callable=is_eligible_to_exe,
+        provide_context=True
+    )
+
+    dockerized_task = DockerOperator(
+        task_id=DAG_TASK_ID,
+        image="databrick/hexaind_backend:develop",
+        api_version="auto",
+        auto_remove=True,
+        command="python -m app.celery_trigger_airflow '{{ schedule_id }}' '{{ workflow_id }}' '{{ project_id }}' '{{ token }}' '{{ site_id }}'",
+        docker_url="unix://var/run/docker.sock",
+        network_mode="hexaind-network",
+        mount_tmp_dir=False,
+        mounts=[ {% for mount in mounts %}
+            {{ mount }},
+            {%- endfor %}
+        ],
+        environment={ {% for key, value in environment.items() %}
+            "{{ key.upper() }}": "{{ value }}",
+            {%- endfor %}
+        },
+    )
+
+    skip_task = DummyOperator(
+        task_id='skip_task'
+    )
+
+    check_eligibility >> [dockerized_task, skip_task]

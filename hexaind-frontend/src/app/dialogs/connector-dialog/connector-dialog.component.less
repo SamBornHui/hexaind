@@ -1,0 +1,38 @@
+.title {
+  color: var(--secondary);
+  line-height: 36px;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+::ng-deep .toggle-button mat-button-toggle button .mat-button-toggle-label-content {
+  line-height: 36px !important;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--grey);
+}
+
+::ng-deep .toggle-button .mat-button-toggle-checked .mat-button-toggle-label-content {
+  background-color: var(--selected-surface);
+  color: var(--primary);
+}
+
+
+.filename-container {
+  width: 300px;
+  background: var(--white);
+  border-radius: 8px;
+  padding: 0px 8px;
+}
+
+.filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.file-input {
+  display: none;
+}

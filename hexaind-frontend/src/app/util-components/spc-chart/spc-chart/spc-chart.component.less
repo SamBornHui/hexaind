@@ -1,0 +1,149 @@
+/* General container styling */
+.container-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* SPC Chart section */
+.chart-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // flex: 1;
+}
+
+.Date-chart-section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+}
+
+/* Slider style */
+.slider {
+    width: 150px;
+    margin-bottom: 5px;
+}
+
+/* Mean & STD Results */
+.chart-result {
+    font-size: 14px;
+    color: #555;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 8px;
+    text-align: center;
+}
+
+
+.chart-table-result{
+    font-size: 14px;
+    color: #555;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 8px;
+    text-align: center;
+    width: 450px;
+    height: 200px; 
+    overflow: auto;
+}
+
+.input-section{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-column1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-column2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+/* Input section with 2-column layout */
+.input-column {
+    display: flex;
+    // grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+    // width: 100%;
+}
+
+/* Labels */
+.input-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    grid-column: span 2;
+    text-align: center;
+}
+
+/* Input fields */
+input {
+    width: 100%;
+    max-width: 150px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+/* Button styling */
+.compute-btn, .filter-btn {
+    padding: 10px;
+    border: none;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    max-width: 150px;
+}
+
+.compute-btn {
+    background: #3f51b5;
+    color: white;
+}
+
+.compute-btn:hover {
+    background: #303f9f;
+}
+
+.filter-btn {
+    background: #bbb;
+    color: #333;
+}
+
+/* Chart container */
+.chart-container {
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .input-section {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    input, .compute-btn, .filter-btn {
+        max-width: 100%;
+    }
+}

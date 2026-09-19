@@ -1,0 +1,28 @@
+.notification-container {
+  height: 100%;
+  overflow-y: auto;
+
+  .row {
+    border-bottom: 1px solid var(--stroke-lite);
+    padding: 32px 0;
+  }
+
+  .unread {
+    width: 8px;
+    height: 8px;
+    line-height: 8px;
+    font-size: 8px;
+    top: 2px;
+    color: var(--primary);
+  }
+
+  .link {
+    font-weight: 500;
+    color: var(--primary);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--grey);
+    }
+  }
+}

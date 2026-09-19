@@ -1,0 +1,447 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" class="p-6 border-bottom">
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+      <div fxFlex>
+        <div class="fw-semi-bold text-grey">Step {{currentStep}} of {{totalSteps}}</div>
+        <h1 class="title">
+          <ng-container *ngIf="currentStep==1">Choose a connector</ng-container>
+          <ng-container *ngIf="currentStep==2">Add connector details</ng-container>
+          <ng-container *ngIf="currentStep==3">Authenticate connector</ng-container>
+        </h1>
+      </div>
+      <div fxFlex="none">
+        <button mat-icon-button [mat-dialog-close]="true">
+          <mat-icon class="close-icon">close</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex class="y-auto">
+    <!-- <div class="p-6" *ngIf="currentStep==1">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search Connector</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (input)="filterConnectors()" placeholder="Search..." />
+      </mat-form-field>
+      <mat-radio-group aria-label="Select an option" class="connector-radio-button" [(ngModel)]="selectedConnector"
+        (change)="onRadioChange($event)">
+        <mat-radio-button color="primary" value="BIGQUERY">
+          <div><img src="assets/icon-bigquery.svg" /></div>
+          <div>Big query</div>
+        </mat-radio-button>
+        <mat-radio-button color="primary" value="SNOWFLAKE">
+          <div><img src="assets/icon-snowflake.svg" /></div>
+          <div>Snowflake</div>
+        </mat-radio-button>
+        <mat-radio-button color="primary" value="RESCALE">
+          <div><img src="assets/icon-rescale.svg" /></div>
+          <div>Rescale</div>
+        </mat-radio-button>
+        <mat-radio-button color="primary" value="THERMOCALC">
+          <div><img src="assets/icon-thermocalc.svg" /></div>
+          <div>ThermoCalc</div>
+        </mat-radio-button>
+      </mat-radio-group>
+    </div> -->
+    <div class="p-6" *ngIf="currentStep==1">
+      <!-- Search Input -->
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search Connector</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (input)="filterConnectors()" placeholder="Search..." />
+      </mat-form-field>
+    
+      <mat-radio-group aria-label="Select an option" class="connector-radio-button" [(ngModel)]="selectedConnector"
+        (change)="onRadioChange($event)">
+        
+        <mat-radio-button *ngFor="let connector of filteredConnectors" color="primary" [value]="connector.value">
+          <div><img [src]="connector.icon" /></div>
+          <div>{{ connector.label }}</div>
+        </mat-radio-button>
+    
+      </mat-radio-group>
+    </div>
+    
+    <!-- <div class="p-6" *ngIf="currentStep == 1">
+      <div fxLayout="column" fxLayoutGap="16px">
+        <div>
+          <mat-form-field appearance="outline" class="connector-dropdown">
+            <mat-select [(ngModel)]="selectedConnector" (selectionChange)="onConnectorChange($event)"
+              placeholder="Select Connector">
+              <mat-form-field class="search-input" appearance="fill">
+                <input matInput [(ngModel)]="searchTerm" placeholder="Search Connector" />
+              </mat-form-field>
+              <mat-option *ngFor="let connector of filteredConnectors()" [value]="connector.value">
+                <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="8px">
+                  <img fxFlex="none" [src]="connector.icon" width="40px" />
+                  <span>{{ connector.label }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div> -->
+
+    <div class="p-6" *ngIf="currentStep==2" fxLayout="column" fxLayoutGap="16px">
+      <div fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="16px">
+        <div>
+          <div class="fw-bold pb-1">Name</div>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Enter name" [(ngModel)]="newConnectorName" (input)="checkContinueButton()">
+          </mat-form-field>
+        </div>
+        <!-- <div>
+      <div class="fw-bold pb-1">Description</div>
+        <mat-form-field appearance="outline">
+          <textarea rows="5" matInput placeholder="Enter Description" [(ngModel)]="newConnectorDescription" (input)="checkContinueButton()"></textarea>
+        </mat-form-field>
+    </div> -->
+      </div>
+    </div>
+    <div class="p-6" *ngIf="currentStep==3" fxLayout="column" fxLayoutGap="16px">
+      <div fxLayout="column" *ngIf="isBigQueryConnection()">
+        <div>
+          <div class="fw-bold pb-1">Select Authentication method</div>
+          <mat-radio-group [(ngModel)]="connectionType">
+            <mat-radio-button color="primary" value="Service Account">Service Authentication</mat-radio-button>
+            <mat-radio-button color="primary" value="User Authentication">User Authentication </mat-radio-button>
+            <!-- <mat-radio-button color="primary" value="Browser Authentication">Authentication via browser</mat-radio-button> -->
+          </mat-radio-group>
+        </div>
+        <div *ngIf="connectionType == 'Service Account'" fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+          <!-- GCS Bucket Name Input -->
+          <mat-form-field appearance="outline" fxFlex="none">
+            <mat-label>GCS Bucket Name</mat-label>
+            <input matInput [(ngModel)]="gcsBucketName" placeholder="Enter GCS Bucket Name" required>
+          </mat-form-field>
+        
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" *ngIf="fileName == ''">
+            <input type="file" class="file-input" #fileUpload (change)="onFileSelected($event)" accept=".json">
+            <button mat-flat-button color="primary" class="upload-btn" (click)="fileUpload.click()">
+              <mat-icon class="material-symbols-outlined">upload</mat-icon>
+              Upload JSON file
+            </button>
+          </div>
+        
+          <div *ngIf="fileName != ''">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center" class="filename-container">
+              <img width="16px" src="assets/draft.png" class="me-2" />
+              <span class="filename">{{ fileName }}</span>
+            </div>
+            <input type="file" class="file-input" #fileUpload (change)="onFileSelected($event)" accept=".json">
+            <button mat-button color="primary" (click)="fileUpload.click()">Replace</button>
+          </div>
+        
+          <div *ngIf="fileName !== ''" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <button mat-flat-button color="primary" class="upload-btn" (click)="authentication()">
+              Authenticate
+            </button>
+            <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+            <div *ngIf="spinner" class="text-gray">Checking authentication...</div>
+        
+            <mat-icon matPrefix *ngIf="isJsonAuthenticationSuccessful" class="text-green">check</mat-icon>
+            <div *ngIf="isJsonAuthenticationSuccessful" class="text-green">Authentication Successful</div>
+        
+            <mat-icon matPrefix *ngIf="isJsonAuthenticationFailed" class="text-red">cancel</mat-icon>
+            <div *ngIf="isJsonAuthenticationFailed" class="text-red">Authentication Failed</div>
+          </div>
+        </div>
+        
+
+        <div *ngIf="connectionType == 'User Authentication'" fxFlex="none" fxLayout="column" fxLayoutGap="16px">
+          <div>
+            <div class="fw-bold pb-1">Project ID</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Project ID" [(ngModel)]="gcp_project_id"
+                (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Client ID</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter client ID" [(ngModel)]="clientId" (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Client Secret</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter client secret" [(ngModel)]="clientSecret"
+                (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Refresh Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter refresh token" [(ngModel)]="refreshToken"
+                (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+            <button mat-flat-button color="primary" class="upload-btn" (click)="authentication()"
+              [disabled]="!enableAuthenticateButton()">
+              Authenticate
+            </button>
+            <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+            <div *ngIf="spinner" class="text-gray">Checking authentication...</div>
+            <mat-icon matPrefix *ngIf="isUserAuthenticatedSuccessful" class="text-green">check</mat-icon>
+            <div *ngIf="isUserAuthenticatedSuccessful" class="text-green">Authentication Successful</div>
+            <mat-icon matPrefix *ngIf="isUserAuthenticatedFailed" class="text-red">cancel</mat-icon>
+            <div *ngIf="isUserAuthenticatedFailed" class="text-red">Authentication Failed</div>
+          </div>
+        </div>
+
+        <!-- The following code is commented out as it may be needed in the 
+         future for Browser Authentication with the BigQuery connector.  -->
+
+        <!-- <div *ngIf="connectionType == 'Browser Authentication'" fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+        <div class="pb-1">Project ID</div>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Enter Project ID" name="browserAuthProjectId" [(ngModel)]="browserAuthProjectId"/>
+          </mat-form-field>
+      </div>
+
+        <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+        <button mat-flat-button color="primary" class="upload-btn" (click)="authentication()" [disabled]="browserAuthProjectId == ''">
+          Authenticate
+        </button>
+        <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+        <div *ngIf="spinner" class="text-gray">Checking authentication...</div>
+        <mat-icon matPrefix *ngIf="isBrowserAuthenticated" class="text-green">check</mat-icon>
+        <div *ngIf="isBrowserAuthenticated" class="text-green">Authentication Successful</div>
+      </div>
+
+    </div> -->
+      </div>
+
+      <div fxLayout="column" *ngIf="isSnowFlakeConnection()">
+        <div>
+          <div class="fw-bold pb-1">Select Authentication method</div>
+          <mat-radio-group [(ngModel)]="connectionType1">
+            <!-- <mat-radio-button color="primary" value="Service Account">Service Authentication</mat-radio-button> -->
+            <mat-radio-button color="primary" value="Snowflake Authentication">User Authentication </mat-radio-button>
+            <!-- <mat-radio-button color="primary" value="Browser Authentication">Authentication via browser</mat-radio-button> -->
+          </mat-radio-group>
+        </div>
+
+
+        <div *ngIf="connectionType1 == 'Snowflake Authentication'" fxFlex="none" fxLayout="column" fxLayoutGap="16px">
+          <div>
+            <div class="fw-bold pb-1">User</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter User" [(ngModel)]="sf_user" (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Password</div>
+            <mat-form-field appearance="outline">
+              <input matInput [type]="passwordVisible ? 'text' : 'password'" placeholder="Enter Password"
+                [(ngModel)]="sf_password" (input)="checkContinueButton()" />
+              <button matSuffix mat-icon-button (click)="togglePasswordVisibility()" type="button">
+                <mat-icon *ngIf="!passwordVisible" class="material-symbols-outlined">visibility_off</mat-icon>
+                <mat-icon *ngIf="passwordVisible" class="material-symbols-outlined">visibility_on</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Account</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Account" [(ngModel)]="sf_account" (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Warehouse</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Warehouse" [(ngModel)]="sf_warehouse"
+                (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Database</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Database" [(ngModel)]="sf_database" (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">DB Schema</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter DB Schema" [(ngModel)]="sf_schema" (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Role</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Role" [(ngModel)]="sf_role" (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+            <button mat-flat-button color="primary" class="upload-btn" (click)="authentication()"
+              [disabled]="!enableSnowflakeAuthenticateButton()">
+              Authenticate
+            </button>
+            <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+            <div *ngIf="spinner" class="text-gray">Checking authentication...</div>
+            <mat-icon matPrefix *ngIf="isUserAuthenticatedSuccessful" class="text-green">check</mat-icon>
+            <div *ngIf="isUserAuthenticatedSuccessful" class="text-green">Authentication Successful</div>
+            <mat-icon matPrefix *ngIf="isUserAuthenticatedFailed" class="text-red">cancel</mat-icon>
+            <div *ngIf="isUserAuthenticatedFailed" class="text-red">Authentication Failed</div>
+          </div>
+        </div>
+      </div>
+
+      <div fxLayout="column" *ngIf="isCouchbaseConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Connection String</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Connection String" name="connection_str" [(ngModel)]="connection_str" [disabled]="spinner"
+                (ngModelChange)="onchangestring()" />
+            </mat-form-field>
+          </div>
+          
+        </div>
+      </div>
+
+      <div fxLayout="column" *ngIf="isElasticConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Token String" name="connection_str" [(ngModel)]="connection_str" [disabled]="spinner"
+                (ngModelChange)="onchangestring()" />
+            </mat-form-field>
+          </div>
+          
+        </div>
+      </div>
+
+      <div fxLayout="column" *ngIf="isMysqlConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Token String" name="connection_str" [(ngModel)]="connection_str" [disabled]="spinner"
+                (ngModelChange)="onchangestring()" />
+            </mat-form-field>
+          </div>
+          
+        </div>
+      </div>
+
+      <div fxLayout="column" *ngIf="isHiveConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Token String" name="connection_str" [(ngModel)]="connection_str" [disabled]="spinner"
+                (ngModelChange)="onchangestring()" />
+            </mat-form-field>
+          </div>
+          
+        </div>
+      </div>
+      <div fxLayout="column" *ngIf="isRedshiftConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Token String" name="connection_str" [(ngModel)]="connection_str" [disabled]="spinner"
+                (ngModelChange)="onchangestring()" />
+            </mat-form-field>
+          </div>
+          
+        </div>
+      </div>
+      <div fxLayout="column" *ngIf="isPostgresqlConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Token String" name="connection_str" [(ngModel)]="connection_str" [disabled]="spinner"
+                (ngModelChange)="onchangestring()" />
+            </mat-form-field>
+          </div>
+          
+        </div>
+      </div>
+      <div fxLayout="column" *ngIf="isRescaleConnection()">
+        <div fxFlex="none" fxLayout="column" class="bg-surface p-4 rounded-2" fxLayoutGap="8px">
+          <div>
+            <div class="fw-bold pb-1">Token</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter Token" name="token" [(ngModel)]="token" [disabled]="spinner"
+                (ngModelChange)="onchange()" />
+            </mat-form-field>
+          </div>
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+            <button mat-flat-button color="primary" class="upload-btn" (click)="authentication()" [disabled]="!token">
+              Authenticate
+            </button>
+            <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+            <div *ngIf="spinner" class="text-gray">Checking authentication...</div>
+            <mat-icon matPrefix *ngIf="isJsonAuthenticationSuccessful" class="text-green">check</mat-icon>
+            <div *ngIf="isJsonAuthenticationSuccessful" class="text-green">Authentication Successful</div>
+            <mat-icon matPrefix *ngIf="isJsonAuthenticationFailed" class="text-red">cancel</mat-icon>
+            <div *ngIf="isJsonAuthenticationFailed" class="text-red">Authentication Failed</div>
+          </div>
+        </div>
+      </div>
+      <div fxLayout="column" *ngIf="isThermCalcConnection()">
+        <div>
+          <div class="fw-bold pb-1">Select Authentication method</div>
+          <mat-radio-group [(ngModel)]="themoCalcAuthMethod">
+            <mat-radio-button color="primary" value="server_ip_address">Server IP Address</mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <div *ngIf="themoCalcAuthMethod == 'server_ip_address'" fxFlex="none" fxLayout="column"
+          class="bg-surface p-4 rounded-2" fxLayoutGap="16px">
+          <div>
+            <div class="fw-bold pb-1">Server Name</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter server name" [(ngModel)]="serverName"
+                (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div>
+            <div class="fw-bold pb-1">Application Path</div>
+            <mat-form-field appearance="outline">
+              <input matInput placeholder="Enter application path" [(ngModel)]="applicationPath"
+                (input)="checkContinueButton()" />
+            </mat-form-field>
+          </div>
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+            <button mat-flat-button color="primary" class="upload-btn" (click)="authentication()"
+              [disabled]="!enableThermoCalcAuthButton()">
+              Authenticate
+            </button>
+            <mat-spinner matSuffix *ngIf="spinner" diameter="24"></mat-spinner>
+            <div *ngIf="spinner" class="text-gray">Checking authentication...</div>
+
+            <mat-icon matPrefix *ngIf="isJsonAuthenticationSuccessful" class="text-green">check</mat-icon>
+            <div *ngIf="isJsonAuthenticationSuccessful" class="text-green">Authentication Successful</div>
+
+            <mat-icon matPrefix *ngIf="isJsonAuthenticationFailed" class="text-red">cancel</mat-icon>
+            <div *ngIf="isJsonAuthenticationFailed" class="text-red">Authentication Failed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div fxFlex="none">
+    <mat-dialog-actions align="end">
+      <button mat-stroked-button color="primary" mat-dialog-close *ngIf="currentStep==1">Cancel</button>
+      <button mat-stroked-button color="primary" mat-dialog-close *ngIf="currentStep==2 && skipStep">Cancel</button>
+      <button mat-stroked-button color="primary" *ngIf="displayBackButton()" (click)="previous()">Back</button>
+      <button mat-flat-button color="primary" (click)="next()" *ngIf="currentStep<=2"
+        [disabled]="!showContinue">Continue</button>
+        <button mat-flat-button color="primary" (click)="finish()" 
+        *ngIf="currentStep==3" 
+        [disabled]="!isCreated() || isLoading">
+        <span *ngIf="!isLoading">Create Connector</span> 
+        <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+    </button>
+    </mat-dialog-actions>
+  </div>
+</div>

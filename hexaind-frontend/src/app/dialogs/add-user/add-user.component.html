@@ -1,0 +1,66 @@
+<mat-dialog-content class="mat-typography">
+  <div fxLayout="column" fxLayoutGap="8px">
+    <div fxLayout="column" fxLayoutGap="16px">
+      <h1 *ngIf="!isUpdatingUser" class="title"> Invite Users </h1>
+      <h1 class="title" *ngIf="isUpdatingUser"> Update User </h1>
+      
+      <div class="close-button">
+        <button mat-icon-button class="close-button" [mat-dialog-close]="true">
+          <mat-icon class="close-icon">close</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div>We'll send out an invite via email.</div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div class="text-sm">Email(s)</div>
+      <div>
+        <mat-form-field class="input-chip-list" color="primary" appearance="outline">
+          <mat-chip-grid #chipGridEmails>
+            <mat-chip-row color="primary" *ngFor="let invite of invitations">{{invite}}
+              <button matChipRemove (click)="removeEmail(invite)">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+            <input matInput placeholder="Enter email"
+                   [matChipInputFor]="chipGridEmails" name="email" [(ngModel)]="email" (keyup.enter)="addEmail()"/>
+          </mat-chip-grid>
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div class="text-sm">User Role</div>
+      <div fxFlex>
+        <mat-form-field MatFormFieldControl appearance="outline">
+          <mat-select
+            id="userRole"
+            name="userRole"
+            [(ngModel)]="userRole"
+          >
+            <mat-option *ngFor="let role of data.userRoles" [value]="role._id">
+                {{role.role_type}}
+            </mat-option>
+          </mat-select>
+
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="none" fxLayout="column" fxLayoutGap="8px">
+      <div>
+        <mat-checkbox color="primary" [(ngModel)]="ssoUser" name="ssoUser">SSO User</mat-checkbox>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" mat-dialog-close [disabled]="isCreatingUser">Cancel</button>
+  <button *ngIf="!isUpdatingUser" mat-flat-button color="primary" (click)="onCreateUser()" [disabled]="isCreatingUser">Send Invite  
+    <span class="material-icons-outlined">send</span>
+  </button>
+  <button *ngIf="isUpdatingUser" mat-flat-button color="primary" (click)="onCreateUser()" [disabled]="isCreatingUser">Update user</button>
+  <div *ngIf="isCreatingUser" style="display: flex; align-items: center">
+    <div class="global-spinner"></div>
+    &nbsp;Creating...
+  </div>
+</mat-dialog-actions>

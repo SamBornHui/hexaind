@@ -1,0 +1,241 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="column" fxLayoutGap="24px">
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex="none">
+                <div class="param-steps" [ngClass]="{ active: connectionIdActive() }">
+                  1
+                </div>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+                  <div class="fw-bold">Configure ThermoCalc Connection</div>
+                  <mat-icon class="material-symbols-outlined global-info-icon"
+                    matTooltip="Configure ThermoCalc Connection">
+                    info
+                  </mat-icon>
+                </div>
+                <div fxLayout="row">
+                  <div fxFlex="50">
+                    <mat-form-field appearance="outline">
+                      <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select connection"
+                        [ngModel]="getConnectorId()" (ngModelChange)="setConnectorId($event)">
+                        <mat-option *ngFor="let connector of connectors" [value]="connector._id">
+                          {{ connector.name }}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                  <button [disabled]="workflowCanvasService.IsViewingRunMode" mat-flat-button color="primary"
+                    [disabled]="isRescaleConnectorSelected()" (click)="authentication()">
+                    Test
+                  </button>
+                  <mat-spinner *ngIf="spinner" diameter="24"></mat-spinner>
+                  <div *ngIf="spinner" class="text-gray">
+                    Checking authentication...
+                  </div>
+                  <div *ngIf="isAuthenticationFailed" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                    class="failed">
+                    <mat-icon class="text-red">cancel</mat-icon>
+                    Authentication Failed
+                  </div>
+                  <div *ngIf="isAuthenticationSuccessful" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px"
+                    class="text-green">
+                    <mat-icon class="text-green">check</mat-icon>
+                    Authenticated successsfully
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxFlex="none">
+                <div class="param-steps" [ngClass]="{ active: connectionIdActive() }">
+                  2
+                </div>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="8px">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                  <div class="fw-bold">Upload Module file</div>
+                  <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="Upload Python file">
+                    info
+                  </mat-icon>
+                </div>
+                <div fxFlex="45">
+                  <button [disabled]="workflowCanvasService.IsViewingRunMode || !connectionIdActive()" mat-flat-button
+                    color="primary" (click)="importScriptFileDialog()">
+                    Browse
+                  </button> OR
+                  <button [disabled]="workflowCanvasService.IsViewingRunMode || !connectionIdActive()" mat-flat-button
+                    color="primary" (click)="selectScriptFileDialog()">
+                    Choose Module
+                  </button>
+                </div>
+                <div class="bg-surface p-4 rounded-1" *ngIf="getModuleId()">
+                  Module Name: {{ moduleName() }}
+                </div>
+
+                <div class="bg-surface p-4 rounded-1" *ngIf="getModuleId()">
+                  Module ID: {{ getModuleId() }}
+                </div>
+              </div>
+            </div>
+            <!-- Irshad- This might be needed in future -->
+            <!-- <div fxLayout="row" fxLayoutGap="16px">
+            <div fxFlex="none">
+              <div
+                class="param-steps"
+                [ngClass]="{ active: connectionIdActive() }"
+              >
+                3
+              </div>
+            </div>
+            <div fxFlex fxLayout="column" fxLayoutGap="8px">
+              <div
+                fxLayout="row"
+                fxLayoutAlign="start center"
+                fxLayoutGap="4px"
+              >                  
+                  <div class="fw-bold">Upload JSON file</div>
+                  <mat-icon
+                    class="material-symbols-outlined global-info-icon"
+                    matTooltip="Optional configurations"
+                  >
+                    info
+                  </mat-icon>                  
+              </div>
+              <div fxLayout="row">
+                <div fxFlex="60">
+                  <input
+                    [disabled]="workflowCanvasService.IsViewingRunMode"
+                    type="file"
+                    #jsonfile
+                    (change)="onUploadJSONFile($event)"
+                    multiple
+                    style="display: none"
+                    accept=".json"
+                  />
+                  <button
+                    [disabled]="workflowCanvasService.IsViewingRunMode"
+                    mat-flat-button
+                    color="primary"
+                    (click)="jsonfile.click()"
+                    [disabled]="!connectionIdActive()"
+                  >
+                    Browse
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          </div>
+
+          <!-- Irshad- This might be needed in future -->
+          <!-- <div fxFlex fxLayout="column" fxLayoutGap="8px">
+            <div
+              fxFlex="none"
+              fxLayout="row"
+              fxLayoutGap="4px"
+              fxLayoutAlign="start center"
+            >
+              <div class="fw-bold">JSON File Preview</div>
+              <mat-icon
+                class="material-symbols-outlined global-info-icon"
+                matTooltip="JSON File Preview"
+              >
+                info
+              </mat-icon>
+            </div>
+            <div fxFlex>
+              <mat-form-field appearance="outline" class="h-100">
+                <textarea
+                  [disabled]="workflowCanvasService.IsViewingRunMode"
+                  matInput
+                  [ngModel]="getThermoCalcConfigs()"
+                  (ngModelChange)="setThermoCalcConfigs($event)"
+                  class="h-100"
+                ></textarea>
+              </mat-form-field>
+            </div>
+          </div> -->
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="ThermoCalc Widget" widgetUrn="{{ getWidgetUrn() }}"
+  siteId="1"></app-config-action-bar>

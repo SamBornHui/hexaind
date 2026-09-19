@@ -1,0 +1,1221 @@
+<div fxLayout="column" class="rslt-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-back-button" (click)="navigate('tools')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">UC2 Result Visualization</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader()">
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex class="p-6 pt-1">
+    <mat-tab-group class="h-100">
+      <mat-tab label="Model Fanout">
+        <div fxLayout="row" fxLayoutGap="16px" class="h-100 pt-4 overflow-hidden">
+          <div [fxFlex]="flexValue" fxLayout="column">
+            <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="!isDataLoaded">
+              <div class="centered-info-message">
+                Please select the parameters to get the required data
+              </div>
+            </div>
+
+            <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="isDataLoaded">
+              <div fxFlex="none">
+                <div class="custom-btn-toggle">
+                  <div class="link" (click)="changeViewerFanout('Tables')"
+                    [ngClass]="{ 'active': selectedPreviewTypeFanout === 'Tables' }">Tables</div>
+                  <div style="background-color: #73797f;" class="link" (click)="changeViewerFanout('CpK Bar Chart')"
+                    [ngClass]="{ 'active': selectedPreviewTypeFanout === 'CpK Bar Chart', 'disabled': isDisabled }" >CpK Bar Chart</div>
+                  <div style="background-color: #73797f;" class="link" (click)="changeViewerFanout('Line Charts')"
+                    [ngClass]="{ 'active': selectedPreviewTypeFanout === 'Line Charts', 'disabled': isDisabled }">Line Charts</div>
+                </div>
+              </div>
+              <div fxFlex fxLayout="column">
+                <div fxFlex fxLayout="column" fxLayoutGap="24px" *ngIf="selectedPreviewTypeFanout === 'Tables'">
+                  <div fxFlex="35" fxLayout="row" fxLayoutGap="16px">
+                    <div fxFlex="40" fxLayout="column" fxLayoutGap="4px">
+                      <div fxFlex="none" class="fw-bold">{{table1Title}}</div>
+                      <div fxFlex class="y-auto">
+                        <table mat-table [dataSource]="modelsComparisonDfPreviewFanout">
+                          <ng-container *ngFor="let column of modelsComparisonDfPreviewColumnsFanout; let i = index"
+                            [matColumnDef]="column">
+                            <ng-container *ngIf="!excludedColumns.includes(column)">
+                              {{ column }}
+                              <th mat-header-cell *matHeaderCellDef>
+                                <div *ngIf="editableColumnName !== column; else editColumn"
+                                  (click)="setEditableColumnName(column)">
+                                  {{ column | titlecase }}
+                                </div>
+                                <ng-template #editColumn>
+                                  <div class="column-editor">
+                                    <input [(ngModel)]="currentEditValue" />
+                                    <button mat-icon-button color="primary" (click)="closeEdit()">
+                                      <mat-icon>close</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="primary"
+                                      (click)="updateColumnName(currentEditValue, column)">
+                                      <mat-icon>check</mat-icon>
+                                    </button>
+                                  </div>
+                                </ng-template>
+                              </th>
+                              <td mat-cell *matCellDef="let element">
+                                {{ convertscientific(element[i], +roundValue) }}
+                              </td>
+                            </ng-container>
+                          </ng-container>
+                          <tr mat-header-row *matHeaderRowDef="modelsComparisonDfPreviewColumnsFanout; sticky: true"></tr>
+                          <tr mat-row
+                            *matRowDef="let row; columns: modelsComparisonDfPreviewColumnsFanout; let i = index"></tr>
+                        </table>
+                      </div>
+                    </div>
+                    <div fxFlex="40" fxLayout="column" fxLayoutGap="4px">
+                      <div fxFlex="none" class="fw-bold">{{table2Title}}</div>
+                      <div fxFlex class="y-auto">
+                        <table mat-table [dataSource]="modelsComparisonDfPreviewFanouttable2">
+                          <ng-container *ngFor="let column of modelsComparisonDfPreviewColumnsFanouttable2; let i = index"
+                            [matColumnDef]="column">
+                            <ng-container *ngIf="!excludedColumns.includes(column)">
+                              {{ column }}
+                              <th mat-header-cell *matHeaderCellDef>
+                                <div *ngIf="editableColumnName !== column; else editColumn"
+                                  (click)="setEditableColumnName(column)">
+                                  {{ column | titlecase }}
+                                </div>
+                                <ng-template #editColumn>
+                                  <div class="column-editor">
+                                    <input [(ngModel)]="currentEditValue" />
+                                    <button mat-icon-button color="primary" (click)="closeEdit()">
+                                      <mat-icon>close</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="primary"
+                                      (click)="updateColumnName(currentEditValue, column)">
+                                      <mat-icon>check</mat-icon>
+                                    </button>
+                                  </div>
+                                </ng-template>
+                              </th>
+                              <td mat-cell *matCellDef="let element">
+                                {{ convertscientific(element[i], +roundValue) }}
+                              </td>
+                            </ng-container>
+                          </ng-container>
+                          <tr mat-header-row *matHeaderRowDef="modelsComparisonDfPreviewColumnsFanouttable2; sticky: true"></tr>
+                          <tr mat-row
+                            *matRowDef="let row; columns: modelsComparisonDfPreviewColumnsFanouttable2; let i = index"></tr>
+                        </table>
+                      </div>
+                    </div>
+                    <div fxFlex="30" class="global-image-container">
+                      <object [data]="PieChartDataFanout?.completeUrl" (load)="onPieChartLoadFanout()"
+                      class="custom-graph-fit"></object>
+                    </div>
+                  </div>
+                  <div fxFlex fxLayout="column" fxLayoutGap="4px">
+                    <div fxFlex="none" class="fw-bold">{{table3Title}}</div>
+                    <div fxFlex class="y-auto" #scrollableDiv>
+                      <table mat-table [dataSource]="chambersComparisonDfPreviewFanout">
+                        <ng-container *ngFor=" let column of chambersComparisonDfPreviewColumnsFanout; let i = index"
+                          [matColumnDef]="column">
+                          <ng-container>
+                            {{ column }}
+                            <th mat-header-cell *matHeaderCellDef>
+                              <div>
+                                {{ column | titlecase }}
+                              </div>
+                              <ng-template #editColumn>
+                                <div class="column-editor">
+                                  <input [(ngModel)]="currentEditValue" />
+                                  <button mat-icon-button color="primary">
+                                    <mat-icon>close</mat-icon>
+                                  </button>
+                                  <button mat-icon-button color="primary">
+                                    <mat-icon>check</mat-icon>
+                                  </button>
+                                </div>
+                              </ng-template>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                              {{ convertscientific(element[i], +roundValue) }}
+                            </td>
+                          </ng-container>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="chambersComparisonDfPreviewColumnsFanout; sticky: true"></tr>
+                          <tr mat-row
+                            *matRowDef="let row; columns: chambersComparisonDfPreviewColumnsFanout; let i = index"></tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div fxFlex *ngIf="selectedPreviewTypeFanout === 'CpK Bar Chart'">
+                  <div class="graph-container" *ngIf="barChartPlotDataFanout">
+                    <div class="h-100" fxLayoutAlign="center center" *ngIf="!barChartPlotDataFanout.isLoaded">
+                      <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                    </div>
+                    <div class="h-100"
+                      [ngStyle]="{ visibility: !barChartPlotDataFanout.isLoaded ? 'hidden' : 'visible' }">
+                      <object [data]="barChartPlotDataFanout.completeUrl" (load)="onBarPlotLoadFanout()"
+                        class="custom-graph-fit"></object>
+                    </div>
+                  </div>
+                </div>
+                <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="selectedPreviewTypeFanout === 'Line Charts'"
+                  class="y-auto">
+                  <div fxFlex="none" class="graph-container" *ngFor="let path of lineChartDataFanout">
+                    <div class="h-100" fxLayoutAlign="center center" *ngIf="!path.isLoaded">
+                      <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                    </div>
+                    <div class="h-100" [ngStyle]="{ visibility: !path.isLoaded ? 'hidden' : 'visible' }">
+                      <object [data]="path.completeUrl" (load)="onLinePathLoadFanout(path)"
+                        class="custom-graph-fit"></object>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div fxFlex="auto" fxLayout="row" class="border-left ps-4">
+            <div fxFlex="none" *ngIf="rgtNavToggle">
+              <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                (click)="toggleRgtNav()">right_panel_open</mat-icon>
+            </div>
+            <div fxFlex="300px" fxLayout="column" fxLayoutGap="16px" *ngIf="!rgtNavToggle">
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+                <div fxFlex class="fw-bold text-lg">Parameters</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                    (click)="toggleRgtNav()">right_panel_close</mat-icon>
+                </div>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="8px" class="y-auto">
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Project Name</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentProjectName" (ngModelChange)="onProjectChangeFanout($event)"
+                      placeholder="Select Project Name">
+                      <mat-option *ngFor="let projectName of projectNamesFanout" [value]="projectName">
+                        {{ projectName }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Step Name</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentStepNameFanout" (ngModelChange)="onStepNameChangeFanout($event)"
+                      placeholder="Select Step Name">
+                      <mat-option *ngFor="let stepName of listOfStepNamesFanout" [value]="stepName">
+                        {{ stepName }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Tech Node</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentTechNodeFanout" (ngModelChange)="onTechNodeChangeFanout($event)"
+                      placeholder="Select Tech Node">
+                      <mat-option *ngFor="let techNode of listOfTechNodesFanout" [value]="techNode">
+                        {{ techNode }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Date Range</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentSelectedDateRangeFanout" placeholder="Select Date Range">
+                      <mat-option *ngFor="let element of currentListOfDateRangesFanout" [value]="element.dateRange"
+                        (click)="onDateRangeChangeFanout(element)">
+                        {{ element.dateRange }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Output Column Name</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentSelectedOutputColumnFanout" placeholder="Select Output Column">
+                      <mat-option *ngFor="let element of currentOutputColumnListFanout" [value]="element"
+                        (click)="onOutputColumnChangeFanout(element)">
+                        {{ element }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <button mat-stroked-button color="primary" (click)="reset()">
+                  Reset
+                </button>
+                <button mat-flat-button color="primary" (click)="submitFanout()">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Model Refresh">
+        <div fxLayout="row" fxLayoutGap="16px" class="h-100 pt-4 overflow-hidden">
+          <div [fxFlex]="flexValue" fxLayout="column">
+            <div fxFlex *ngIf="!isDataLoaded">
+              <div class="centered-info-message">
+                Please select the parameters to get the required data
+              </div>
+            </div>
+            <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="isDataLoaded">
+              <div fxFlex="none">
+                <div class="custom-btn-toggle">
+                  <div class="link" (click)="changeViewer('Tables')"
+                    [ngClass]="{ 'active': selectedPreviewType === 'Tables' }">Tables</div>
+                  <div class="link" (click)="changeViewer('CpK Bar Chart')"
+                    [ngClass]="{ 'active': selectedPreviewType === 'CpK Bar Chart' }">CpK Bar Chart</div>
+                  <div class="link" (click)="changeViewer('Line Charts')"
+                    [ngClass]="{ 'active': selectedPreviewType === 'Line Charts' }">Line Charts</div>
+                </div>
+              </div>
+              <div fxFlex fxLayout="column">
+                <div fxFlex fxLayout="column" fxLayoutGap="24px" *ngIf="selectedPreviewType === 'Tables'">
+                  <div fxFlex="35" fxLayout="row" fxLayoutGap="16px">
+                    <div fxFlex="100" fxLayout="column" fxLayoutGap="4px">
+                      <div fxFlex="none" class="fw-bold">{{modelRefreshtable1Title}}</div>
+                      <div fxFlex class="y-auto">
+                        <table mat-table [dataSource]="modelsComparisonDfPreview">
+                          <ng-container *ngFor="let column of modelsComparisonDfPreviewColumns; let i = index"
+                            [matColumnDef]="column">
+                            <ng-container *ngIf="!excludedColumns.includes(column)">
+                              {{ column }}
+                              <th mat-header-cell *matHeaderCellDef>
+                                <div *ngIf="editableColumnName !== column; else editColumn"
+                                  (click)="setEditableColumnName(column)">
+                                  {{ column | titlecase }}
+                                </div>
+                                <ng-template #editColumn>
+                                  <div class="column-editor">
+                                    <input [(ngModel)]="currentEditValue" />
+                                    <button mat-icon-button color="primary" (click)="closeEdit()">
+                                      <mat-icon>close</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="primary"
+                                      (click)="updateColumnName(currentEditValue, column)">
+                                      <mat-icon>check</mat-icon>
+                                    </button>
+                                  </div>
+                                </ng-template>
+                              </th>
+                              <td mat-cell *matCellDef="let element">
+                                {{ convertscientific(element[i], +roundValue) }}
+                              </td>
+                            </ng-container>
+                          </ng-container>
+                          <!-- <tr mat-header-row *matHeaderRowDef="chambersComparisonDfPreviewColumns; sticky: true"></tr>
+                          <tr mat-row *matRowDef="let row; columns: chambersComparisonDfPreviewColumns; let i = index"></tr> -->
+                          <tr mat-header-row *matHeaderRowDef="getDisplayColumns(); sticky: true"></tr>
+                          <tr mat-row *matRowDef="let row; columns: getDisplayColumns(); let i = index"></tr>
+                        </table>
+                      </div>
+                    </div>
+                    <!-- <div fxFlex="40" fxLayout="column" fxLayoutGap="4px">
+                      <div fxFlex="none" class="fw-bold">Cpk Comparison by Chambers</div>
+                      <div fxFlex class="y-auto">
+                        <table mat-table [dataSource]="chambersComparisonDfPreview">
+                          <ng-container *ngFor="let column of chambersComparisonDfPreviewColumns; let i = index"
+                            [matColumnDef]="column">
+                            <ng-container *ngIf="!excludedColumns.includes(column)">
+                              {{ column }}
+                              <th mat-header-cell *matHeaderCellDef>
+                                <div *ngIf="editableColumnName !== column; else editColumn"
+                                  (click)="setEditableColumnName(column)">
+                                  {{ column | titlecase }}
+                                </div>
+                                <ng-template #editColumn>
+                                  <div class="column-editor">
+                                    <input [(ngModel)]="currentEditValue" />
+                                    <button mat-icon-button color="primary" (click)="closeEdit()">
+                                      <mat-icon>close</mat-icon>
+                                    </button>
+                                    <button mat-icon-button color="primary"
+                                      (click)="updateColumnName(currentEditValue, column)">
+                                      <mat-icon>check</mat-icon>
+                                    </button>
+                                  </div>
+                                </ng-template>
+                              </th>
+                              <td mat-cell *matCellDef="let element">
+                                {{ convertscientific(element[i], +roundValue) }}
+                              </td>
+                            </ng-container>
+                          </ng-container>
+                          <tr mat-header-row *matHeaderRowDef="chambersComparisonDfPreviewColumns; sticky: true"></tr>
+                          <tr mat-row *matRowDef="let row; columns: chambersComparisonDfPreviewColumns; let i = index">
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                    <div fxFlex="30" class="global-image-container">
+                      <img src="../../../assets/pie-chart.png" class="custom-img-fit">
+                    </div> -->
+                  </div>
+                  <div fxFlex fxLayout="column" fxLayoutGap="4px">
+                    <div fxFlex="none" class="fw-bold">{{modelRefreshtable2Title}}</div>
+                    <div fxFlex class="y-auto" #scrollableDiv>
+                      <table mat-table [dataSource]="chambersComparisonDfPreview">
+                        <ng-container *ngFor="let column of chambersComparisonDfPreviewColumns; let i = index"
+                          [matColumnDef]="column">
+                          <ng-container>
+                            {{ column }}
+                            <th mat-header-cell *matHeaderCellDef>
+                              <div>
+                                {{ column | titlecase }}
+                              </div>
+                              <ng-template #editColumn>
+                                <div class="column-editor">
+                                  <input [(ngModel)]="currentEditValue" />
+                                  <button mat-icon-button color="primary">
+                                    <mat-icon>close</mat-icon>
+                                  </button>
+                                  <button mat-icon-button color="primary">
+                                    <mat-icon>check</mat-icon>
+                                  </button>
+                                </div>
+                              </ng-template>
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                              {{ convertscientific(element[i], +roundValue) }}
+                            </td>
+                          </ng-container>
+                        </ng-container>
+                        <!-- <tr mat-header-row *matHeaderRowDef="getDisplayColumns(); sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: getDisplayColumns(); let i = index"></tr> -->
+                        <tr mat-header-row *matHeaderRowDef="chambersComparisonDfPreviewColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: chambersComparisonDfPreviewColumns; let i = index"></tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div fxFlex *ngIf="selectedPreviewType === 'CpK Bar Chart'">
+                  <div class="graph-container" *ngIf="barChartPlotData">
+                    <div class="h-100" fxLayoutAlign="center center" *ngIf="!barChartPlotData.isLoaded">
+                      <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                    </div>
+                    <div class="h-100" [ngStyle]="{visibility: !barChartPlotData.isLoaded ? 'hidden' : 'visible'}">
+                      <object [data]="barChartPlotData.completeUrl" (load)="onBarPlotLoad()"
+                        class="custom-graph-fit"></object>
+                    </div>
+                  </div>
+                </div>
+                <div fxFlex fxLayout="column" fxLayoutGap="16px" *ngIf="selectedPreviewType === 'Line Charts'"
+                  class="y-auto">
+                  <div fxFlex="none" class="graph-container" *ngFor="let path of lineChartData">
+                    <div class="h-100" fxLayoutAlign="center center" *ngIf="!path.isLoaded">
+                      <mat-progress-spinner mode="indeterminate" color="primary" diameter="24"></mat-progress-spinner>
+                    </div>
+                    <div class="h-100" [ngStyle]="{visibility: !path.isLoaded ? 'hidden' : 'visible'}">
+                      <object [data]="path.completeUrl" (load)="onLinePathLoad(path)" class="custom-graph-fit"></object>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div fxFlex="auto" fxLayout="row" class="border-left ps-4">
+            <div fxFlex="none" *ngIf="rgtNavToggle">
+              <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                (click)="toggleRgtNav()">right_panel_open</mat-icon>
+            </div>
+            <div fxFlex="300px" fxLayout="column" fxLayoutGap="16px" *ngIf="!rgtNavToggle">
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+                <div fxFlex class="fw-bold text-lg">Parameters</div>
+                <div fxFlex="none">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey"
+                    (click)="toggleRgtNav()">right_panel_close</mat-icon>
+                </div>
+              </div>
+              <div fxFlex fxLayout="column" fxLayoutGap="8px" class="y-auto">
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Project Name</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentProjectName" (ngModelChange)="onProjectChange($event)"
+                      placeholder="Select Project Name">
+                      <mat-option *ngFor="let projectName of projectNames" [value]="projectName">
+                        {{ projectName }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Step Name</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentStepName" (ngModelChange)="onStepNameChange($event)"
+                      placeholder="Select Step Name">
+                      <mat-option *ngFor="let stepName of listOfStepNames" [value]="stepName">
+                        {{ stepName }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Tech Node</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentTechNode" (ngModelChange)="onTechNodeChange($event)"
+                      placeholder="Select Tech Node">
+                      <mat-option *ngFor="let techNode of listOfTechNodes" [value]="techNode">
+                        {{ techNode }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Date Range</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentSelectedDateRange" placeholder="Select Date Range">
+                      <mat-option *ngFor="let element of currentListOfDateRanges" [value]="element.dateRange"
+                        (click)="onDateRangeChange(element)">
+                        {{ element.dateRange }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="none">
+                  <div class="fw-bold pb-1">Output Column Name</div>
+                  <mat-form-field appearance="outline">
+                    <mat-select [ngModel]="currentSelectedOutputColumn" placeholder="Select Output Column">
+                      <mat-option *ngFor="let element of currentOutputColumnList" [value]="element"
+                        (click)="onOutputColumnChange(element)">
+                        {{ element }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <button mat-stroked-button color="primary" (click)="reset()">
+                  Reset
+                </button>
+                <button mat-flat-button color="primary" (click)="submit()">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+
+<!-- Commented old code on 20240925 - Srihari
+ <div fxLayout="column" class="rslt-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="header"
+  >
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button
+          mat-icon-button
+          class="global-back-button"
+          (click)="navigate('tools')"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">UC2 Result Visualization</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button
+          mat-icon-button
+          class="global-icon-button"
+          (click)="toggleMainHeader()"
+        >
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="center center" style="margin-top: 20px;"></div>
+  <mat-tab-group (selectedTabChange)="onTabClick($event.tab.textLabel)">
+    <mat-tab label="Modal Fanout">
+      <div>
+  <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="8px">
+    <div
+      fxLayout="row"
+      fxLayoutAlign="center center"
+      style="padding-right: 260px; padding-top: 10px; gap: 10px"
+    >
+      <button
+        class="styled-button"
+        [ngClass]="{ 'active-button': selectedPreviewTypeFanout === 'Tables' }"
+        (click)="changeViewerFanout('Tables')"
+      >
+        Tables
+      </button>
+      <button
+        class="styled-button"
+        (click)="changeViewerFanout('CpK Bar Chart')"
+        [ngClass]="{ 'active-button': selectedPreviewTypeFanout === 'CpK Bar Chart' }"
+      >
+        CpK Bar Chart
+      </button>
+      <button
+        class="styled-button"
+        (click)="changeViewerFanout('Line Charts')"
+        [ngClass]="{ 'active-button': selectedPreviewTypeFanout === 'Line Charts' }"
+      >
+        Line Charts
+      </button>
+    </div>
+    <div fxLayout="row">
+      <div>
+        <div
+          fxLayout="column"
+          style="
+            height: 80vh;
+            width: 65vw;
+            overflow: auto;
+            padding-bottom: 25px;
+            padding-top: 10px;
+            align-items: center;
+          "
+        >
+          <ng-container *ngIf="selectedPreviewTypeFanout === 'Tables'">
+            <div
+              *ngIf="isDataLoaded"
+              style="padding: 5px; font-weight: 500; font-size: large"
+            >
+              Latest Model vs Active Cpk Comparison
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="start center"
+              style="height: 65%; width: 90%; overflow: auto"
+              #scrollableDiv
+            >
+              <table mat-table [dataSource]="modelsComparisonDfPreviewFanout">
+                <ng-container
+                  *ngFor="
+                    let column of modelsComparisonDfPreviewColumnsFanout;
+                    let i = index
+                  "
+                  [matColumnDef]="column"
+                >
+                  <ng-container>
+                    {{ column }}
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div>
+                        {{ column | titlecase }}
+                      </div>
+                      <ng-template #editColumn>
+                        <div class="column-editor">
+                          <input [(ngModel)]="currentEditValue" />
+                          <button mat-icon-button color="primary">
+                            <mat-icon>close</mat-icon>
+                          </button>
+                          <button mat-icon-button color="primary">
+                            <mat-icon>check</mat-icon>
+                          </button>
+                        </div>
+                      </ng-template>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ convertscientific(element[i], +roundValue) }}
+                    </td>
+                  </ng-container>
+                </ng-container>
+
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="getDisplayColumnsFanout(); sticky: true"
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="
+                    let row;
+                    columns: getDisplayColumnsFanout();
+                    let i = index
+                  "
+                ></tr>
+              </table>
+            </div>
+            <div
+              *ngIf="isDataLoaded"
+              style="padding: 15px; font-weight: 500; font-size: large"
+            >
+              Cpk Comparison by Chambers
+            </div>
+            <div
+              *ngIf="!isDataLoaded"
+              class="global-nodata centered-info-message"
+            >
+              Please select the parameters to get the required data
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="start center"
+              style="height: 27%; width: 90%; overflow: auto"
+            >
+              <table
+                fxFlex="2"
+                mat-table
+                [dataSource]="chambersComparisonDfPreviewFanout"
+              >
+                <ng-container
+                  *ngFor="
+                    let column of chambersComparisonDfPreviewColumnsFanout;
+                    let i = index
+                  "
+                  [matColumnDef]="column"
+                >
+                  <ng-container *ngIf="!excludedColumns.includes(column)">
+                    {{ column }}
+                    <th mat-header-cell *matHeaderCellDef>
+                      <div
+                        *ngIf="editableColumnName !== column; else editColumn"
+                        (click)="setEditableColumnName(column)"
+                      >
+                        {{ column | titlecase }}
+                      </div>
+                      <ng-template #editColumn>
+                        <div class="column-editor">
+                          <input [(ngModel)]="currentEditValue" />
+                          <button
+                            mat-icon-button
+                            color="primary"
+                            (click)="closeEdit()"
+                          >
+                            <mat-icon>close</mat-icon>
+                          </button>
+                          <button
+                            mat-icon-button
+                            color="primary"
+                            (click)="updateColumnName(currentEditValue, column)"
+                          >
+                            <mat-icon>check</mat-icon>
+                          </button>
+                        </div>
+                      </ng-template>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ convertscientific(element[i], +roundValue) }}
+                    </td>
+                  </ng-container>
+                </ng-container>
+
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="
+                    chambersComparisonDfPreviewColumns;
+                    sticky: true
+                  "
+                ></tr>
+                <tr
+                  mat-row
+                  *matRowDef="
+                    let row;
+                    columns: chambersComparisonDfPreviewColumnsFanout;
+                    let i = index
+                  "
+                ></tr>
+              </table>
+            </div>
+          </ng-container>
+          <div *ngIf="selectedPreviewTypeFanout === 'CpK Bar Chart'">
+            <div
+              *ngIf="barChartPlotDataFanout"
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              class="h-100"
+              style="overflow: auto"
+            >
+              <div *ngIf="!barChartPlotDataFanout.isLoaded">
+                <mat-progress-spinner
+                  mode="indeterminate"
+                  color="primary"
+                  diameter="50"
+                ></mat-progress-spinner>
+              </div>
+              <div
+                [ngStyle]="{
+                  visibility: !barChartPlotDataFanout.isLoaded ? 'hidden' : 'visible'
+                }"
+              >
+                <object
+                  [data]="barChartPlotDataFanout.completeUrl"
+                  (load)="onBarPlotLoadFanout()"
+                  style="
+                    aspect-ratio: 1;
+                    height: 75vh;
+                    width: 75vh;
+                    background-color: white;
+                  "
+                ></object>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="selectedPreviewTypeFanout === 'Line Charts'">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              class="h-100"
+              style="overflow: auto"
+            >
+              <div *ngFor="let path of lineChartDataFanout">
+                <div *ngIf="!path.isLoaded">
+                  <mat-progress-spinner
+                    mode="indeterminate"
+                    color="primary"
+                    diameter="50"
+                  ></mat-progress-spinner>
+                </div>
+                <div
+                  [ngStyle]="{
+                    visibility: !path.isLoaded ? 'hidden' : 'visible'
+                  }"
+                >
+                  <object
+                    [data]="path.completeUrl"
+                    (load)="onLinePathLoadFanout(path)"
+                    style="
+                      aspect-ratio: 1;
+                      height: 55vh;
+                      width: 45vw;
+                      background-color: white;
+                    "
+                  ></object>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          fxFlex
+          style="
+            width: 400px;
+            padding-top: 60px;
+            padding-right: 5px;
+            padding-left: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          "
+        >
+          <mat-form-field>
+            <mat-label>Project Name</mat-label>
+            <mat-select
+              [ngModel]="currentProjectName"
+              (ngModelChange)="onProjectChangeFanout($event)"
+            >
+              <mat-option
+                *ngFor="let projectName of projectNamesFanout"
+                [value]="projectName"
+              >
+                {{ projectName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Step Name</mat-label>
+            <mat-select
+              [ngModel]="currentStepName"
+              (ngModelChange)="onStepNameChangeFanout($event)"
+            >
+              <mat-option
+                *ngFor="let stepName of listOfStepNamesFanout"
+                [value]="stepName"
+              >
+                {{ stepName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Tech Node</mat-label>
+            <mat-select
+              [ngModel]="currentTechNode"
+              (ngModelChange)="onTechNodeChangeFanout($event)"
+            >
+              <mat-option
+                *ngFor="let techNode of listOfTechNodesFanout"
+                [value]="techNode"
+              >
+                {{ techNode }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Date Range</mat-label>
+            <mat-select [ngModel]="currentSelectedDateRangeFanout">
+              <mat-option
+                *ngFor="let element of currentListOfDateRangesFanout"
+                [value]="element.dateRange"
+                (click)="onDateRangeChangeFanout(element)"
+              >
+                {{ element.dateRange }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div style="padding: 10px">
+            <button mat-flat-button color="primary" (click)="submitFanout()">
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+     </div>
+    </mat-tab>
+  <mat-tab label="Modal Refresh">
+    <div>
+      <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="8px">
+        <div
+          fxLayout="row"
+          fxLayoutAlign="center center"
+          style="padding-right: 260px; padding-top: 10px; gap: 10px"
+        >
+          <button
+            class="styled-button"
+            [ngClass]="{ 'active-button': selectedPreviewType === 'Tables' }"
+            (click)="changeViewer('Tables')"
+          >
+            Tables
+          </button>
+          <button
+            class="styled-button"
+            (click)="changeViewer('CpK Bar Chart')"
+            [ngClass]="{ 'active-button': selectedPreviewType === 'CpK Bar Chart' }"
+          >
+            CpK Bar Chart
+          </button>
+          <button
+            class="styled-button"
+            (click)="changeViewer('Line Charts')"
+            [ngClass]="{ 'active-button': selectedPreviewType === 'Line Charts' }"
+          >
+            Line Charts
+          </button>
+        </div>
+        <div fxLayout="row">
+          <div>
+            <div
+              fxLayout="column"
+              style="
+                height: 80vh;
+                width: 65vw;
+                overflow: auto;
+                padding-bottom: 25px;
+                padding-top: 10px;
+                align-items: center;
+              "
+            >
+              <ng-container *ngIf="selectedPreviewType === 'Tables'">
+                <div
+                  *ngIf="isDataLoaded"
+                  style="padding: 5px; font-weight: 500; font-size: large"
+                >
+                  Latest Model vs Active Cpk Comparison
+                </div>
+                <div
+                  fxLayout="column"
+                  fxLayoutAlign="start center"
+                  style="height: 65%; width: 90%; overflow: auto"
+                  #scrollableDiv
+                >
+                  <table mat-table [dataSource]="modelsComparisonDfPreview">
+                    <ng-container
+                      *ngFor="
+                        let column of modelsComparisonDfPreviewColumns;
+                        let i = index
+                      "
+                      [matColumnDef]="column"
+                    >
+                      <ng-container>
+                        {{ column }}
+                        <th mat-header-cell *matHeaderCellDef>
+                          <div>
+                            {{ column | titlecase }}
+                          </div>
+                          <ng-template #editColumn>
+                            <div class="column-editor">
+                              <input [(ngModel)]="currentEditValue" />
+                              <button mat-icon-button color="primary">
+                                <mat-icon>close</mat-icon>
+                              </button>
+                              <button mat-icon-button color="primary">
+                                <mat-icon>check</mat-icon>
+                              </button>
+                            </div>
+                          </ng-template>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                          {{ convertscientific(element[i], +roundValue) }}
+                        </td>
+                      </ng-container>
+                    </ng-container>
+
+                    <tr
+                      mat-header-row
+                      *matHeaderRowDef="getDisplayColumns(); sticky: true"
+                    ></tr>
+                    <tr
+                      mat-row
+                      *matRowDef="
+                        let row;
+                        columns: getDisplayColumns();
+                        let i = index
+                      "
+                    ></tr>
+                  </table>
+                </div>
+                <div
+                  *ngIf="isDataLoaded"
+                  style="padding: 15px; font-weight: 500; font-size: large"
+                >
+                  Cpk Comparison by Chambers
+                </div>
+                <div
+                  *ngIf="!isDataLoaded"
+                  class="global-nodata centered-info-message"
+                >
+                  Please select the parameters to get the required data
+                </div>
+                <div
+                  fxLayout="column"
+                  fxLayoutAlign="start center"
+                  style="height: 27%; width: 90%; overflow: auto"
+                >
+                  <table
+                    fxFlex="2"
+                    mat-table
+                    [dataSource]="chambersComparisonDfPreview"
+                  >
+                    <ng-container
+                      *ngFor="
+                        let column of chambersComparisonDfPreviewColumns;
+                        let i = index
+                      "
+                      [matColumnDef]="column"
+                    >
+                      <ng-container *ngIf="!excludedColumns.includes(column)">
+                        {{ column }}
+                        <th mat-header-cell *matHeaderCellDef>
+                          <div
+                            *ngIf="editableColumnName !== column; else editColumn"
+                            (click)="setEditableColumnName(column)"
+                          >
+                            {{ column | titlecase }}
+                          </div>
+                          <ng-template #editColumn>
+                            <div class="column-editor">
+                              <input [(ngModel)]="currentEditValue" />
+                              <button
+                                mat-icon-button
+                                color="primary"
+                                (click)="closeEdit()"
+                              >
+                                <mat-icon>close</mat-icon>
+                              </button>
+                              <button
+                                mat-icon-button
+                                color="primary"
+                                (click)="updateColumnName(currentEditValue, column)"
+                              >
+                                <mat-icon>check</mat-icon>
+                              </button>
+                            </div>
+                          </ng-template>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                          {{ convertscientific(element[i], +roundValue) }}
+                        </td>
+                      </ng-container>
+                    </ng-container>
+
+                    <tr
+                      mat-header-row
+                      *matHeaderRowDef="
+                        chambersComparisonDfPreviewColumns;
+                        sticky: true
+                      "
+                    ></tr>
+                    <tr
+                      mat-row
+                      *matRowDef="
+                        let row;
+                        columns: chambersComparisonDfPreviewColumns;
+                        let i = index
+                      "
+                    ></tr>
+                  </table>
+                </div>
+              </ng-container>
+              <div *ngIf="selectedPreviewType === 'CpK Bar Chart'">
+                <div
+                  *ngIf="barChartPlotData"
+                  fxLayout="column"
+                  fxLayoutAlign="center center"
+                  class="h-100"
+                  style="overflow: auto"
+                >
+                  <div *ngIf="!barChartPlotData.isLoaded">
+                    <mat-progress-spinner
+                      mode="indeterminate"
+                      color="primary"
+                      diameter="50"
+                    ></mat-progress-spinner>
+                  </div>
+                  <div
+                    [ngStyle]="{
+                      visibility: !barChartPlotData.isLoaded ? 'hidden' : 'visible'
+                    }"
+                  >
+                    <object
+                      [data]="barChartPlotData.completeUrl"
+                      (load)="onBarPlotLoad()"
+                      style="
+                        aspect-ratio: 1;
+                        height: 75vh;
+                        width: 75vh;
+                        background-color: white;
+                      "
+                    ></object>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="selectedPreviewType === 'Line Charts'">
+                <div
+                  fxLayout="column"
+                  fxLayoutAlign="center center"
+                  class="h-100"
+                  style="overflow: auto"
+                >
+                  <div *ngFor="let path of lineChartData">
+                    <div *ngIf="!path.isLoaded">
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        diameter="50"
+                      ></mat-progress-spinner>
+                    </div>
+                    <div
+                      [ngStyle]="{
+                        visibility: !path.isLoaded ? 'hidden' : 'visible'
+                      }"
+                    >
+                      <object
+                        [data]="path.completeUrl"
+                        (load)="onLinePathLoad(path)"
+                        style="
+                          aspect-ratio: 1;
+                          height: 55vh;
+                          width: 45vw;
+                          background-color: white;
+                        "
+                      ></object>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              fxFlex
+              style="
+                width: 400px;
+                padding-top: 60px;
+                padding-right: 5px;
+                padding-left: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+              "
+            >
+              <mat-form-field>
+                <mat-label>Project Name</mat-label>
+                <mat-select
+                  [ngModel]="currentProjectName"
+                  (ngModelChange)="onProjectChange($event)"
+                >
+                  <mat-option
+                    *ngFor="let projectName of projectNames"
+                    [value]="projectName"
+                  >
+                    {{ projectName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Step Name</mat-label>
+                <mat-select
+                  [ngModel]="currentStepName"
+                  (ngModelChange)="onStepNameChange($event)"
+                >
+                  <mat-option
+                    *ngFor="let stepName of listOfStepNames"
+                    [value]="stepName"
+                  >
+                    {{ stepName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Tech Node</mat-label>
+                <mat-select
+                  [ngModel]="currentTechNode"
+                  (ngModelChange)="onTechNodeChange($event)"
+                >
+                  <mat-option
+                    *ngFor="let techNode of listOfTechNodes"
+                    [value]="techNode"
+                  >
+                    {{ techNode }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Date Range</mat-label>
+                <mat-select [ngModel]="currentSelectedDateRange">
+                  <mat-option
+                    *ngFor="let element of currentListOfDateRanges"
+                    [value]="element.dateRange"
+                    (click)="onDateRangeChange(element)"
+                  >
+                    {{ element.dateRange }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div style="padding: 10px">
+                <button mat-flat-button color="primary" (click)="submit()">
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+</mat-tab-group>
+</div> -->

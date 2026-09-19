@@ -1,0 +1,14 @@
+.chart-wrapper {
+    width: 100%; /* Allow the chart to take full width of the parent */
+    max-width: 500px; /* Optional: Limit the maximum width */
+    height: auto; /* Adjust height proportionally */
+    overflow: hidden; /* Prevent any overflow */
+    position: relative; /* Ensure the container's dimensions are respected */
+}
+  
+  .chart-container {
+    position: relative; /* Important for responsive resizing */
+    height: 0;
+    padding-bottom: 100%; /* This maintains a 1:1 aspect ratio */
+  }
+  

@@ -1,0 +1,135 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Input(s)</div>
+              <div class="pb-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Select input 1</mat-label>
+                  <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" [ngModel]="inputWidget1"
+                    (ngModelChange)="input2Widget($event, 0)" name="inputWidget1Selector">
+                    <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                      {{ getInputingWidgetsOutputName(inputWidget) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select input 2</mat-label>
+                  <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" [ngModel]="inputWidget2"
+                    (ngModelChange)="input2widget($event, 1)" name="inputWidget2Selector">
+                    <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                      {{ getInputingWidgetsOutputName(inputWidget) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Output</div>
+              <div>
+                <mat-form-field appearance="outline">
+                  <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                    placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event" />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div fxLayout="column" fxLayoutGap="24px" class="global-widget-area">
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start center">
+            <div fxFlex="none" class="fw-bold">Join Type</div>
+            <div fxFlex="180px">
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select type" [(value)]="config!.join_type"
+                  (selectionChange)="onJoinTypeChange($event.value)">
+                  <mat-option *ngFor="let joinType of joinTypes" [value]="joinType">{{ joinType }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxFlex="none" fxLayout="row" fxLayoutGap="16px">
+            <div fxFlex>
+              <div class="fw-bold">{{getDatasetName(selectedInputWidget1)}}</div>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold">{{getDatasetName(selectedInputWidget2)}}</div>
+            </div>
+            <div fxFlex="70px">&nbsp;</div>
+          </div>
+          <div fxFlex fxLayout="column" fxLayoutGap="16px">
+            <div *ngFor="let pair of columnPairs; let i = index" fxLayout="row" fxLayoutAlign="start center"
+              fxLayoutGap="16px">
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select left column</mat-label>
+                  <input type="text" placeholder="Search..." matInput [matAutocomplete]="auto"
+                    [(ngModel)]="searchLeftTerms[i]" (input)="filterLeftColumns(i)">
+                  <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option *ngFor="let column of filteredLeftColumns[i]" [value]="column"
+                      (onSelectionChange)="updateConfigCache(i, 'left', column)">
+                      {{ column }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-label>Select right column</mat-label>
+                  <input type="text" placeholder="Search..." matInput [matAutocomplete]="autoRight"
+                    [(ngModel)]="searchRightTerms[i]" (input)="filterRightColumns(i)">
+                  <mat-autocomplete #autoRight="matAutocomplete">
+                    <mat-option *ngFor="let column of filteredRightColumns[i]" [value]="column"
+                      (onSelectionChange)="updateConfigCache(i, 'right', column)">
+                      {{ column }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div fxFlex="70px">
+                <mat-icon class="material-symbols-outlined global-icon-button-sm" *ngIf="i > 0"
+                  (click)="removeRow(pair.get('key'))">remove</mat-icon>
+                <mat-icon class="material-symbols-outlined global-icon-button-sm ms-2"
+                  *ngIf="i == columnPairs.length - 1" (click)="addRow()">add</mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+<div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+  <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+    Cancel
+  </button>
+  <button [disabled]="!changeMade" mat-flat-button color="primary" (click)="onSave()" id="createBeutton">
+    Save
+  </button>
+</div>
+<app-config-action-bar widgetName="Join" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

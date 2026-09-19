@@ -1,0 +1,8 @@
+:host {
+  height: var(--mst-button-height, 44px);
+  display: inline-block;
+  &.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}

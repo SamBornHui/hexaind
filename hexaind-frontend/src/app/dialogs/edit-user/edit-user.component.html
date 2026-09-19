@@ -1,0 +1,118 @@
+<div fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Edit User</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div>
+      <div class="fw-bold pb-1">Name</div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          placeholder="Enter Name"
+          [ngModel]="data.name"
+          (ngModelChange)="data.name = $event"
+          [readonly]="isReadOnly()"
+        />
+      </mat-form-field>
+    </div>
+    <div>
+      <div class="fw-bold pb-1">Email</div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          placeholder="Enter Email"
+          [ngModel]="data.email"
+          (ngModelChange)="data.email = $event"
+          [readonly]="isReadOnly()"
+        />
+      </mat-form-field>
+    </div>
+
+    <div>
+      <div class="fw-bold pb-1">Status</div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          placeholder="Enter Status"
+          [ngModel]="data.status"
+          readonly
+        />
+      </mat-form-field>
+    </div>
+
+    <!-- May be below code require in future -->
+    <!-- <div>
+          <div class="fw-bold pb-1">Status</div>
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Status" [(value)]="data.status" (selectionChange)="onStatusChange($event.value)">
+              <mat-option *ngFor="let status of userStatus" [value]="status.status_name" readonly>
+                {{ status.status_name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div> -->
+
+    <div>
+      <div class="fw-bold pb-1">Server Role</div>
+      <mat-form-field appearance="outline">
+        <!-- <mat-label>Select Server Role</mat-label> -->
+        <mat-select
+          placeholder="Select Server Role"
+          [(ngModel)]="data.server_role_value"
+        >
+          <mat-option *ngFor="let role of serveRoles" [value]="role.role_id">
+            {{ role.role_name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div *ngIf="this.data.server_role != 'Server Admin'">
+      <div fxLayout="row" fxLayoutGap="16px" class="border-bottom p-3">
+        <div fxFlex class="fw-bold">Project Assigned</div>
+        <div fxFlex class="fw-bold">Access Type</div>
+      </div>
+      <ng-container *ngIf="userProjects.length == 0">
+        <div fxLayout="row" class="border-bottom p-3">No project found.</div>
+      </ng-container>
+      <ng-container *ngIf="userProjects.length > 0">
+        <div
+          style="max-height: 130px"
+          class="y-auto"
+          *ngIf="userProjects.length > 0"
+        >
+          <div
+            *ngFor="let project of userProjects"
+            fxLayout="row"
+            fxLayoutGap="16px"
+            class="border-bottom p-3"
+          >
+            <div fxFlex class="text-ellipse">{{ project.project_name }}</div>
+            <div fxFlex>{{ project.role_name }}</div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="close()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="onSave()">Save</button>
+  </div>
+</div>

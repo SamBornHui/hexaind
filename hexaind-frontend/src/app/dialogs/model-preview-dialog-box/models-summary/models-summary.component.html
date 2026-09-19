@@ -1,0 +1,570 @@
+<ng-container *ngIf="type === 'summary' && !loader">
+  <div fxLayout="row" class="pb-2" fxLayoutAlign="end center" fxLayoutGap="8px"
+    *ngIf="checkTheProblemType() && models.length > 1">
+    <div>Sort Models Matrix</div>
+    <div fxFlex="320px">
+      <mat-form-field appearance="outline">
+        <mat-select [(value)]="selectedSortOption" (selectionChange)="onSortChange($event.value)">
+          <mat-option value="Mean Absolute Error (MAE)">Mean Absolute Error (MAE)</mat-option>
+          <mat-option value="Mean Absolute Percentage Error (MAPE)">Mean Absolute Percentage Error (MAPE)</mat-option>
+          <mat-option value="Mean Squared Error (MSE)">Mean Squared Error (MSE)</mat-option>
+          <mat-option value="Median Absolute Error (MedAE)">Median Absolute Error (MedAE)</mat-option>
+          <mat-option value="R2 Score">R2 Score</mat-option>
+          <mat-option value="Root Mean Squared Error (RMSE)">Root Mean Squared Error (RMSE)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <mat-accordion class="global-accordion">
+    <mat-expansion-panel *ngFor="let modelDetails of models; let index = index" [expanded]="models.length === 1">
+      <mat-expansion-panel-header [class.highlighted]="isActiveModel(modelDetails)">
+        <mat-panel-title>
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px">
+            <div> {{ modelDetails.model.name }}</div>
+            <mat-icon class="text-green" *ngIf="modelDetails.access_mode === 'EXTERNAL'">check_circle</mat-icon>
+          </div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div fxLayout="row" fxLayoutGap="24px">
+        <div fxFlex>
+          <div class="p-4 border-bottom fw-bold">Model details</div>
+          <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="p-4 border-bottom">
+            <div fxFlex="50">Model ID</div>
+            <div fxFlex="50" class="fw-bold" fxLayout="row" fxLayoutAlign="start center">
+              <div fxFlex *ngIf="!isEditing" class="text-ellipse">
+                {{
+                modelDetails.model.name.length > 35
+                ? (modelDetails.model.name | slice: 0 : 35) + "..."
+                : modelDetails.model.name
+                }}
+              </div>
+
+              <div *ngIf="!isEditing" fxFlex="none">
+                <button mat-icon-button (click)="toggleEdit(modelDetails)">
+                  <mat-icon class="material-symbols-outlined"> edit</mat-icon>
+                </button>
+              </div>
+              <div fxFlex *ngIf="isEditing">
+                <mat-form-field appearance="outline">
+                  <input matInput placeholder="Enter value" [(ngModel)]="editedName" />
+                </mat-form-field>
+              </div>
+              <div *ngIf="isEditing" fxFlex="none">
+                <button mat-icon-button (click)="cancelEdit()">
+                  <mat-icon class="material-symbols-outlined"> close</mat-icon>
+                </button>
+                <button mat-icon-button (click)="saveEdit(modelDetails)">
+                  <mat-icon class="material-symbols-outlined"> check</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+            <div fxFlex="50">Model Type</div>
+            <div fxFlex="50" class="fw-bold">
+              {{ modelDetails.model.type }}
+            </div>
+          </div>
+
+          <div *ngIf="modelDetails.model.configs.split_ratio" fxLayout="row" fxLayoutGap="8px"
+            class="p-4 border-bottom">
+            <div fxFlex="50">Test split (%)</div>
+            <div fxFlex="50" class="fw-bold">
+              {{
+              modelDetails.model.configs.split_ratio !== undefined
+              ? modelDetails.model.configs.split_ratio > 0
+              ? modelDetails.model.configs.split_ratio
+              : 0
+              : 0
+              }}
+            </div>
+          </div>
+
+          <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+            <div fxFlex="50">Training Samples</div>
+            <div fxFlex="50" class="fw-bold">
+              {{ modelDetails.model.training_samples }}
+            </div>
+          </div>
+
+          <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+            <div fxFlex="50">Testing Samples</div>
+            <div fxFlex="50" class="fw-bold">
+              {{ modelDetails.model.testing_samples }}
+            </div>
+          </div>
+          <ng-container *ngIf="modelDetails.model.additional_info">
+            <div *ngIf="modelDetails.model.additional_info.model_type" fxLayout="row" fxLayoutGap="8px"
+              class="p-4 border-bottom">
+              <div fxFlex="50">Model Type</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.additional_info.model_type }}
+              </div>
+            </div>
+            <div *ngIf="modelDetails.model.additional_info.num_latents" fxLayout="row" fxLayoutGap="8px"
+              class="p-4 border-bottom">
+              <div fxFlex="50">No. of Latent Functions</div>
+              <div fxFlex="50" class="fw-bold">
+                {{modelDetails.model.additional_info.num_latents }}
+              </div>
+            </div>
+            <div *ngIf="modelDetails.model.additional_info.variational" fxLayout="row" fxLayoutGap="8px"
+              class="p-4 border-bottom">
+              <div fxFlex="50">Variational</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.additional_info.variational }}
+              </div>
+            </div>
+            <div *ngIf="modelDetails.model.additional_info.num_inducing" fxLayout="row" fxLayoutGap="8px"
+              class="p-4 border-bottom">
+              <div fxFlex="50">No. of Inducing Points</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.additional_info.num_inducing }}
+              </div>
+            </div>
+          </ng-container>
+
+
+          <div *ngIf="modelDetails.model.configs.input_scaling" fxLayout="row" fxLayoutGap="8px"
+            class="p-4 border-bottom">
+            <div fxFlex="50">Input Scaling</div>
+            <div fxFlex="50" class="fw-bold">
+              {{ modelDetails.model.configs.input_scaling }}
+            </div>
+          </div>
+          <div class="d-block mb-8"></div>
+          <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+            <div fxFlex="50">Dataset Name</div>
+            <div fxFlex="50" class="fw-bold">
+              {{ modelDetails.model.dataset_name }}
+            </div>
+          </div>
+
+          <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+            <div fxFlex="50">
+              <ng-container *ngIf="
+                  isArray(modelDetails.model.configs.output_cols);
+                  else singleOutputHeader
+                ">
+                Outputs
+              </ng-container>
+              <ng-template #singleOutputHeader> Output </ng-template>
+            </div>
+            <div fxFlex="50" class="fw-bold">
+              <ng-container *ngIf="
+                  isArray(modelDetails.model.configs.output_cols);
+                  else singleOutput
+                ">
+                <ng-container *ngFor="
+                    let output of modelDetails.model.configs.output_cols;
+                    let last = last
+                  ">
+                  {{ output }}{{ !last ? ", " : "" }}
+                </ng-container>
+              </ng-container>
+              <ng-template #singleOutput>
+                <span>{{ modelDetails.model.configs.output_col }}</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+            <div fxFlex="50">Inputs</div>
+            <div fxFlex="50" class="fw-bold">
+              <span *ngFor="
+                  let input of modelDetails.model.configs.input_cols;
+                  let last = last
+                ">{{ input }}{{ !last ? ", " : "" }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div fxFlex fxLayout="column">
+          <ng-container *ngIf="isRegressionModel(modelDetails.model)">
+            <div fxFlex="none" class="p-4 border-bottom fw-bold">
+              Error values
+              <mat-form-field appearance="outline">
+                <mat-select [(value)]="selectedmetrics" (selectionChange)="metricsOnChange($event.value)">
+                  <mat-option value="test">Test data</mat-option>
+                  <mat-option *ngIf="modelDetails.model.cv_metrics != null" value="cv">Cross validation</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div fxFlex class="y-auto" *ngIf="multipleOutputs(modelDetails.model)">
+              <table class="custom-table-sm">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th *ngFor="let column of modelDetails.model.configs.output_cols">
+                      {{ column | replaceAndCapitalize }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let key of keys(modelDetails.model.metrics)">
+                    <td>{{ key }}</td>
+                    <td *ngFor="let column of modelDetails.model.configs.output_cols">
+                      <!-- {{modelDetails.model.metrics[key][column] | number: "1.4-4"}} -->
+                      {{
+                      isObj(modelDetails.model.metrics[key])
+                      ? isDecimal(modelDetails.model.metrics[key][column])
+                      ? (modelDetails.model.metrics[key][column]
+                      | scientificNumber:isScientificNotationEnabled)
+                      : modelDetails.model.metrics[key][column]
+                      : column === "accuracy"
+                      ? modelDetails.model.metrics[key]
+                      : "-"
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div fxFlex class="y-auto" *ngIf="!multipleOutputs(modelDetails.model)">
+              <ng-container *ngIf="selectedmetrics === 'test'">
+                <table class="custom-table-sm">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let key of getMetricsKeys(modelDetails.model.metrics)">
+                      <td>{{ formatKey(key) }}</td>
+                      <td>
+                        <ng-container *ngIf="isNumeric(modelDetails.model.metrics[key]); else stringValue">
+                          {{ modelDetails.model.metrics[key] | scientificNumber:isScientificNotationEnabled
+                          }}
+                        </ng-container>
+                        <ng-template #stringValue>
+                          {{ modelDetails.model.metrics[key] | scientificNumber:isScientificNotationEnabled
+                          }}
+                        </ng-template>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </ng-container>
+              
+              <ng-container *ngIf="selectedmetrics === 'cv'">
+                <table class="custom-table-sm">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let key of getMetricsKeys(modelDetails.model.cv_metrics)">
+                      <td>{{ formatKey(key) }}</td>
+                      <td>
+                        <ng-container
+                          *ngIf="isNumeric(modelDetails.model.cv_metrics[key]); else stringValue">
+                          {{ modelDetails.model.cv_metrics[key] |
+                          scientificNumber:isScientificNotationEnabled }}
+                        </ng-container>
+                        <ng-template #stringValue>
+                          {{ modelDetails.model.cv_metrics[key] |
+                          scientificNumber:isScientificNotationEnabled }}
+                        </ng-template>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </ng-container>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="isClassificationModel(modelDetails.model)">
+            <div fxFlex="none" class="p-4 border-bottom fw-bold">Metrics</div>
+            <div fxFlex class="y-auto">
+              <table class="custom-table-sm">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th *ngFor="let column of columns">
+                      {{ column | replaceAndCapitalize }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let key of keys(modelDetails.model.metrics)">
+                    <td>{{ key }}</td>
+                    <td *ngFor="let column of columns">
+                      {{
+                      isObj(modelDetails.model.metrics[key])
+                      ? isDecimal(modelDetails.model.metrics[key][column])
+                      ? (modelDetails.model.metrics[key][column]
+                      | scientificNumber:isScientificNotationEnabled)
+                      : modelDetails.model.metrics[key][column]
+                      : column === "accuracy"
+                      ? modelDetails.model.metrics[key]
+                      : "-"
+                      }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</ng-container>
+
+<ng-container *ngIf="type === 'comparision' && !loader">
+  <div fxLayout="column" class="h-100">
+    <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom p-6">
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <button mat-icon-button (click)="goToBuildModePage()">
+          <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+        </button>
+        <h1>Model Preview</h1>
+      </div>
+    </div>
+    <div fxFlex fxLayout="row" class="y-auto">
+      <div fxFlex class="p-6 y-auto">
+        <div fxLayout="row" fxLayoutGap="24px">
+          <div fxFlex>
+            <div class="p-4 border-bottom fw-bold">Model details</div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center" class="p-4 border-bottom">
+              <div fxFlex="50">Model ID</div>
+              <div fxFlex="50" class="fw-bold" fxLayout="row" fxLayoutAlign="start center">
+                <div fxFlex *ngIf="!isEditing">
+                  {{
+                  modelDetails.model.name.length > 35
+                  ? (modelDetails.model.name | slice: 0 : 35) + "..."
+                  : modelDetails.model.name
+                  }}
+                </div>
+                <div *ngIf="!isEditing" fxFlex="none">
+                  <button mat-icon-button (click)="toggleEdit(modelDetails)">
+                    <mat-icon class="material-symbols-outlined"> edit</mat-icon>
+                  </button>
+                </div>
+                <div fxFlex *ngIf="isEditing">
+                  <mat-form-field appearance="outline">
+                    <input matInput placeholder="Enter value" [(ngModel)]="editedName" />
+                  </mat-form-field>
+                </div>
+                <div *ngIf="isEditing" fxFlex="none">
+                  <button mat-icon-button (click)="cancelEdit()">
+                    <mat-icon class="material-symbols-outlined">
+                      close</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="saveEdit(modelDetails)">
+                    <mat-icon class="material-symbols-outlined">
+                      check</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+              <div fxFlex="50">Model type</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.type }}
+              </div>
+            </div>
+            <div *ngIf="isNotExcludedModelType(modelDetails.model.type)" fxLayout="row" fxLayoutGap="8px"
+              class="p-4 border-bottom">
+              <div fxFlex="50">Test split (%)</div>
+              <div fxFlex="50" class="fw-bold">
+                {{
+                modelDetails.model.configs.split_ratio !== undefined
+                ? modelDetails.model.configs.split_ratio > 0
+                ? modelDetails.model.configs.split_ratio
+                : 0
+                : 0
+                }}
+              </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+              <div fxFlex="50">Training Samples</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.training_samples }}
+              </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+              <div fxFlex="50">Testing Samples</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.testing_samples }}
+              </div>
+            </div>
+            <ng-container *ngIf="modelDetails.model.additional_info">
+              <div *ngIf="modelDetails.model.additional_info.model_type" fxLayout="row" fxLayoutGap="8px"
+                class="p-4 border-bottom">
+                <div fxFlex="50">Model Type</div>
+                <div fxFlex="50" class="fw-bold">
+                  {{ modelDetails.model.additional_info.model_type }}
+                </div>
+              </div>
+              <div *ngIf="modelDetails.model.additional_info.num_latents" fxLayout="row" fxLayoutGap="8px"
+                class="p-4 border-bottom">
+                <div fxFlex="50">No. of Latent Functions</div>
+                <div fxFlex="50" class="fw-bold">
+                  {{modelDetails.model.additional_info.num_latents }}
+                </div>
+              </div>
+              <div *ngIf="modelDetails.model.additional_info.variational" fxLayout="row" fxLayoutGap="8px"
+                class="p-4 border-bottom">
+                <div fxFlex="50">Variational</div>
+                <div fxFlex="50" class="fw-bold">
+                  {{ modelDetails.model.additional_info.variational }}
+                </div>
+              </div>
+              <div *ngIf="modelDetails.model.additional_info.num_inducing" fxLayout="row" fxLayoutGap="8px"
+                class="p-4 border-bottom">
+                <div fxFlex="50">No. of Inducing Points</div>
+                <div fxFlex="50" class="fw-bold">
+                  {{ modelDetails.model.additional_info.num_inducing }}
+                </div>
+              </div>
+            </ng-container>
+            <div *ngIf="modelDetails.model.configs.input_scaling" fxLayout="row" fxLayoutGap="8px"
+              class="p-4 border-bottom">
+              <div fxFlex="50">Input Scaling</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.configs.input_scaling }}
+              </div>
+            </div>
+            <div class="d-block mb-8"></div>
+            <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+              <div fxFlex="50">Dataset Name</div>
+              <div fxFlex="50" class="fw-bold">
+                {{ modelDetails.model.dataset_name }}
+              </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+              <div fxFlex="50">Output</div>
+              <div fxFlex="50" class="fw-bold">
+                <ng-container *ngIf="
+                    modelDetails.model.configs.output_cols;
+                    instanceof: Array;
+                    else: singleOutput
+                  ">
+                  <span *ngFor="
+                      let output of modelDetails.model.configs.output_cols
+                    ">
+                    {{ output }},
+                  </span>
+                </ng-container>
+                <ng-template #singleOutput>
+                  <span>{{ modelDetails.model.configs.output_col }}</span>
+                </ng-template>
+              </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+              <div fxFlex="50">Inputs</div>
+              <div fxFlex="50" class="fw-bold">
+                <span *ngFor="let input of modelDetails.model.configs.input_cols">{{ input }},
+                </span>
+              </div>
+            </div>
+          </div>
+          <div fxFlex fxLayout="column">
+            <ng-container *ngIf="isRegressionModel(modelDetails.model)">
+              <div fxFlex="none" class="p-4 border-bottom fw-bold">
+                Error values (test dataset)
+              </div>
+              <div fxFlex class="y-auto" *ngIf="multipleOutputs(modelDetails.model)">
+                <table class="custom-table-sm">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th *ngFor="let column of modelDetails.model.configs.output_cols">
+                        {{ column | replaceAndCapitalize }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let key of keys(modelDetails.model.metrics)">
+                      <td>{{ key }}</td>
+                      <td *ngFor="let column of modelDetails.model.configs.output_cols">
+                        {{
+                          isObj(modelDetails.model.metrics[key])
+                          ? isDecimal(modelDetails.model.metrics[key][column])
+                            ? (modelDetails.model.metrics[key][column]
+                                | scientificNumber: isScientificNotationEnabled)
+                            : modelDetails.model.metrics[key][column]
+                          : column === 'accuracy'
+                            ? modelDetails.model.metrics[key]
+                            : '-'
+                        }}
+                      </td>                      
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div fxFlex class="y-auto" *ngIf="!multipleOutputs(modelDetails.model)">
+                <ng-container *ngFor="let key of getMetricsKeys(modelDetails.model.metrics)">
+                  <div fxLayout="row" fxLayoutGap="8px" class="p-4 border-bottom">
+                    <div fxFlex="50">
+                      {{ formatKey(key) }}
+                    </div>
+                    <div fxFlex="50" class="fw-bold">
+                      <ng-container *ngIf="
+                          isNumeric(modelDetails.model.metrics[key]);
+                          else stringValue
+                        ">
+                        {{ modelDetails.model.metrics[key] | scientificNumber:isScientificNotationEnabled }}
+                      </ng-container>
+                      <ng-template #stringValue>
+                        {{ modelDetails.model.metrics[key] | scientificNumber:isScientificNotationEnabled }}
+                      </ng-template>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="isClassificationModel(modelDetails.model)">
+              <div fxFlex="none" class="p-4 border-bottom fw-bold">Metrics</div>
+              <div fxFlex class="y-auto">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th *ngFor="let column of columns">
+                        {{ column | replaceAndCapitalize }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let key of keys(modelDetails.model.metrics)">
+                      <td>{{ key }}</td>
+                      <td *ngFor="let column of columns">
+                        {{
+                        isObj(modelDetails.model.metrics[key])
+                        ? isDecimal(modelDetails.model.metrics[key][column])
+                        ? (modelDetails.model.metrics[key][column]
+                        | scientificNumber:isScientificNotationEnabled)
+                        : modelDetails.model.metrics[key][column]
+                        : column === "accuracy"
+                        ? modelDetails.model.metrics[key]
+                        : "-"
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<div *ngIf="loader" fxLayout="column" fxLayoutAlign="center center" class="h-100">
+  <mat-spinner diameter="24"></mat-spinner>
+</div>

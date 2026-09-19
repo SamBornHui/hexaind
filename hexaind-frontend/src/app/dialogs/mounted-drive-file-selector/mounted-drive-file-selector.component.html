@@ -1,0 +1,33 @@
+<div class="global-overlay">
+  <div class="global-panel">
+    <div class="global-panel-header">
+      <button class="global-panel-close-button" (click)="onClosePanel()">
+        X
+      </button>
+      <label>Mounted Drive: {{ mountedDrive }}</label>
+    </div>
+
+    <div class="global-panel-content">
+      <div class="global-no-bullet">
+        <app-tree-node
+          *ngFor="let item of directoryContent"
+          [node]="item"
+          (nodeClick)="loadNodeContent($event.path, $event.name)"
+          (nodeDoubleClick)="onFileNodeDoubleClick($event)"
+        ></app-tree-node>
+      </div>
+    </div>
+
+    <!-- Footer with buttons -->
+    <div class="global-panel-footer">
+      <!-- Save and Close buttons -->
+      <button
+        id="closeButton"
+        style="width: 100px; height: 35px"
+        (click)="onClosePanel()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

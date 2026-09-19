@@ -1,0 +1,64 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Input">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Input 1:</div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Output">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Output 1:</div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <div fxFlex>
+              <div class="fw-bold pb-1">Field</div>
+              <mat-form-field appearance="outline">
+                <input matInput placeholder="Enter field name" [(ngModel)]="field" name="field" />
+              </mat-form-field>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold pb-1">Operator</div>
+              <mat-form-field appearance="outline">
+                <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" [ngModel]="getOperator()"
+                  (ngModelChange)="setOperator($event)" name="operator" aria-placeholder="Select operator">
+                  <mat-option *ngFor="let operator of filterOperator" [value]="operator">{{ operator }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div fxFlex>
+              <div class="fw-bold pb-1">Value</div>
+              <mat-form-field appearance="outline">
+                <input matInput placeholder="Enter value" [(ngModel)]="value" name="value" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

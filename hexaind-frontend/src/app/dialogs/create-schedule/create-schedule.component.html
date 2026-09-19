@@ -1,0 +1,326 @@
+<div fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom" style="overflow:auto;">
+  <div>
+    <h1>New Schedule</h1>
+  </div>
+  <div>
+    <button mat-icon-button [mat-dialog-close]="true">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+
+<form [formGroup]="formData" (ngSubmit)="onSubmit()" class="modal-overflow">
+  <div fxLayout="column" fxLayoutGap="24px" class="p-6" style="overflow:auto;"> 
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+      <!-- Name -->
+      <div fxFlex>
+        <div class="fw-bold pb-1">Name</div>
+        <mat-form-field appearance="outline">
+          <input matInput placeholder="Enter name" formControlName="name" />
+        </mat-form-field>
+      </div>
+      <!-- Workflow -->
+      <div fxFlex>
+        <div class="fw-bold pb-1">Workflow</div>
+        <mat-form-field appearance="outline">
+          <ng-container *ngIf="!data.workflow_id; else selectBox">
+            <mat-select placeholder="Select" formControlName="workflow">
+              <mat-option *ngFor="let session of sessions" [value]="session._id">
+                {{ session.name }}
+              </mat-option>
+            </mat-select>
+          </ng-container>
+          <ng-template #selectBox>
+            <mat-select placeholder="Select" formControlName="workflow" [value]="data.workflow_id">
+              <mat-option [value]="data.workflow_id">
+                {{ getSelectedSessionName() }}
+              </mat-option>
+            </mat-select>
+          </ng-template>
+        </mat-form-field>
+      </div>
+      <!-- Occurrence Type -->
+      <div fxFlex="200px">
+        <div class="fw-bold pb-1">Occurrence Type</div>
+        <mat-form-field appearance="outline">
+          <mat-select placeholder="Select" formControlName="occurrenceType" (selectionChange)="onOccurrenceTypeChange($event)">
+            <mat-option value="ONCE">Once</mat-option>
+            <mat-option value="RECURRING">Recurring</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Once Occurrence -->
+    <div fxLayout="column" fxLayoutGap="24px" *ngIf="formData.get('occurrenceType')?.value === 'ONCE'">
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+        <!-- Date -->
+        <div fxFlex="200px">
+          <div class="fw-bold pb-1">Date</div>
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="onceDateTimePicker" placeholder="Choose a date"
+              formControlName="onceDateTime" [min]="minDate">
+            <mat-datepicker-toggle matSuffix [for]="onceDateTimePicker"></mat-datepicker-toggle>
+            <mat-datepicker #onceDateTimePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <!-- Time -->
+        <div fxFlex="180px">
+          <div class="fw-bold pb-1">Time</div>
+          <mat-form-field appearance="outline">
+            <mat-select formControlName="time"  placeholder="Choose a time" (selectionChange)="onOnceTypeTimeChange()">
+              <mat-option *ngFor="let time of times" [value]="time">{{ time }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div>Occurs once on {{ formData.get('onceDateTime')?.value | date }} {{ formData.get('occurrenceType')?.value }}
+      </div>
+    </div>
+
+    <!-- Recurring Occurrence -->
+    <div fxLayout="column" fxLayoutGap="24px" *ngIf="formData.get('occurrenceType')?.value === 'RECURRING'">
+      <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="24px">
+        <!-- Start Date -->
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+          <div fxFlex="200px">
+            <div class="fw-bold pb-1">Start Date</div>
+            <mat-form-field appearance="outline">
+              <input matInput [matDatepicker]="recurringStartDatePicker" placeholder="Select start date"
+                formControlName="recurringStartDate" [min]="minDate"/>
+              <mat-datepicker-toggle matSuffix [for]="recurringStartDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #recurringStartDatePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <!-- Time -->
+          <div fxFlex="180px">
+            <div class="fw-bold pb-1">Time</div>
+            <mat-form-field appearance="outline">
+              <mat-select formControlName="recurringStartTime" placeholder="Choose a time">
+                <mat-option *ngFor="let time of times" [value]="time">{{ time }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Repeat Every -->
+        <div>
+          <div class="fw-bold pb-1">Repeat Every</div>
+          <div fxLayout="row" fxLayoutGap="8px">
+            <div fxFlex="100px">
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select" formControlName="repeatEvery">
+                  <mat-option value="1">1</mat-option>
+                  <mat-option value="2">2</mat-option>
+                  <mat-option value="3">3</mat-option>
+                  <mat-option value="4">4</mat-option>
+                  <mat-option value="5">5</mat-option>
+                  <mat-option value="6">6</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div fxFlex="150px">
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Select" formControlName="repeatType">
+                  <mat-option value="Days">Days</mat-option>
+                  <mat-option value="Weeks">Weeks</mat-option>
+                  <mat-option value="Months">Months</mat-option>
+                  <!-- <mat-option value="Years">Years</mat-option> -->
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <!-- Week Days (if Repeat Type is Weeks) -->
+        <!-- <div *ngIf="formData.get('repeatType')?.value === 'Weeks'">
+          <mat-button-toggle-group multiple formControlName="weekDays">
+            <mat-button-toggle value="M">M</mat-button-toggle>
+            <mat-button-toggle value="T">T</mat-button-toggle>
+            <mat-button-toggle value="W">W</mat-button-toggle>
+            <mat-button-toggle value="R">T</mat-button-toggle>
+            <mat-button-toggle value="F">F</mat-button-toggle>
+            <mat-button-toggle value="A">S</mat-button-toggle>
+            <mat-button-toggle value="S">S</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div> -->
+
+        <!-- Week Days (if Repeat Type is Weeks) -->
+        <div *ngIf="formData.get('repeatType')?.value === 'Weeks'">
+          <mat-button-toggle-group multiple formControlName="weekDays" 
+            (change)="onWeekDaySelection($event)">
+            <mat-button-toggle value="M">M</mat-button-toggle>
+            <mat-button-toggle value="T">T</mat-button-toggle>
+            <mat-button-toggle value="W">W</mat-button-toggle>
+            <mat-button-toggle value="R">T</mat-button-toggle>
+            <mat-button-toggle value="F">F</mat-button-toggle>
+            <mat-button-toggle value="A">S</mat-button-toggle>
+            <mat-button-toggle value="S">S</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <!-- End Date -->
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+          <div fxFlex="200px">
+            <div class="fw-bold pb-1">End Date</div>
+            <mat-form-field appearance="outline">
+              <input matInput [matDatepicker]="recurringEndDatePicker" placeholder="Select end date"
+                formControlName="recurringEndDate" [min]="minDate"/>
+              <mat-datepicker-toggle matSuffix [for]="recurringEndDatePicker"
+                class="custom-datepicker-toggle"></mat-datepicker-toggle>
+              <mat-datepicker #recurringEndDatePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <!-- Time -->
+          <div fxFlex="180px">
+            <div class="fw-bold pb-1">Time</div>
+            <mat-form-field appearance="outline">
+              <mat-select formControlName="recurringEndTime" placeholder="Choose a time">
+                <mat-option *ngFor="let time of times" [value]="time">{{ time }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div>Occurs every {{ formData.get('repeatEvery')?.value }} {{ formData.get('repeatType')?.value }} until {{
+        formData.get('recurringEndDate')?.value | date }} {{ formData.get('recurringEndTime')?.value }}</div>
+    </div>
+
+    <!-- Event-Based Config Checkbox and Dropdown -->
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+      <mat-checkbox formControlName="eventBasedConfig" (change)="onEventBasedConfigChange($event.checked)">Event Based
+        Scheduling</mat-checkbox>
+      <div *ngIf="formData.get('eventBasedConfig')?.value" fxFlex="300px">
+        <mat-form-field appearance="outline">
+          <mat-select placeholder="Select Event Type" formControlName="eventType">
+            <mat-option value="WF_COMPLETION_VIA_SCHEDULE_TRIGGER_WF">Workflow Completed</mat-option>
+            <mat-option value="ANY_FILE_IN_FOLDER_TRIGGER_WF">New File Added to a Folder</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Conditionally Render Based on Event Type -->
+
+    <div *ngIf="formData.get('eventType')?.value === 'WF_COMPLETION_VIA_SCHEDULE_TRIGGER_WF'" style="max-width: 520px;">
+      <div class="fw-bold pb-1">Dependent Workflow</div>
+      <mat-form-field appearance="outline">
+        <ng-container *ngIf="!data.workflow_id; else selectBox">
+          <mat-select placeholder="Select" formControlName="workflowId">
+            <mat-option *ngFor="let session of sessions" [value]="session._id">
+              {{ session.name }}
+            </mat-option>
+          </mat-select>
+        </ng-container>
+        <ng-template #selectBox>
+          <mat-select placeholder="Select" formControlName="workflowId" [value]="data.workflow_id">
+            <mat-option [value]="data.workflow_id">
+              {{ getSelectedSessionName() }}
+            </mat-option>
+          </mat-select>
+        </ng-template>
+      </mat-form-field>
+    </div>
+    <div *ngIf="formData.get('eventType')?.value === 'ANY_FILE_IN_FOLDER_TRIGGER_WF'" fxLayout="column"
+     fxLayoutGap="16px">
+    <div class="fw-bold mb-1">Choose Destination</div>
+
+    <div>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Search" (input)="filterNodes($event)" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+    <div class="scroll-container">
+      <div *ngIf="dataSource.data && dataSource.data.length > 0; else noFolderMessage">
+        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding [class.selected]="isFileSelected(node)"
+                        (click)="toggleFileSelection(node); $event.stopPropagation()">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <div fxFlex="none">
+                <button mat-icon-button disabled></button>
+              </div>
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined text-grey">
+                  {{ node.type === 'file' ? 'insert_drive_file' : 'folder' }}
+                </mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">{{ node.name }}</div>
+              <div fxFlex="none" class="check" *ngIf="isFileSelected(node)">
+                <mat-icon>check</mat-icon>
+              </div>
+            </div>
+          </mat-tree-node>
+
+          <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+                                [class.selected]="isFileSelected(node)" (click)="toggleFileSelection(node); $event.stopPropagation()">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <div fxFlex="none">
+                <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.name">
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{ treeControl.isExpanded(node) ? 'arrow_drop_down' : 'arrow_right' }}
+                  </mat-icon>
+                </button>
+              </div>
+              <div fxFlex="none">
+                <mat-icon class="material-symbols-outlined text-grey">
+                  {{ node.type === 'file' ? 'insert_drive_file' : 'folder' }}
+                </mat-icon>
+              </div>
+              <div fxFlex class="text-ellipse">{{ node.name }}</div>
+              <div fxFlex="none" class="check" *ngIf="isFileSelected(node)">
+              </div>
+            </div>
+            <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)" class="my-0">
+              <ng-container matTreeNodeOutlet></ng-container>
+            </ul>
+          </mat-nested-tree-node>
+        </mat-tree>
+      </div>
+      <ng-template #noFolderMessage>
+        <div class="no-folder-message">
+          Folder path is not available
+        </div>
+      </ng-template>
+    </div>
+
+    <style>
+      .example-tree-invisible {
+        display: none;
+      }
+
+      .example-tree ul,
+      .example-tree li {
+        margin-top: 0;
+        margin-bottom: 0;
+        list-style-type: none;
+      }
+
+      .scroll-container {
+        max-height: 300px; /* Set desired height */
+        overflow-y: auto; /* Enables vertical scrolling */
+        border: 1px solid #ddd; /* Optional: adds a border for better visibility */
+        padding: 8px; /* Optional: adds padding for inner content */
+      }
+    </style>
+  </div>
+
+  </div>
+
+  <!-- Buttons -->
+  <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6">
+    <button mat-stroked-button color="primary" type="button" [disabled]="isSubmitting" (click)="closeDialog(undefined)">Cancel</button>
+    <ng-container *ngIf="data.isEdit; else scheduleButton">
+      <button mat-flat-button color="primary" type="submit">
+        Update
+      </button>
+    </ng-container>
+    
+    <ng-template #scheduleButton>
+      <button mat-flat-button color="primary" type="submit" [disabled]="!enableSchedule">
+        Schedule
+      </button>
+    </ng-template>
+  </div>
+</form>
+<div class="spinner-overlay" *ngIf="isLoading">
+  <mat-spinner diameter="24"></mat-spinner>
+</div>

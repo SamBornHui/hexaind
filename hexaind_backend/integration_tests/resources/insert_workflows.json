@@ -1,0 +1,187 @@
+[
+    {
+        "_id": {
+            "$oid": "668ac62745ca9c5bddcd65d6"
+        },
+        "id": "668ac62745ca9c5bddcd65d6",
+        "interactive_mode": true,
+        "name": "test-sample-wf1-master",
+        "description": "used for testing purposes contains csv widget, save widget",
+        "workflow_version": "v0",
+        "widgets": [],
+        "state": "IDLE",
+        "start": [],
+        "end": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "version": "1.0",
+        "client_tags": {
+            "StartWidgetPosition": {
+                "X": 150,
+                "Y": 150
+            },
+            "EndWidgetPosition": {
+                "X": 650,
+                "Y": 150
+            },
+            "Arrows": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "66954ada4649cf54ee4c3daa"
+        },
+        "id": "66954ada4649cf54ee4c3daa",
+        "interactive_mode": true,
+        "name": "P1-Mobo",
+        "description": "used for testing purposes contains p1 mobo flow",
+        "workflow_version": "v0",
+        "widgets": [],
+        "state": "IDLE",
+        "start": [],
+        "end": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "version": "1.0",
+        "client_tags": {
+            "StartWidgetPosition": {
+                "X": 150,
+                "Y": 150
+            },
+            "EndWidgetPosition": {
+                "X": 650,
+                "Y": 150
+            },
+            "Arrows": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "66960ecc51dcbc2e63b9678a"
+        },
+        "id": "66960ecc51dcbc2e63b9678a",
+        "interactive_mode": true,
+        "name": "P1-ActiveLearning",
+        "description": "used for testing purposes contains p1 mobo flow",
+        "workflow_version": "v0",
+        "widgets": [],
+        "state": "IDLE",
+        "start": [],
+        "end": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "version": "1.0",
+        "client_tags": {
+            "StartWidgetPosition": {
+                "X": 150,
+                "Y": 150
+            },
+            "EndWidgetPosition": {
+                "X": 650,
+                "Y": 150
+            },
+            "Arrows": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "669791eabeb903bc34831a7f"
+        },
+        "id": "669791eabeb903bc34831a7f",
+        "interactive_mode": true,
+        "name": "P3-Workflow",
+        "description": "used for testing purposes contains p3 usecase",
+        "workflow_version": "v0",
+        "widgets": [],
+        "state": "IDLE",
+        "start": [],
+        "end": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "version": "1.0",
+        "client_tags": {
+            "StartWidgetPosition": {
+                "X": 150,
+                "Y": 150
+            },
+            "EndWidgetPosition": {
+                "X": 650,
+                "Y": 150
+            },
+            "Arrows": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6698b27440feaaf9aab0e23e"
+        },
+        "id": "6698b27440feaaf9aab0e23e",
+        "interactive_mode": true,
+        "name": "P2-Workflow",
+        "description": "used for testing purposes contains p2 usecase",
+        "workflow_version": "v0",
+        "widgets": [],
+        "state": "IDLE",
+        "start": [],
+        "end": [],
+        "owner_id": "664c569824e6fd041c96c25b",
+        "owner_name": "TestUser",
+        "created_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "last_modified_by_id": "664c569824e6fd041c96c25b",
+        "last_modified_at": {
+            "$date": "2024-05-21T08:08:56.139Z"
+        },
+        "project_id": "664ee2ced73a5a44b61aadd9",
+        "site_id": "1",
+        "version": "1.0",
+        "client_tags": {
+            "StartWidgetPosition": {
+                "X": 150,
+                "Y": 150
+            },
+            "EndWidgetPosition": {
+                "X": 650,
+                "Y": 150
+            },
+            "Arrows": []
+        }
+    }
+]

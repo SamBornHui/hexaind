@@ -1,0 +1,33 @@
+<mst-input
+  type="select"
+  [label]="fieldLabel"
+  [value]="filter.field"
+  [items]="fields"
+  (change)="onFilterChange($event, 'field')"
+/><mst-input
+  type="select"
+  label="Type"
+  [value]="filter.type"
+  [items]="filterTypeItems"
+  (change)="onFilterChange($event, 'type')"
+/>
+<div class="mst-filter__value">
+  <mst-input
+    [label]="filter.type === 'range' ? 'From' : 'Value'"
+    [value]="filter.value"
+    (change)="onFilterChange($event, 'value')"
+  />
+  <mst-input
+    *ngIf="filter.type === 'range'"
+    label="To"
+    [value]="filter.to"
+    (change)="onFilterChange($event, 'to')"
+  />
+</div>
+<mst-select-viz-items
+  *ngIf="targetItems.length > 0"
+  [global]="filter.global"
+  [items]="targetItems"
+  [selectedIds]="filter.targetIds || []"
+  (change)="onFilterChange($event, 'target')"
+/>

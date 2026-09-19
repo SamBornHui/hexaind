@@ -1,0 +1,11 @@
+<div fxFlex fxLayout="column" fxLayoutGap="10px"  style="padding:30px">
+    <textarea style="font-size:large; height: 550px; width:540px; overflow:auto; padding:5px" matInput [(ngModel)]="displayedData"></textarea>
+    <div fxFlex fxLayoutAlign="end center" fxLayoutGap="10px">
+        <button color="primary" mat-flat-button (click)="onCancel()">
+            Cancel
+        </button>
+        <button color='primary' mat-flat-button (click)="onSave()">
+            Save
+        </button>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+<div fxLayout="column" class="h-100">
+    <div
+      fxFlex="none"
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+      class="p-2 border-bottom"
+    >
+      <div>
+        <h1>UC3 Probe Model PopUp</h1>
+      </div>
+      <div>
+        <button mat-icon-button [mat-dialog-close]="true">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+    <div fxFlex fxLayout="column" class="p-4">
+        <div fxFlex="none" *ngIf="isColumnDisplay == false">
+            No Data Available Please Upload CSV
+        </div>
+        <div class="columns-container" *ngIf="isColumnDisplay == true">
+            <!-- Available Columns -->
+            <div fxFlex="30vw" class="columns-section-container">
+              <h3>Available Columns</h3>
+              <div class="search-keyword-container p-1">
+                <mat-form-field appearance="outline">
+                  <mat-label>Filter based on keywords</mat-label>
+                  <input matInput [(ngModel)]="availableColumnsFilter" placeholder="Search">
+                </mat-form-field>
+              </div>
+              <mat-checkbox [(ngModel)]="AvailableColumnsSelectAll" *ngIf="filteredAvailableColumns.length > 0" (change)="toggleAvialableSelectAll()">
+                Select All
+              </mat-checkbox>
+              <div class="columns-table-outer">
+                <table mat-table [dataSource]="filteredAvailableColumns" class="columns-table-container">
+                  <!-- Column Name -->
+                  <ng-container matColumnDef="name">
+                    <td mat-cell *matCellDef="let column" class="columns-table-cell">
+                      <mat-checkbox [(ngModel)]="column.selected" (change)="onAvailableValuesChange()"></mat-checkbox>
+                      {{ column.name }}
+                    </td>
+                  </ng-container>
+                  <tr mat-row *matRowDef="let row; columns: ['name']"></tr>
+                </table>
+              </div>
+            </div>
+          
+            <!-- Move Buttons -->
+            <div fxFlex="108px" class="move-buttons-container">
+              <button mat-icon-button (click)="onSelectColumns()" matTooltip="Move to selected columns">
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+              <button mat-icon-button (click)="onUnselectColumns()" matTooltip="Move back to available columns">
+                <mat-icon>arrow_back</mat-icon>
+              </button>
+            </div>
+          
+            <!-- Selected Columns -->
+            <div fxFlex="30vw" class="columns-section-container">
+              <h3>Selected Columns</h3>
+              <div class="search-keyword-container p-1">
+                <mat-form-field appearance="outline">
+                  <mat-label>Filter based on keywords</mat-label>
+                  <input matInput [(ngModel)]="selectedColumnsFilter" placeholder="Search">
+                </mat-form-field>
+              </div>
+          
+              <mat-checkbox [(ngModel)]="isAllSelected" *ngIf="filteredSelectedColumns.length > 0" (change)="toggleSelectAll()">
+                Select All
+              </mat-checkbox>
+          
+              <div class="columns-table-outer">
+                <table mat-table [dataSource]="filteredSelectedColumns" class="columns-table-container">
+                  <!-- Column Name -->
+                  <ng-container matColumnDef="name">
+                    <td mat-cell *matCellDef="let column" class="columns-table-cell">
+                      <mat-checkbox [(ngModel)]="column.selected" (change)="onSelectedValuesChange()"></mat-checkbox>
+                      {{ column.name }}
+                    </td>
+                  </ng-container>
+                  <tr mat-row *matRowDef="let row; columns: ['name']"></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+    </div>
+    <div
+      fxFlex="none"
+      fxLayout="row"
+      fxLayoutAlign="end center"
+      fxLayoutGap="8px"
+      class="p-6"
+    >
+     <input type="file" #fileInput (change)="onCSVFileSelected($event)"  accept=".csv"
+        style="display: none;" />
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="browseFileInputClick(fileInput)"
+      >
+        Upload CSV
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="UC3SaveModelPopupButton()"
+      >
+        Save
+      </button>
+      <button mat-stroked-button color="primary" mat-dialog-close>Close</button>
+    </div>
+  </div>

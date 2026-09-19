@@ -1,0 +1,53 @@
+<div fxLayout="column">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Output Directory</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="closeDialog(false)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <div>
+      <mat-checkbox
+        color="primary"
+        [(ngModel)]="outputDirOptions['defaultDirectory']"
+      >
+        Save the analysis report in the default directory
+      </mat-checkbox>
+    </div>
+    <div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          type="text"
+          #directory
+          placeholder="Ex. D:\workflows\"
+          [disabled]="outputDirOptions['defaultDirectory']"
+          [(ngModel)]="outputDirOptions['outputDirectory']"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="16px"
+    class="p-6"
+  >
+    <button mat-stroked-button color="primary" (click)="closeDialog(false)">
+      Cancel
+    </button>
+    <button mat-flat-button color="primary" (click)="checkOutDirectory()">
+      Save
+    </button>
+  </div>
+</div>

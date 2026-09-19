@@ -1,0 +1,88 @@
+<div fxLayout="column" class="h-100">
+    <div fxFlex class="y-auto">
+      <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+        <mat-tab> <!-- Information -->
+          <ng-template mat-tab-label>
+            {{matTabNames[0].name}} <span *ngIf="matTabNames[0].isUserInputNeeded">*</span>
+          </ng-template>
+          <div class="global-widget-area">
+            <app-configs-information [widgetData]="data"></app-configs-information>
+          </div>
+        </mat-tab>
+        <mat-tab> <!-- Inputs -->
+          <ng-template mat-tab-label>
+            {{matTabNames[1].name}} <span *ngIf="matTabNames[1].isUserInputNeeded">*</span>
+          </ng-template>
+          <div class="global-widget-area">
+            <div fxLayout="row">
+              <div fxFlex="50">
+                <div class="fw-bold pb-1">Select Input</div>
+                <mat-form-field appearance="outline">
+                  <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)" name="inputWidgetSelector" placeholder="Select input">
+                    <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                      {{ getInputingWidgetsOutputName(inputWidget) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab> <!-- Outputs -->
+          <ng-template mat-tab-label>
+            {{matTabNames[2].name}} <span *ngIf="matTabNames[2].isUserInputNeeded">*</span>
+          </ng-template>
+          <div class="global-widget-area">
+            <div fxLayout="row">
+              <div fxFlex="50">
+                <div class="fw-bold pb-1">Set Output Name</div>
+                <div>
+                  <mat-form-field appearance="outline">
+                    <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                      placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event" />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Parameters"> <!-- Parameters -->
+          <div fxFlex fxLayout="row" fxGap="25px" style="padding: 25px;">
+            <mat-form-field fxFlex appearance="outline" style="padding-right: 20px;">
+              <mat-label>Configured column(s)</mat-label>
+              <input matInput [value]="overviewOfSelectedColumns" disabled>
+            </mat-form-field>
+            <div *ngIf="isLoadingMetadata" fxLayout="row" fxLayoutAlign="center center" style="text-align: center;">
+              <mat-spinner style="width:20%" diameter="25" ></mat-spinner>   
+              <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                Fetching dataset columns...
+              </p>
+            </div>  
+            <button *ngIf="!isLoadingMetadata" (click)="openColumnDropDown()" fxFlex="15" mat-flat-button color="primary">
+              Configure Columns
+            </button>
+          </div>
+        </mat-tab>
+        <mat-tab> <!-- Settings -->
+          <ng-template mat-tab-label>
+            {{matTabNames[4].name}} <span *ngIf="matTabNames[4].isUserInputNeeded">*</span>
+          </ng-template>
+          <div class="global-widget-area">
+            <app-settings (notifyParent)="onAppSettingsUpdated()" />
+          </div>
+        </mat-tab>
+        <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+          <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+  <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+    <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onReset()">
+      Reset
+    </button>
+    <button [disabled]="!changeMade" mat-flat-button color="primary" id="createBeutton" (click)="onSave()">
+      Save
+    </button>
+  </div>
+  <app-config-action-bar widgetName="Drop Columns Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

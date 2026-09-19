@@ -1,0 +1,84 @@
+.sa-table {
+    background-color: var(--white);
+    text-align: center;
+
+    .cell {
+        border-right: 1px solid var(--stroke-lite);
+        padding: 8px 4px;
+
+        &:last-child {
+            border-right: none;
+        }
+    }
+}
+
+.selected-option {
+    background-color: var(--selected-surface);
+}
+
+.change-button {
+    border-radius: 4px !important;
+    height: 28px !important;
+    padding: 8px !important;
+    font-size: 12px !important;
+}
+
+.sa-custom-input {
+    width: 100%;
+    border: 1px solid var(--stroke-lite);
+    border-radius: 4px;
+    padding: 4px;
+
+    &:focus {
+        outline: none;
+        border: 1px solid var(--stroke-dark);
+    }
+}
+
+.button-text {
+  flex-grow: 1; /* Ensures the text takes up all available space on the left */
+}
+  
+.button-spinner {
+    position: absolute; 
+    z-index: 1; 
+    right: 10px; 
+    top:10px;
+}  
+.disable-content {
+    pointer-events: none;
+    opacity: 0.7; /* Optional: visually indicates disabled state */
+}   
+
+.menu-top-item {
+  
+  flex: 0 1 auto;  /* Allow them to take their natural width */
+  background-color: white;
+}
+  
+.scrollable-menu-items {
+  max-height: calc(100% - 30px);  /* Adjust based on your preference */
+  overflow-y: auto;  /* Allow scrolling within this container */
+}
+
+.menu-top-container {
+  position: sticky;
+  top: 0;
+  background-color: var(--white); /* Optional: Make sure the top items have a background */
+  z-index: 2; /* Keep it on top of other items */
+//   justify-content: space-between; /* Align items to the left and right */
+  padding: 8px; /* Adjust padding if needed */
+  border-bottom: 1px solid var(--stroke-lite);
+
+  .select-options {
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--primary);    
+
+    &:hover {
+      color: var(--secondary);
+    }
+  }
+}
+  

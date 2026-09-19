@@ -1,0 +1,170 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 2</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output2" [(ngModel)]="widgetOutput2"
+                  (ngModelChange)="widgetOutput2 = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="100" fxFlex.lt-lg="100">
+              <app-features-list-common (changeMade)="changeMade = $event" [numericalDataSource]="numericalDataSource"
+              [categoricalDataSource]="categoricalDataSource" [configCache]="configCache">
+              </app-features-list-common>
+
+              <div class="p-4">
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Evaluation metrics</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="Evaluation metrics">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <mat-radio-group [(ngModel)]="selectedEvaluationMetric" (change)="storeSelectedMetric($event)">
+                      <mat-radio-button color="primary" *ngFor="let metric of evaluationMetric" [value]="metric">{{
+                        metric | replaceAndCapitalize }}</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Split ratio</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Split ratio">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="50px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getSplitRatio()}}" (keyup.enter)="setSplitRatio($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex>
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="100" [min]="1" [step]="1"
+                          [discrete]="true" (change)="setSplitRatio($event)">
+                          <input matSliderThumb [ngModel]="getSplitRatio()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+                    <div class="fw-bold">Number of trials</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Number of trials">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="24px">
+                    <div fxFlex="288px" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                      <div fxFlex="50px">
+                        <mat-form-field appearance="outline">
+                          <input matInput value="{{getNumberOfTrials()}}" (keyup.enter)="setNumberOfTrials($event)"
+                            [disabled]="workflowCanvasService.IsViewingRunMode" />
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex>
+                        <mat-slider [disabled]="workflowCanvasService.IsViewingRunMode" [max]="100" [min]="1" [step]="1"
+                          [discrete]="true" (change)="setNumberOfTrials($event)">
+                          <input matSliderThumb [ngModel]="getNumberOfTrials()" />
+                        </mat-slider>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="RF ML Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"
+  (callParentFunction)="openModelPreveiwDialog($event)"></app-config-action-bar>

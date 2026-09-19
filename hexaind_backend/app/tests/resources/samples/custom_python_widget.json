@@ -1,0 +1,138 @@
+{
+  "recipe_id": "test",
+  "version": "1.0",
+  "name": "Test Recipe",
+  "widget_version": "1",
+  "description": "Test Description",
+  "reference_links": [
+    "link1",
+    "link2"
+  ],
+  "tags": [
+    "tag1",
+    "tag2"
+  ],
+  "widget_inputs_rules": {
+    "count": 1,
+    "config": [
+      {
+        "count": 1,
+        "expected_type": "DATASET",
+        "expected_type_constraints": {
+          "sub_type": "TABULAR"
+        },
+        "optional": false
+      }
+    ]
+  },
+  "widget_outputs_rules": {
+    "count": 2,
+    "config": [
+      {
+        "count": 1,
+        "expected_type": "DATASET",
+        "expected_type_constraints": {
+          "sub_type": "TABULAR"
+        },
+        "optional": false
+      },
+      {
+        "count": 1,
+        "expected_type": "STRING",
+        "optional": false
+      }
+    ]
+  },
+  "widget_settings": {
+    "color_code": "#12323",
+    "allow_users_to_modify_configurations": false
+  },
+  "inputs": [
+    {
+      "urn": "<ToBeModifiedDuringWidgetRunTimeByUI>",
+      "map_to_argument": "df",
+      "name": "<ToBeModifiedDuringWidgetRunTimeByUI>"
+    }
+  ],
+  "outputs": [
+    {
+      "urn": "<ToBeModifiedDuringWidgetRunTimeByUI>",
+      "map_to_argument": "output_1",
+      "type": "STRING",
+      "name": "<ToBeModifiedDuringWidgetRunTimeByUI>"
+    },
+    {
+      "urn": "<ToBeModifiedDuringWidgetRunTimeByUI>",
+      "map_to_argument": "output_2",
+      "type": "DATASET",
+      "name": "<ToBeModifiedDuringWidgetRunTimeByUI>"
+    }
+  ],
+  "config": {
+    "version": "1.0",
+    "module_id": "module_123",
+    "widget_type" : "CUSTOM_CODE",
+    "function_inputs": [
+      {
+        "type": "<class 'pandas.core.frame.DataFrame'>",
+        "arg_name": "df"
+      }
+    ],
+    "widget_parameters": [
+      {
+        "type": "<class 'str'>",
+        "arg_name": "param1",
+        "is_mandatory": true,
+        "default_value": {
+          "type": "STRING",
+          "result": {
+            "string_value": "123"
+          }
+        },
+        "value": {
+          "type": "STRING",
+          "result": {
+            "string_value": "123"
+          }
+        }
+      },
+      {
+        "type": "<class 'pandas.core.frame.DataFrame'>",
+        "arg_name": "df2",
+        "is_mandatory": true,
+        "default_value": {
+          "type": "DATASET",
+          "result": {
+            "dataset_id": "65dc7b346892e8ef96848ad3"
+          }
+        },
+        "value": {
+          "type": "DATASET",
+          "result": {
+            "dataset_id": "65dc7b346892e8ef96848ad3"
+          }
+        }
+      }
+    ],
+    "function_outputs": [
+      {
+        "type": "<class 'str'>",
+        "arg_name": "output_1"
+      },
+      {
+        "type": "<class 'pandas.core.frame.DataFrame'>",
+        "arg_name": "output_2"
+      }
+    ]
+  },
+  "published_by": "user_456",
+  "published_at": "2024-02-26T17:21:16.614967",
+  "project_ids": [
+    "project_123"
+  ],
+  "site_ids": [
+    "site_789"
+  ],
+  "access_mode": "EXTERNAL",
+  "usage_count": 0
+}

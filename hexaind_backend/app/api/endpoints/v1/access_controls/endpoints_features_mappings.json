@@ -1,0 +1,1943 @@
+[
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/models/create_visualizations",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/models/compare_models",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/models/interactiveGraphHover",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/model/{model_id}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/run/{run_id}/models/preview_models",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/models/save_models",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/models",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/delete_models",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/folder_structure",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/get_childern",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/scheduling/create_schedule",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/scheduling/update_schedule",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/scheduling/delete_schedule/{schedule_id}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/scheduling/pause_schedule",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/scheduling/get_all_schedules",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/{workflowId}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/{workflowId}",
+    "method": "PUT",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "update_versioned"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/{workflowId}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/widget/{widget_type}/schema",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/session",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/session/{sessionId}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/session/{sessionId}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/session/{sessionId}",
+    "method": "PUT",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/session",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/save",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/saveas",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "publish"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/run",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "execute"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/stop",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "execute"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/widget/{widgetURN}/run",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [
+      ["assets", "workflows", "update"],
+      ["assets", "workflows", "create"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/widget/{widgetURN}/stop",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/run/status",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/run/widget/{widgetURN}/results",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflows/{workflowId}/run",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflows/{workflowId}/run_summary/{runId}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/{workflowId}/run",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "execute"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/{workflowId}/run/{runId}/status",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/workflow/{workflowId}/run/{runId}/widget/{urn}/result",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/thermocalc_authentication/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/rescale_authentication/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/rescale_information",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/upload_to_rescale/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/connector/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/connectors/{connectorId}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/connectors/{connectorId}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/connectors",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "connectors", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/connector/{connectorId}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [
+      ["assets", "connectors", "update"],
+      ["assets", "connectors", "create"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/notifications",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/notifications/{userId}",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/notificationid/{siteId}/notifications/{notificationId}",
+    "method": "PUT",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/notificationid/{notificationId}/notificationStatus",
+    "method": "PUT",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/notifications/{notificationId}",
+    "method": "DELETE",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/read_file_content",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/dataset/tabular/upload",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/dataset/tabular/download/{dataset_id}",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/dataset/{dataset_id}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/dataset/file_preview/{dataset_id}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/datasets",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/datasets/delete",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/multiple_file_uploads",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/copy_file",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/module/upload",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/modules",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/datasets/mounted_files_list",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/dataset/tabular/mounted_upload",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/custom_python_code_builder/get_file_names",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [
+      ["assets", "datasets", "create"],
+      ["assets", "datasets", "read"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/custom_python_code_builder/get_metadata",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [
+      ["assets", "datasets", "read"],
+      ["assets", "datasets", "create"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/custom_python_code_builder/create_module",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/modules/{module_id}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [
+      ["assets", "datasets", "read"],
+      ["assets", "datasets", "create"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/custom_python_code_builder/validate_custom_code",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/custom_python_code_builder/multiple_file_uploads",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/dataset/rename/{dataset_id}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/elasticsearch/logs",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets_modification/datasets_conversion",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_python_widget_recipe/update_or_insert",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_python_widget_recipe/preview",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/custom_python/custom_python_widget_recipe/clone",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/custom_python/custom_code_widget/delete/{recipe_id}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_python_widget_recipes",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_python_widget_recipe/get",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_code_widget/get",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_code_widget/fetch_all",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/custom_python/custom_code_widget/publish",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/create_new_project_with_user_mappings",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2],
+    "features_keys": [["projects", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2],
+    "features_keys": [["projects", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["projects", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}",
+    "method": "PATCH",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["projects", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["projects", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": [["projects", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/shareProject/{projectId}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/updateFavoriteProject/{projectId}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/update_last_update_at/{project_id}",
+    "method": "PATCH",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/login",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/logout",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/deleteUser",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/delete_user",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/activate_user_by_admin",
+    "method": "PATCH",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/sso_login",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/invite_users",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/createSite",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/isUserAlreadyRegistered",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/registerUser",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/activate_user",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/get_users_list",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/get_user_details_based_on_filter",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/getUserDetailsWithRoles",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/getUserAccessRoles",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/changePassword",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/getRefreshedTokens",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/reset_password_by_user",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/reset_password_by_server_admin",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/updatePasswordByEmailToken",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/toggleUserActiveStatus",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/update_user_server_roles",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/updateUserNames",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/invite_bulk_users",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/update_user_by_admin",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/resend_invitation_mail",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/get_login_methods_of_plotform",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/authentication/get_server_roles",
+    "method": "POST",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/site-management/getRolesList",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/site-management/getSitesList",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/dryrun",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/authenticate",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": [
+      ["assets", "datasets", "read"],
+      ["assets", "datasets", "create"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/datasets_list",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/tables_list",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/preview",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/query",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/query/{query_id}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/bigquery/query",
+    "method": "PATCH",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/data/snowflake/authenticate",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": [
+      ["assets", "datasets", "read"],
+      ["assets", "datasets", "create"]
+    ]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/data/snowflake/get_databases",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/data/snowflake/get_db_schemas",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/data/snowflake/get_tables",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/assets/data/snowflake/get_preview",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/datasheet/{datasheet}/nominal_age/{nominal_age}/reset/{reset}/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/generate_datasheet/{datasheet}/nominal_age/{nominal_age}/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/read_csv",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/get_datasheets",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/correct_tensile",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/preview",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/local_fit",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/ingest_data",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/eda/preview",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/eda/statistics",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/eda/metadata",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/eda/visualization",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "read"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/eda/file",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/eda/correlation_heatmap",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/roles_features_maps/create",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/roles_features_maps/{roles_features_map_id}/update",
+    "method": "PUT",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/roles_features_maps/get_role_feature_map_id",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/roles_features_maps/get_role_feature_map_name",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/roles_features_maps/get_all_roles",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/users_projects_mappings/create_user_project_mappings",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": [["manage_project_users", "add"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/users_projects_mappings/update_user_roles_for_project",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/users_projects_mappings/update_user_project_mapping",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["manage_project_users", "modify"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/users_projects_mappings/get_mappings_based_on_project_id",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/users_projects_mappings/get_mappings_based_on_user_id",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/roles_features_maps/delete_user_project_mapping",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["manage_project_users", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/create_endpoints_features_mappings_based_db_dump",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/get_unmapped_users_for_project",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/update_server_based_roles_with_mappings",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/healthcheck/test_mail_delivery",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/healthcheck/get_database_status",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/healthcheck/test_keyvault_access",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/healthcheck/get_users_details",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/healthcheck/create_app_permissions",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/folder_structure",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/create_folder",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/move_assets",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/rename_assets",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/create_dataset_duplicate",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/delete_asset",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/download_asset",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/notification",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/notification",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/notification/{notificationId}/updateNotification",
+    "method": "PUT",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/userid/{userId}",
+    "method": "PUT",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/notificationConfiguration",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/workflow/{workflow_id}/get_session",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/users/{userId}/notification/{notificationId}",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/datasheet/{datasheet}/nominal_age/{nominal_age}/reset/{reset}/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/generate_datasheet/{datasheet}/nominal_age/{nominal_age}/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/generate_new_datasheet/{datasheet}/nominal_age/{nominal_age}/",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/datasheet/{datasheet}/save_metadata",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/read_csv",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/get_datasheets",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/get_datasheets_details",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/correct_tensile",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/preview",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/local_fit",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/save_flc_ascii",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/save_tensile_ascii",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/datasheet/ingest_data",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/upload_flc_file_to_convert",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/upload_tensile_file_to_convert",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/tensile_file_convertor",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/{datasheet}/download_results",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/download_ascii",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/projects/{projectId}/datasheet/{datasheet}/delete",
+    "method": "DELETE",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/projects/{projectId}/images/upload_images_data",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/sites/{siteId}/projects/{projectId}/assets/create_dataset",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/get_files_list_of_folder",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/get_file",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/get_folder_struct_json",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1, 2, 4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/projects/{projectId}/images/upload_images_data_from_mounted_drive",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/projects/{projectId}/images/rename",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "update"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/image_datasets/projects/{projectId}/images/delete",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "delete"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/duplication/{type}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "publish"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sessions/{sessionId}/workflow/template",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "publish"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/templates",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "workflows", "publish"]]
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/feature_flags",
+    "method": "GET",
+    "exclude": true,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/update_app_permission",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/get_all_apps_permissions",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/update_app_permissions",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/dataset/{datasetId}/retrieve_fe_data",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/dataset/{datasetId}/quantification_techniques",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/dataset/{datasetId}/batch_processing",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/get_image_size",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/datasets/upload_defect_images_metadata",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/image_datasets",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/update_datasheet/{datasheet_id}",
+    "method": "PUT",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/set_initial_fit/{datasheet}/nominal_age/{nominal_age}",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/datasheet/{datasheetId}/nominal_age/{nominalAge}/selected_datasheet/{selectedDataSheetId}/save_changes",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/reset_tensile_sample",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/datasheet/comparison_tensile_sample",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2,4],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/uc3/get_workflow_names",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/uc3/get_runs_for_workflow",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/uc3/get_dashboard_metadata",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{site_id}/projects/{project_id}/uc3/get_tool_recipe_plots",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sam/get_baselines",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sam/format_scrap_data",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sam/extract_alloys_data",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sam/save_scenarios",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sam/get_scenarios",
+    "method": "GET",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/sam/usecase/{usecaseId}/run_scenarios",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1,2],
+    "features_keys": []
+  },
+  {
+    "version": "1.0",
+    "endpoint": "/v1/sites/{siteId}/projects/{projectId}/assets/dataset/upload/multiple_text_file",
+    "method": "POST",
+    "exclude": false,
+    "bypassed_server_roles": [1],
+    "features_keys": [["assets", "datasets", "create"]]
+  }
+]

@@ -1,0 +1,109 @@
+<div #root class="mst-table__container">
+  <ng-template #header>
+    <thead *ngIf="columns.length > 0">
+      <tr class="mst-table__row">
+        <th
+          class="mst-table__cell__spacer mst-shimmer"
+          [class.mst-shimmer]="leftFillerWidth !== 0"
+          [style.width.px]="leftFillerWidth"
+        >
+          <div [style.width.px]="leftFillerWidth"></div>
+        </th>
+        <th
+          *ngFor="
+            let column of columns
+              | slice: startColumnIndex : startColumnIndex + visibleColumnCount
+          "
+          class="mst-table__cell mst-table__cell--header"
+          [style.min-width.px]="column.minWidth"
+          [style.max-width.px]="column.maxWidth"
+        >
+          <mst-table-header-cell
+            [column]="column"
+            [sortDirection]="
+              column.hasSort && sortInfo?.field === column.field
+                ? sortInfo?.direction || 'none'
+                : 'none'
+            "
+            (sort)="onSort($event)"
+          />
+        </th>
+        <th
+          class="mst-table__cell__spacer"
+          [class.mst-shimmer]="rightFillerWidth !== 0"
+          [style.width.px]="rightFillerWidth"
+        >
+          <div [style.width.px]="rightFillerWidth"></div>
+        </th>
+      </tr>
+    </thead>
+  </ng-template>
+  <ng-template #page let-startIndex="startIndex">
+    <tr
+      [class]="'mst-table__row' + ' mst-table__row--index-' + i + startIndex"
+      [class.selected]="selectedIdSet.has(item[keyField] + '')"
+      *ngFor="
+        let item of items | slice: startIndex : startIndex + limit;
+        let i = index
+      "
+    >
+      <td
+        class="mst-table__cell__spacer"
+        [class.mst-shimmer]="leftFillerWidth !== 0"
+        [style.width.px]="leftFillerWidth"
+      >
+        <div [style.width.px]="leftFillerWidth"></div>
+      </td>
+      <ng-container
+        *ngFor="
+          let column of columns
+            | slice: startColumnIndex : startColumnIndex + visibleColumnCount;
+          let columnIndex = index
+        "
+      >
+        <td
+          *ngIf="getColSpan(columnIndex, item) !== 0"
+          class="mst-table__cell"
+          [style.min-width.px]="column.minWidth"
+          [style.max-width.px]="column.maxWidth"
+          [attr.data.colspan]="getColSpan(columnIndex, item)"
+          [attr.colspan]="getColSpan(columnIndex, item)"
+        >
+          <mst-table-cell
+            [selectedRow]="selectedIdSet.has(item[keyField] + '')"
+            [column]="column"
+            [columns]="columns"
+            [columnIndex]="columnIndex"
+            [rowIndex]="i + startIndex"
+            [item]="item"
+            [keyField]="keyField"
+            (change)="onCellValueChange($event)"
+            (cellClick)="onCellClick($event)"
+            (arrowClick)="onArrowClick($event)"
+          />
+        </td>
+      </ng-container>
+      <td
+        class="mst-table__cell__spacer"
+        [class.mst-shimmer]="rightFillerWidth !== 0"
+        [style.width.px]="rightFillerWidth"
+      >
+        <div [style.width.px]="rightFillerWidth"></div>
+      </td>
+    </tr>
+  </ng-template>
+  <table
+    mstVirtualScroll
+    [loading]="loading"
+    [containerEl]="root"
+    [limit]="limit"
+    [headerTemplate]="header"
+    [pageTemplate]="page"
+    [items]="items"
+    [isTable]="true"
+    [hasMore]="hasMore"
+    emptyMessage="No data"
+    (loadMore)="onLoadMore($event)"
+    (reset)="onResetScrolll()"
+  ></table>
+</div>

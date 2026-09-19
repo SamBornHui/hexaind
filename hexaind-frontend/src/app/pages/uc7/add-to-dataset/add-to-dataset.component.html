@@ -1,0 +1,71 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>{{ headerMessage }}</h1>
+    </div>
+    <div>
+      <button mat-icon-button [mat-dialog-close]="true">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="y-auto">
+    <mat-table [dataSource]="dataSource">
+      <!-- File Path Column -->
+      <ng-container matColumnDef="filePath">
+        <mat-header-cell *matHeaderCellDef> File Path </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <div class="text-ellipse" matTooltip="{{ element.filePath }}">{{ element.filePath }}</div>
+        </mat-cell>
+      </ng-container>
+
+      <!-- File Name Column -->
+      <ng-container matColumnDef="fileName">
+        <mat-header-cell *matHeaderCellDef> Dataset Name </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <mat-form-field appearance="outline">
+            <input
+              matInput
+              [(ngModel)]="element.fileName"
+              placeholder="Enter file name"
+            />
+          </mat-form-field>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="end center"
+    fxLayoutGap="8px"
+    class="p-6"
+  >
+    <button
+      mat-stroked-button
+      color="primary"
+      mat-dialog-close
+      (click)="cancelRequest()"
+    >
+      Cancel
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="disableSubmit()"
+    >
+      Submit
+    </button>
+  </div>
+</div>

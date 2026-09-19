@@ -1,0 +1,108 @@
+<div class="py-4 h-100 y-auto" fxLayout="column" fxLayoutGap="16px">
+  <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center" class="border-bottom pb-2">
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+      <div fxFlex="none" class="bg-surface py-1 px-2 rounded-1">
+        Total columns:
+        <span class="fw-bold">{{ totalColumns }}</span>
+      </div>
+      <div class="bg-surface py-1 px-2 rounded-1">
+        Row counts: <span class="fw-bold">{{ totalRows }}</span>
+      </div>
+      <!-- <div>
+        <span>Enter the rows per page: </span>
+        <input type="text" placeholder="Row count per page" [(ngModel)]="rowCount">
+      </div> -->
+      <!-- <div>Slide to show rows:</div>
+      <div>
+        <mat-slider min="0" max="100" *ngIf="rowCountPerPage" step="10" value="1.5" discrete [displayWith]="formatLabel"
+          [(ngModel)]="sliderValue" (change)="onSliderChange($event)">
+          <input matSliderThumb />
+        </mat-slider>
+      </div> -->
+      <mat-paginator [length]="totalRowsToShow" [pageSize]="rowCountPerPage" [pageIndex]="currentPage-1"
+        [pageSizeOptions]="[]" (page)="onPageChange($event)">
+      </mat-paginator>
+    </div>
+    <div fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="end center">
+      <button mat-icon-button color="primary" *ngIf="enableVisButton" (click)="showDowloadDataDialog()"
+        matTooltip="Download Visualization">
+        <mat-icon class="material-symbols-outlined">download</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" (click)="triggerDownloadDataset()" matTooltip="Download Dataset">
+        <mat-icon class="material-symbols-outlined">download</mat-icon>
+      </button>
+      <mat-slide-toggle [(ngModel)]="isScientificNotationEnabled" color="primary" fxFlex="None" style="min-width: 150px;">
+        Scientific Notation
+      </mat-slide-toggle>
+      <mat-form-field appearance="outline" class="search-form">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search data" (input)="applyFilter($event)" />
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div *ngIf="showRowsBeyondLimitAlert" class="rows-limit-exceeded">
+    <mat-icon matPrefix>warning</mat-icon> 
+    The data requested is beyond the limit of {{MAX_ROWS}} rows, showing only the first {{MAX_ROWS}} rows.
+  </div>
+
+  <div *ngIf="showColsBeyondLimitAlert" class="cols-limit-exceeded">
+    <mat-icon matPrefix>warning</mat-icon> 
+    The data requested is beyond the limit of {{MAX_COLUMNS}} columns, showing only the first {{MAX_COLUMNS}} columns.
+  </div>
+
+  <div #spinner fxLayout="column" fxLayoutAlign="center center" style="font-size: large;font-weight: 500; "
+    class="h-100" *ngIf="isLoading">
+    <ng-container *ngIf="isDataRequestedBeyondLimit">
+      The data requested is beyond the limit of 1000 rows
+    </ng-container>
+    <div fxLayout="column" fxLayoutAlign="center center" flex class="h-100" fxLayoutGap="20px"
+      *ngIf="!isDataRequestedBeyondLimit">
+      <mat-spinner diameter="24"></mat-spinner>
+      <div style="font-size: large; font-weight: 500;">
+        Processing the dataset
+      </div>
+    </div>
+  </div>
+  
+  <div fxFlex class="y-auto" #scrollableDiv *ngIf="!isLoading">
+    <div class="py-4 h-100 y-auto no-data" *ngIf="filteredData.length===0" fxLayout="column"
+    fxLayoutAlign="center center">
+      No rows to show
+    </div>
+    <table mat-table *ngIf="filteredData.length > 0" [dataSource]="filteredData">
+      <ng-container *ngFor="let column of displayedColumns; let i = index" [matColumnDef]="column">
+        <ng-container *ngIf="!excludedColumns.includes(column)">
+          {{ column }}
+          <th mat-header-cell *matHeaderCellDef>
+            <div *ngIf="editableColumnName !== column; else editColumn" (click)="setEditableColumnName(column)">
+              {{ column}}
+            </div>
+            <ng-template #editColumn>
+              <div class="column-editor">
+                <input [(ngModel)]="currentEditValue" />
+                <button mat-icon-button color="primary" (click)="closeEdit()">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <button mat-icon-button color="primary" (click)="updateColumnName(currentEditValue, column)">
+                  <mat-icon>check</mat-icon>
+                </button>
+              </div>
+            </ng-template>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <span
+              [innerHTML]="element[i] | scientificNumber:isScientificNotationEnabled"></span>
+          </td>
+        </ng-container>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="getDisplayColumns(); sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: getDisplayColumns(); let i = index"></tr>
+    </table>
+  </div>
+  <div class="py-4 h-100 y-auto error-text" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center center"
+    *ngIf="!isLoading && isError">
+    Unable to fetch the data at the moment
+  </div>
+</div>

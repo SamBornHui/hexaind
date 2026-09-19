@@ -1,0 +1,32 @@
+<header *ngIf="title">
+  <b>{{ title }}</b>
+</header>
+<mst-input
+  *ngIf="sourceItems && sourceItems.length > 0"
+  type="select"
+  [label]="sourceTitle"
+  [value]="selectedSourceId"
+  [items]="sourceItems"
+  (change)="onSourceChange($event)"
+/>
+<mst-search-box
+  *ngIf="!hideSearch"
+  (search)="onSearch($event)"
+  [placeholder]="placeholder"
+  [value]="searchTerm"
+/>
+<mst-list
+  class="mst-select-list__list"
+  [hasMore]="hasMore"
+  [items]="filteredItems"
+  [selectedIds]="selectedItem ? [selectedItem.id] : []"
+  [draggable]="draggable"
+  [itemTemplate]="itemTemplate"
+  [selectedItemHighlight]="selectedItemHighlight"
+  [rightIconNames]="draggable ? ['drag_indicator'] : undefined"
+  [emptyMessage]="emptyMessage"
+  (itemClick)="onItemClick($event)"
+  (itemDragStart)="onItemDragStart($event)"
+  (itemDragEnd)="onItemDragEnd($event)"
+  (loadMore)="onLoadMore($event)"
+/>

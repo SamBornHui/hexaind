@@ -1,0 +1,27 @@
+
+<div fxLayout="column" class="h-100">
+    <div fxFlex="none" class="p-6 border-bottom">
+        <h1 *ngIf="data.action === 'stop'">Stop Workflow</h1>
+        <h1 *ngIf="data.action === 'publish'">Publish Workflow</h1>
+    </div>
+
+    <!-- Rescale Confirmation Section -->
+    <ng-container *ngIf="data.action === 'stop'">
+      <div fxFlex="none" fxLayout="column"  fxLayoutGap="8px" class="p-6">
+          <button class="w-100" mat-flat-button color="primary" (click)="onStopAll()">Stop All Jobs</button>
+          <button class="w-100" mat-flat-button color="primary" (click)="onStopPending()">Stop Pending Jobs</button>
+          <button class="w-100" mat-stroked-button color="primary" (click)="onClose()">Cancel</button>
+      </div>
+    </ng-container>
+
+    <!-- Publish Workflow Section -->
+    <ng-container *ngIf="data.action === 'publish'">
+      <div fxFlex="none" class="p-6 y-auto">
+          <p>Go to saved published workflow?</p>
+      </div>
+      <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="px-6 pb-6">
+          <button mat-stroked-button color="primary" (click)="onClose()">Cancel</button>
+          <button mat-flat-button color="primary" (click)="navigateToPublishedWorkflow()">Confirm</button>
+      </div>
+    </ng-container>
+</div>

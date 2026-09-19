@@ -1,0 +1,62 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1 class="mb-1">Workflow Preview</h1>
+      <div *ngIf="data['diplayedImagesType'] != 0">
+        <span class="fw-bold">Workflow: </span>
+        <span>{{ data["workflowName"] }}</span>
+      </div>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex class="p-6 h-100 y-auto">
+    <div class="global-image-container" *ngIf="data['diplayedImagesType'] == 0">
+      <img
+        loading="lazy"
+        class="global-image-fit"
+        src="{{ data.rawImage }}"
+        (load)="imageLoaded()"
+      />
+    </div>
+    <div class="global-image-container" *ngIf="data['diplayedImagesType'] == 1">
+      <img
+        loading="lazy"
+        class="global-image-fit"
+        src="{{ data.segmentedImage }}"
+        (load)="imageLoaded()"
+      />
+    </div>
+    <div
+      fxLayout="row"
+      fxLayoutGap="16px"
+      class="h-100"
+      *ngIf="data['diplayedImagesType'] == 2"
+    >
+      <div fxFlex class="global-image-container">
+        <img
+          loading="lazy"
+          class="global-image-fit"
+          src="{{ data.rawImage }}"
+          (load)="imageLoaded()"
+        />
+      </div>
+      <div fxFlex class="global-image-container">
+        <img
+          loading="lazy"
+          class="global-image-fit"
+          src="{{ data.segmentedImage }}"
+          (load)="imageLoaded()"
+        />
+      </div>
+    </div>
+  </div>
+</div>

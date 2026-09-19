@@ -1,0 +1,27 @@
+{
+    "disabledThirdPartyWidgets": [],
+    "disabledAIMLWidgets": [
+        "Gaussian Process Classification",
+        "SVM",
+        "Linear Regression",
+        "AutoML",
+        "LGBM",
+        "Random Forest",
+        "Neural Network(FASTAI)",
+        "Neural Network(TORCH)",
+        "CAT BOOST",
+        "XG BOOST",
+        "K Nearest Neighbor",
+        "Extra Trees"
+    ],
+    "disabledApps": [
+        "UC6",
+        "UC7/Data Catalog",
+        "UC12",
+        "UC1-Configuration",
+        "Data Catalog",
+        "UC2-Visualization-results",
+        "UC3-Dashboard",
+        "Scrap Analysis"
+    ]
+}

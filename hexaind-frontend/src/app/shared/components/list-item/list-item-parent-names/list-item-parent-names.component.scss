@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  line-height: 16px;
+  padding: 8px 0;
+}
+
+.mst-list-item-parent-names {
+  &__parents {
+    display: flex;
+    font-size: 10px;
+    &__parent-name {
+    }
+  }
+}

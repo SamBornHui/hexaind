@@ -1,0 +1,81 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="p-6 border-bottom">
+    <div>
+      <h1>Select Columns</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="8px" class="p-6">
+    <div fxFlex="none" fxLayout="row" fxLayoutGap="16px">
+      <div fxFlex>
+        <div class="fw-bold">Dataset 1</div>
+      </div>
+      <div fxFlex>
+        <div class="fw-bold">Dataset 2</div>
+      </div>
+      <div fxFlex="70px">&nbsp;</div>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="8px" class="y-auto">
+      <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Select column" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Select column" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div fxFlex="70px">
+          <mat-icon class="material-symbols-outlined global-icon-button-sm">remove</mat-icon>
+        </div>
+      </div>
+      <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Select column" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Select column" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div fxFlex="70px">
+          <mat-icon class="material-symbols-outlined global-icon-button-sm">remove</mat-icon>
+        </div>
+      </div>
+      <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Select column" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div fxFlex>
+          <mat-form-field appearance="outline">
+            <input matInput placeholder="Select column" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <div fxFlex="70px">
+          <mat-icon class="material-symbols-outlined global-icon-button-sm">remove</mat-icon>
+          <mat-icon class="material-symbols-outlined global-icon-button-sm ms-2">add</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px" class="p-6">
+    <button mat-stroked-button color="primary" (click)="close()">Cancel</button>
+    <button mat-flat-button color="primary">Apply</button>
+  </div>
+</div>

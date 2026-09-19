@@ -1,0 +1,142 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex="none"><app-header></app-header></div>
+  <div fxFlex fxLayout="column" fxLayoutGap="24px" class="h-100 p-8">
+    <div *ngIf="loader == true" fxLayout="row" fxLayoutAlign="center center" class="h-100">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+    <div *ngIf="loader == false" fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+      <div>
+        <h1 class="global-main-title">
+          Manage Users
+          <mat-icon class="material-symbols-outlined global-info-icon"
+            matTooltip="On this page, you can add, edit, and deactivate users on the server instance. ">info</mat-icon>
+        </h1>
+      </div>
+      <div fxLayout="row" fxLayoutGap="8px">
+        <div class="bg-surface p-1 rounded-1">
+          Licenses in use: <span class="fw-bold">0</span>
+        </div>
+        <div class="bg-surface p-1 rounded-1">
+          Total licenses: <span class="fw-bold">6</span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="loader == false" fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center">
+      <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center" fxHide.lt-sm>
+        <div fxFlex="220px" fxFlex.lt-md="150px">
+          <mat-form-field appearance="outline">
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput #searchInput (keyup)="applySearch($event)" placeholder="Search" />
+          </mat-form-field>
+        </div>
+      </div>
+      <div>
+        <button mat-flat-button color="primary" (click)="addUsers()">
+          <mat-icon>add</mat-icon> Add Users
+        </button>
+      </div>
+    </div>
+    <div fxFlex class="y-auto">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="log_status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+          <td mat-cell *matCellDef="let element">
+            <mat-icon [ngClass]="getStatusColor(element.login_activity)" [matTooltip]="getTooltipText(element.login_activity)" class="mt-1">circle</mat-icon>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="server_role">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Server Role</th>
+          <td mat-cell *matCellDef="let element">{{ element.server_role }}</td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+          <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+        </ng-container>
+        <ng-container matColumnDef="projects">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Projects</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.user_projects_count }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let element" [ngClass]="getStatusClasses(element.status)">
+            {{ element.status }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="invited_by">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Invited By</th>
+          <td mat-cell *matCellDef="let element">{{ element.invited_by }}</td>
+        </ng-container>
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Date Created <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+              matTooltip="User's local time">info</mat-icon>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.created_at }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="last_login">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Last Login <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+              matTooltip="User's local time">info</mat-icon>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.last_login_date }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef width="40">&nbsp;</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button [matMenuTriggerFor]="actionsMenu" (click)="setCurrentElement(element)">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<mat-menu #actionsMenu="matMenu" class="global-menu">
+  <ng-container *ngIf="!deleteAction">
+    <button *ngIf="this.userInfo._id != this.selectedElement?._id" mat-menu-item (click)="editUser()">
+      <mat-icon class="material-symbols-outlined">edit</mat-icon> Edit
+    </button>
+    <button mat-menu-item *ngIf="selectedElement?.status !== 'Active'" (click)="resendInvitation()">
+      <mat-icon class="material-symbols-outlined">login</mat-icon> Invite
+    </button>
+    <button mat-menu-item *ngIf="selectedElement?.status !== 'Active'" (click)="activateUser()">
+      <mat-icon class="material-symbols-outlined">refresh</mat-icon> Activate
+    </button>
+    <button mat-menu-item *ngIf="selectedElement?.status !== 'Inactive'"
+      (click)="startAction('deactivate', $event); $event.stopPropagation()">
+      <mat-icon class="material-symbols-outlined">block</mat-icon> Deactivate
+    </button>
+    <button mat-menu-item *ngIf="selectedElement?.inactive_days > 30"
+      (click)="startAction('delete', $event); $event.stopPropagation()">
+      <mat-icon class="material-symbols-outlined">delete</mat-icon> Delete
+    </button>
+    <!-- New Create Password Button -->
+    <button mat-menu-item *ngIf="selectedElement?.is_sso_user == false" (click)="createPassword()">
+      <mat-icon class="material-symbols-outlined">vpn_key</mat-icon> Create
+      Password
+    </button>
+  </ng-container>
+  <ng-container *ngIf="deleteAction">
+    <div mat-menu-item class="header">Are You Sure?</div>
+    <button mat-menu-item (click)="confirmAction(); deleteAction = false">
+      <mat-icon>check</mat-icon> Yes
+    </button>
+    <button mat-menu-item (click)="deleteAction = false">
+      <mat-icon>close</mat-icon> No
+    </button>
+  </ng-container>
+</mat-menu>

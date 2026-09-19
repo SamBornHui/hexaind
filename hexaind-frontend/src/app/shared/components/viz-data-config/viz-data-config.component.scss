@@ -1,0 +1,84 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  width: 100%;
+}
+.mst-viz-data-config {
+  &__header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    &__fields {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      > input {
+        width: 100%;
+        border: 0;
+      }
+      &__name {
+        font-size: 24px;
+        font-weight: bold;
+      }
+    }
+  }
+  &__body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 16px;
+    &__item {
+      overflow: auto;
+      &__select-dataset {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        &__name {
+          flex: 1;
+        }
+      }
+    }
+  }
+  &__select-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    &__column {
+      width: 300px;
+      flex: 1;
+      min-height: 0;
+    }
+  }
+  &__config {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    &__viz-size {
+      > header {
+        margin-bottom: 8px;
+      }
+    }
+    &__actions {
+      padding: 4px 0;
+      text-align: center;
+    }
+  }
+  &__visualization {
+    flex: 1;
+    min-width: 0;
+  }
+  &__fields {
+    display: flex;
+    gap: 8px;
+    &.vertical {
+      flex-direction: column;
+    }
+  }
+  &__actions {
+    text-align: right;
+  }
+}

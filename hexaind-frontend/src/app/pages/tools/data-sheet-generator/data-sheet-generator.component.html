@@ -1,0 +1,1055 @@
+<div fxLayout="column" class="dsg-container">
+  <div fxFlex="none" *ngIf="showMainHeader"><app-header></app-header></div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div>
+        <button mat-icon-button class="global-back-button" (click)="navigate('tools')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="title">Automatic Datasheet config editor</div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="4px">
+      <div class="border-left">
+        <button mat-icon-button class="global-icon-button" (click)="toggleMainHeader()">
+          <mat-icon class="material-symbols-outlined">
+            {{ toggleHeaderButton }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="row" class="y-auto">
+    <div fxLayout="column" fxLayoutGap="12px" class="left-panel">
+      <div>
+        <button mat-flat-button color="primary" class="w-100" (click)="navigate('converter')"
+          [disabled]="loader || resultLoader">
+          Converter
+        </button>
+      </div>
+      <div>
+        <button mat-flat-button color="primary" class="w-100" (click)="navigate('data-sheets')"
+          [disabled]="dataSheetsArray.length == 0 || loader || resultLoader">
+          Data Sheets
+        </button>
+      </div>
+      <div>
+        <mat-accordion class="global-accordion">
+          <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header>
+              Data Source
+            </mat-expansion-panel-header>
+            <div class="pb-2 p-relative">
+              <mat-form-field appearance="outline">
+                <input type="text" matInput placeholder="Choose folder" [(ngModel)]="selectedFolder" readonly="true"
+                  #fileInputText (click)="fileInput.click()" />
+              </mat-form-field>
+              <mat-spinner class="floating-spinner" diameter="20" *ngIf="uploadLoader"></mat-spinner>
+            </div>
+            <div>
+              <input type="file" #fileInput style="display: none" (change)="onDirectorySelected($event)" directory
+                multiple webkitdirectory />
+            </div>
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <div fxFlex>
+                <button mat-flat-button class="global-button-sm w-100" color="primary" (click)="fileInput.click()"
+                  [disabled]="loader || resultLoader || uploadLoader">
+                  Browse
+                </button>
+              </div>
+              <div fxFlex>
+                <button mat-flat-button class="global-button-sm w-100" color="primary" (click)="uploadDirectory()"
+                  [disabled]="!selectedFolder || loader || resultLoader || uploadLoader">
+                  Upload
+                </button>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+
+      <div fxLayout="column" fxLayoutGap="16px">
+        <div fxLayout="column" fxLayoutGap="16px" class="border-bottom pb-6">
+          <div>
+            <div class="fw-semi-bold pb-1">Data Sheet Number</div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div fxFlex>
+                <mat-form-field appearance="outline">
+                  <mat-select placeholder="Select value" name="datasheetId" [(ngModel)]="datasheetId"
+                    [disabled]="loader || resultLoader || dataSheetsArray.length === 0"
+                    (selectionChange)="onDataSheetChange($event.value)">
+                    <mat-option *ngFor="let sheet of dataSheetsArray" [value]="sheet.datasheet">
+                      {{ sheet.datasheet }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- Lock/Unlock Icon for Selected Datasheet -->
+              <div fxFlex="none" *ngIf="selectedDataSheet">
+                <button mat-icon-button color="primary"
+                  [disabled]="loader || resultLoader || !canModify(selectedDataSheet)"
+                  [matTooltip]="selectedDataSheet?.locked ? 'Read Only Mode' : 'Editable Mode'"
+                  (click)="toggleLock(selectedDataSheet, !selectedDataSheet?.locked)">
+                  <mat-icon>{{ selectedDataSheet?.locked ? 'lock' : 'lock_open' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="datasheetId">
+            <div fxLayout="row" fxLayoutAlign="start center" class="fw-semi-bold pb-1">
+              <div fxFlex>Nominal Age</div>
+              <div fxFlex="90px">
+                <div *ngIf="resultLoader ==true" class="text-primary">
+                  {{ dynamicMessage }}{{ animatedDots }}
+                </div>
+              </div>
+            </div>
+            <mat-form-field appearance="outline">
+              <mat-select placeholder="Select value" name="nominalAge" [(ngModel)]="nominalAge"
+                [disabled]="loader || resultLoader || nominalAgeArray.length === 0"
+                (selectionChange)="onDataChange(false)">
+                <mat-option *ngFor="let age of nominalAgeArray" [value]="age">
+                  {{ age }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+
+          <div fxLayout="column" fxLayoutGap="8px" *ngIf="showButtons">
+            <button *ngIf="streamLiteLoadData" mat-stroked-button color="primary" class="w-100" (click)="resetConfig()"
+              [disabled]="loader || resultLoader ||selectedDataSheet?.locked">
+              Reset Configurations
+            </button>
+            <button *ngIf="streamLiteLoadData" mat-stroked-button color="primary" class="w-100"
+              (click)="setInitialFit()" [disabled]="loader || resultLoader ||selectedDataSheet?.locked">
+              Set New Fit as Initial Fit
+            </button>
+            <div class="p-relative">
+              <button *ngIf="!isInitialFitParamsEmpty() && streamLiteLoadData" mat-stroked-button color="primary"
+                class="w-100" (click)="performNavigation('activity-logs')"
+                [disabled]="loader || resultLoader || selectedDataSheet?.locked || !areDataSheetsEqual()">
+                Activity Logs
+              </button>
+            </div>
+            <!-- <div class="p-relative">
+              <button *ngIf="streamLiteLoadData" mat-stroked-button color="primary" class="w-100"
+                (click)="generateDataSheet('initial')" [disabled]="loader || resultLoader ">
+                Gen Initial Datasheet
+              </button>
+            </div> -->
+            <div class="p-relative">
+              <button *ngIf="streamLiteLoadData" mat-stroked-button color="primary" class="w-100"
+                (click)="generateDataSheet('new')" [disabled]="loader || resultLoader ">
+                Gen Datasheet
+              </button>
+            </div>
+            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="center center" *ngIf="dataSheetSpinner">
+              <div class="text-primary">Generating Datasheet</div>
+              <div>
+                <mat-spinner diameter="20"></mat-spinner>
+              </div>
+            </div>
+
+            <button *ngIf="dataSheetGenerated" mat-stroked-button color="primary" class="w-100"
+              (click)="previewDataSheet()" [disabled]="loader || resultLoader">
+              Preview Datasheet
+            </button>
+
+            <button *ngIf="dataSheetGenerated" mat-stroked-button color="primary" class="w-100"
+              (click)="downloadDataSheetResults()" [disabled]="loader || resultLoader">
+              Download Results
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div fxFlex fxLayout="column" fxLayoutGap="24px" class="p-6 h-100 y-auto">
+      <div *ngIf="loader == true" fxLayout="row" fxLayoutAlign="center center" class="h-100">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+      <mat-accordion *ngIf="loader == false && streamLiteLoadData" class="global-accordion" multi>
+        <!-- Datasheet Configurations -->
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Datasheet configurations</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="16px">
+              <!-- Product Commercial Name -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Product commercial name <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <input matInput placeholder="Enter name" name="productName" [(ngModel)]="productName"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" (ngModelChange)="onChange()"
+                    (focus)="onFocus()" (blur)="onBlur()" required />
+                </mat-form-field>
+              </div>
+
+              <!-- Gauge -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Gauge <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" name="gauge" [(ngModel)]="gauge"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" (ngModelChange)="onChange()"
+                    (focus)="onFocus()" (blur)="onBlur()" placeholder="Enter value" min="1" step="0.01" required />
+                </mat-form-field>
+              </div>
+
+              <!-- Material Source -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Material source <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <mat-select name="m_source" [(ngModel)]="m_source"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" (ngModelChange)="saveMetadata()"
+                    (focus)="onFocus()" (blur)="onBlur()" placeholder="Select material source" required>
+                    <mat-option value="Europe">Europe</mat-option>
+                    <mat-option value="North America">North America</mat-option>
+                    <mat-option value="Asia">Asia</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="16px">
+              <!-- Branch -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Branch <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <mat-select placeholder="Select branch" name="branchName" [(ngModel)]="branchName"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" (ngModelChange)="saveMetadata()" required>
+                    <mat-option value="production">Production</mat-option>
+                    <mat-option value="testing">Testing</mat-option>
+                    <mat-option value="development">Development</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <!-- Issue Date -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Issue date (YYYY-MM-DD) <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <input matInput [matDatepicker]="picker1" placeholder="YYYY-MM-DD"
+                    [(ngModel)]="latestRevalidationDate" name="latestRevalidationDate" (dateChange)="saveMetadata()"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" required />
+                  <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <!-- Validity Date -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Validity date (YYYY-MM-DD) <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <input matInput [matDatepicker]="picker2" placeholder="YYYY-MM-DD" [(ngModel)]="validUntilDate"
+                    name="validUntilDate" (dateChange)="saveMetadata()"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" required />
+                  <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                  <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <!-- Relevant Customer Specs -->
+              <div fxFlex>
+                <div class="fw-semi-bold pb-1">
+                  Relevant customer specs <span class="required-asterisk">*</span>
+                </div>
+                <mat-form-field appearance="outline">
+                  <mat-select placeholder="Choose an option" name="specName" [(ngModel)]="specName"
+                    [disabled]="selectedDataSheet?.locked || resultLoader" (ngModelChange)="saveMetadata()" required>
+                    <mat-option value="specA">Spec A</mat-option>
+                    <mat-option value="spec2">Spec 2</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxFlex="none" fxLayoutAlign="end center">
+              <button *ngIf="hasSectionChanged('meta-data')" mat-stroked-button color='primary'
+                (click)="reset('meta-data')" [disabled]="selectedDataSheet?.locked || resultLoader">Reset</button>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Tensile Related -->
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title> Tensile test data <mat-icon class="material-symbols-outlined text-grey"
+                style="margin-left: 8px;" matTooltip="At least one sample should be included each tensile directions"
+                matTooltipPosition="above">
+                info
+              </mat-icon></mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <!-- Tensile Stats Table -->
+            <ng-container *ngIf="dataSheetResults.tensile_stats">
+              <div class="fw-semi-bold pb-1">Tensile stats</div>
+              <div class="tensile-stats-table sticky">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Direction</th>
+                        <ng-container *ngFor="let age of getAges(dataSheetResults.tensile_stats)">
+                          <th colspan="4" class="text-center">{{ age }}</th>
+                        </ng-container>
+                      </tr>
+                      <tr>
+                        <th>Property</th>
+                        <ng-container *ngFor="let age of getAges(dataSheetResults.tensile_stats)">
+                          <th>Mean</th>
+                          <th>Max</th>
+                          <th>Min</th>
+                          <th>Std</th>
+                        </ng-container>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let prop of getProperties(dataSheetResults.tensile_stats)">
+                        <td>{{ prop }}</td>
+                        <ng-container *ngFor="let age of getAges(dataSheetResults.tensile_stats)">
+                          <td>{{ dataSheetResults.tensile_stats[age][prop].mean | number:'1.4-4' }}</td>
+                          <td>{{ dataSheetResults.tensile_stats[age][prop].max | number:'1.4-4' }}</td>
+                          <td>{{ dataSheetResults.tensile_stats[age][prop].min | number:'1.4-4' }}</td>
+                          <td>{{ dataSheetResults.tensile_stats[age][prop].std | number:'1.4-4' }}</td>
+                        </ng-container>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </ng-container>
+
+
+            <div fxFlex="none" class="p-relative">
+              <!-- Included Tensile Samples -->
+              <div class="fw-semi-bold pb-1">Included tensile samples</div>
+              <mat-form-field>
+                <mat-chip-grid #tensileSample aria-label="Sample selection">
+                  <mat-chip-row *ngFor="let option of sortOptions(tensileSelectedOptions)"
+                    (removed)="remove(option, 'tensile')"
+                    [ngClass]="{ 'disabled-icon': selectedDataSheet?.locked || resultLoader  }">
+                    {{ option }}
+                    <button matChipRemove [attr.aria-label]="'remove ' + option"
+                      [style.pointerEvents]="selectedDataSheet?.locked || resultLoader ? 'none' : 'auto'">
+                      <mat-icon class="text-red"
+                        [ngClass]="{ 'dim-icon': selectedDataSheet?.locked || resultLoader }">cancel</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                </mat-chip-grid>
+                <input matInput [matChipInputFor]="tensileSample" (matChipInputTokenEnd)="add($event, 'tensile')"
+                  (click)="focusOptions('tensile')" [disabled]="selectedDataSheet?.locked || resultLoader" />
+              </mat-form-field>
+              <mat-icon *ngIf="tensileSelectedOptions.length > 0" class="close-all-btn" (click)="removeAll('tensile')"
+                matTooltip="Remove all"
+                [ngClass]="{ 'disabled-icon': selectedDataSheet?.locked || resultLoader, 'dim-icon': selectedDataSheet?.locked || resultLoader }"
+                [style.pointerEvents]="selectedDataSheet?.locked || resultLoader ? 'none' : 'auto'">
+                cancel
+              </mat-icon>
+            </div>
+            <!-- Reset Button -->
+            <div fxFlex="none" fxLayoutAlign="end center">
+              <button mat-stroked-button color='primary' (click)="reset('tensile')"
+                *ngIf="hasSectionChanged('tensile') "
+                [disabled]="selectedDataSheet?.locked || resultLoader">Reset</button>
+            </div>
+
+            <!-- Excluded Tensile Samples -->
+            <div fxFlex="none" class="rounded-2 bg-surface p-4" *ngIf="tensilePanel"
+              [class.disabled-container]="selectedDataSheet?.locked || resultLoader">
+              <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="16px">
+                <div fxFlex class="fw-semi-bold pb-1">Excluded tensile samples</div>
+                <div *ngIf="tensileExcludedData.length > 0" fxFlex class="fw-semi-bold pb-1">Reason for excluding</div>
+                <div fxFlex="20px">&nbsp;</div>
+              </div>
+
+              <div *ngIf="tensileExcludedData.length === 0">No file available</div>
+
+              <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="16px" class="pb-1"
+                *ngFor="let excluded of tensileExcludedData; let i = index">
+                <div fxFlex>{{ excluded.file_name }}</div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <input matInput placeholder="Reason" [(ngModel)]="excluded.reason"
+                      (ngModelChange)="onInputChange(excluded.file_name, 'tensile')" name="tensileReasons{{ i }}"
+                      [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex="20px">
+                  <mat-icon class="remove-btn"
+                    (click)="selected(excluded.file_name, 'tensile'); removeExcludedFile(excluded.file_name, 'tensile')"
+                    [ngClass]="{ 'disabled-icon': selectedDataSheet?.locked || resultLoader, 'dim-icon': selectedDataSheet?.locked || resultLoader }"
+                    [style.pointerEvents]="selectedDataSheet?.locked || resultLoader ? 'none' : 'auto'">
+                    cancel
+                  </mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tensile Properties Table -->
+            <div class="fw-semi-bold text-md">Tensile Properties</div>
+            <div *ngIf="dataSheetResults && dataSheetResults.tensile_sample_data && tensileSampleData"
+              class="x-auto rounded-2 bg-surface p-4" fxLayout="column" fxLayoutGap="16px">
+
+              <div *ngFor="let direction of tensileDirections">
+                <!-- Direction Header -->
+                <div class="fw-semi-bold text-md">{{ direction }}° Direction</div>
+
+                <!-- Sample Data Table -->
+                <div class="tensile-table-wrapper">
+                  <div class="float">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th *ngFor="let column of getTensilePropertyColumnNames(tensileSampleData[0])">
+                            {{ column === 'sampleId' ? 'Sample ID' : (column === 'included' ? 'Included' : column) }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let row of getFilteredAndSortedTensileData(direction)">
+                          <td *ngFor="let column of getTensilePropertyColumnNames(tensileSampleData[0])">
+                            {{ column === 'sampleId' || column === 'included' ? row[column] :
+                            getRoundedValue(row[column], column) }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Stats Table -->
+                <div class="tensile-stats-table-wrapper" *ngIf="tensileStatsAndResults?.tensile_stats">
+                  <div class="fw-semi-bold text-md">{{ direction }}° Statistics</div>
+                  <div class="custom-table-wrapper" style="height: 232px;">
+                    <div class="float">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Property</th>
+                            <th>Count</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                            <th>Std Dev</th>
+                            <th>Mean</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let prop of getStatProperties(direction)">
+                            <td>{{ prop }}</td>
+                            <td>{{ tensileStatsAndResults.tensile_stats[getNormalizedDirection(direction)][prop].count
+                              }}</td>
+                            <td>{{
+                              getTensileRoundedValue(tensileStatsAndResults.tensile_stats[getNormalizedDirection(direction)][prop].min,
+                              prop) }}</td>
+                            <td>{{
+                              getTensileRoundedValue(tensileStatsAndResults.tensile_stats[getNormalizedDirection(direction)][prop].max,
+                              prop) }}</td>
+                            <td>{{
+                              getTensileRoundedValue(tensileStatsAndResults.tensile_stats[getNormalizedDirection(direction)][prop].std,
+                              prop) }}</td>
+                            <td>{{
+                              getTensileRoundedValue(tensileStatsAndResults.tensile_stats[getNormalizedDirection(direction)][prop].mean,
+                              prop) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mechanical Properties in Tensile Tests -->
+            <div class="fw-semi-bold text-md">Mechanical Properties in Tensile Tests</div>
+            <div *ngIf="tensileStatsAndResults && tensileStatsAndResults.tensile_results"
+              class="x-auto rounded-2 bg-surface p-4">
+              <div class="custom-table-wrapper" style="height: 158px;">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th *ngFor="let key of objectKeys(tensileStatsAndResults.tensile_results[0])">
+                          {{key}}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Iterate over each result row -->
+                      <tr *ngFor="let result of tensileStatsAndResults.tensile_results">
+                        <td *ngFor="let key of objectKeys(tensileStatsAndResults.tensile_results[0])">
+                          {{ result[key] }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tensile Directions Checkbox-->
+            <div>
+              <div class="fw-semi-bold pb-1">Tensile Direction(s)</div>
+              <div fxLayout="row" fxLayoutWrap fxLayoutGap="16px" fxLayoutAlign="start center">
+                <mat-checkbox *ngFor="let direction of tensileDirections" [checked]="selectedDirections[direction]"
+                  [disabled]="isDirectionDisabled(direction)" (change)="onDirectionToggle(direction, $event.checked)">
+                  {{ direction }}
+                </mat-checkbox>
+              </div>
+            </div>
+
+            <!-- Tensile Plot Data -->
+            <ng-container *ngIf="dataSheetResults && dataSheetResults.tensile_plot_data_path">
+              <div class="x-auto rounded-2 bg-surface p-4" fxLayout="column" fxLayoutGap="16px">
+                <div class="graph-ratio" id="plotly-div-1"></div>
+              </div>
+            </ng-container>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Bulge Related -->
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title class=""> Bulge test data </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+
+            <!-- Bulge Scale Factor Section -->
+
+            <div *ngIf="dataSheetResults?.bulge_scale_factor?.scale_factor_bulge?.length; else noData" fxLayout="row">
+
+              <div fxFlex="180px" class="fw-semi-bold">
+                <div class="p-2 border-bottom">File name</div>
+                <div class="p-2 border-bottom">Scale factor</div>
+              </div>
+
+              <div fxFlex fxLayout="row" class="x-auto">
+                <div fxFlex="200px" *ngFor="let item of dataSheetResults.bulge_scale_factor.scale_factor_bulge">
+                  <div class="p-2 border-bottom">{{ item.file }}</div>
+                  <div class="p-2 border-bottom">{{ item.k }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fallback Message -->
+            <ng-template #noData>
+              <div class="fw-semi-bold text-red">
+                No bulge scale factor data available.
+              </div>
+            </ng-template>
+
+            <!-- Included Bulge Samples -->
+            <div fxFlex="none" class="p-relative">
+              <div class="fw-semi-bold pb-1">Included bulge samples</div>
+              <mat-form-field>
+                <mat-chip-grid #bulgeSample aria-label="Sample selection">
+                  <mat-chip-row *ngFor="let option of sortOptions(bulgeSelectedOptions)"
+                    (removed)="remove(option, 'bulge')"
+                    [ngClass]="{ 'disabled-icon': selectedDataSheet?.locked || resultLoader }">
+                    {{ option }}
+                    <button matChipRemove [attr.aria-label]="'remove ' + option"
+                      [style.pointerEvents]="selectedDataSheet?.locked || resultLoader ? 'none' : 'auto'">
+                      <mat-icon class="text-red"
+                        [ngClass]="{ 'dim-icon': selectedDataSheet?.locked || resultLoader }">cancel</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                </mat-chip-grid>
+                <input matInput [matChipInputFor]="bulgeSample" (matChipInputTokenEnd)="add($event, 'bulge')"
+                  (click)="focusOptions('bulge')" [disabled]="selectedDataSheet?.locked || resultLoader" />
+              </mat-form-field>
+              <mat-icon *ngIf="bulgeSelectedOptions.length > 0" class="close-all-btn" (click)="removeAll('bulge')"
+                matTooltip="Remove all"
+                [ngClass]="{ 'disabled-icon': selectedDataSheet?.locked || resultLoader, 'dim-icon': selectedDataSheet?.locked || resultLoader }"
+                [style.pointerEvents]="selectedDataSheet?.locked || resultLoader ? 'none' : 'auto'">
+                cancel
+              </mat-icon>
+            </div>
+
+            <!-- Average bulge scale factor -->
+            <div><span class="fw-semi-bold">Average bulge scale factor:</span>
+              {{dataSheetResults?.bulge_scale_factor?.k_mean}}
+            </div>
+
+            <div fxFlex="none" fxLayoutAlign="end center">
+              <button mat-stroked-button color='primary' (click)="reset('bulge')" *ngIf="hasSectionChanged('bulge')"
+                [disabled]="selectedDataSheet?.locked || resultLoader">Reset</button>
+            </div>
+
+            <!-- Excluded Bulge Samples -->
+            <div fxFlex="none" class="rounded-2 bg-surface p-4" *ngIf="bulgePanel"
+              [class.disabled-container]="selectedDataSheet?.locked || resultLoader">
+              <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="16px">
+                <div fxFlex class="fw-semi-bold pb-1">Excluded bulge samples</div>
+                <div *ngIf="bulgeExcludedData.length > 0" fxFlex class="fw-semi-bold pb-1">Reason for excluding</div>
+                <div fxFlex="20px">&nbsp;</div>
+              </div>
+
+              <div *ngIf="bulgeExcludedData.length === 0">No file available</div>
+
+              <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="16px" class="pb-1"
+                *ngFor="let excluded of bulgeExcludedData; let i = index">
+                <div fxFlex>{{ excluded.file_name }}</div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <input matInput placeholder="Reason" [(ngModel)]="excluded.reason"
+                      (ngModelChange)="onInputChange(excluded.file_name, 'bulge')" name="bulgeReasons{{ i }}"
+                      [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex="20px">
+                  <mat-icon class="remove-btn"
+                    (click)="selected(excluded.file_name, 'bulge'); removeExcludedFile(excluded.file_name, 'bulge')"
+                    [ngClass]="{ 'disabled-icon': selectedDataSheet?.locked || resultLoader, 'dim-icon': selectedDataSheet?.locked || resultLoader }"
+                    [style.pointerEvents]="selectedDataSheet?.locked || resultLoader ? 'none' : 'auto'">
+                    cancel
+                  </mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bulge Plot Data -->
+            <ng-container *ngIf="dataSheetResults && dataSheetResults.bulge_plot_data_path">
+              <div class="x-auto rounded-2 bg-surface p-4" fxLayout="column" fxLayoutGap="16px">
+                <div class="graph-ratio" id="plotly-div-2"></div>
+              </div>
+            </ng-container>
+          </div>
+        </mat-expansion-panel>
+
+        <!--Corrected Tensile Related  -->
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="">Corrected tensile related</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div *ngIf="dataSheetResults && dataSheetResults.corrected_tensile_results" fxLayout="column"
+            fxLayoutGap="16px">
+            <!-- Select Tensile Sample to Correct -->
+            <div fxFlex="none">
+              <div class="fw-semi-bold pb-1">Select tensile sample to correct</div>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Choose an option" [(ngModel)]="selectedTensileSample"
+                  (selectionChange)="fileChangeOnCorrectedResults()"
+                  [disabled]="selectedDataSheet?.locked || resultLoader">
+                  <mat-option *ngFor="let file of dataSheetResults.tensile_files | slice:0:5" [value]="file">
+                    {{ file }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <!-- Elastic Modulus Fitting -->
+            <div fxFlex="none" fxLayout="column" fxLayoutGap="16px" class="rounded-2 bg-surface p-4">
+              <div class="fw-semi-bold text-md">Elastic modulus fitting</div>
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Stress fit lower bound [MPa]</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" placeholder="Enter value" min="1" step="0.01"
+                      [ngModel]="getStressFitLowerBound()" (ngModelChange)="setStressFitLowerBound($event)" name="s_min"
+                      [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Stress fit upper bound [MPa]</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" placeholder="Enter value" min="1" step="0.01"
+                      [ngModel]="getStressFitUpperBound()" (ngModelChange)="setStressFitUpperBound($event)" name="s_max"
+                      [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                <div fxFlex fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                  <div>
+                    <button mat-stroked-button color="primary" (click)="computeElasticModule()"
+                      [disabled]="selectedDataSheet?.locked || resultLoader">
+                      Apply changes
+                    </button>
+                  </div>
+
+                  <div>
+                    <mat-spinner *ngIf="isComputingElastic" diameter="24"></mat-spinner>
+                  </div>
+
+                </div>
+                <div fxFlex>
+                  <mat-checkbox color="primary" [(ngModel)]="recomputeRp02"
+                    [disabled]="selectedDataSheet?.locked || resultLoader">
+                    Recompute Rp02
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <!-- Corrected Tensile Results Table -->
+            <div class="fw-semi-bold text-md">Property Table</div>
+            <div *ngIf="dataSheetResults && dataSheetResults.corrected_tensile_results"
+              class="x-auto rounded-2 bg-surface p-4">
+              <div class="custom-table-wrapper" [ngStyle]="isHardeningFit ? { height: '124px' } : null">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>&nbsp;</th>
+                        <th *ngFor="let signature of getCorrectedSignatures(); trackBy: trackBySignature">
+                          {{ signature }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Auto Fit Row (non-editable) -->
+                      <tr>
+                        <td>Auto Fit</td>
+                        <td *ngFor="let signature of getCorrectedSignatures()">
+                          {{ getRoundedValue(autoFitResult[signature], signature) }}
+                        </td>
+                      </tr>
+                      <!-- Adjusted Row (editable; only shown when isHardeningFit is true) -->
+                      <tr *ngIf="isHardeningFit">
+                        <td>User Adjusted</td>
+                        <td *ngFor="let signature of getCorrectedSignatures(); let colIndex = index"
+                          (dblclick)="switchEditMode(colIndex, signature, true)"
+                          (focusout)="switchEditMode(colIndex, signature, false)">
+                          <span *ngIf="!isEditingCR[colIndex + '-' + signature]">
+                            {{ getRoundedValue(adjustedResult[signature], signature) }}
+                          </span>
+                          <input *ngIf="isEditingCR[colIndex + '-' + signature]"
+                            [attr.data-param]="colIndex + '-' + signature" [attr.data-signature]="signature"
+                            [ngModel]="getValueAdjusted(signature)"
+                            (ngModelChange)="setValueAdjusted(signature, $event)" type="number" autofocus />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- Checkbox to toggle the Adjusted row -->
+              <mat-checkbox color="primary" [(ngModel)]="isHardeningFit">
+                Adjust values for hardening fit
+              </mat-checkbox>
+            </div>
+
+            <div fxFlex="none" fxLayoutAlign="end center">
+              <button mat-stroked-button color='primary' (click)="onResetCorrectedTensile();"
+                *ngIf="hasSectionChanged('corrected-tensile')"
+                [disabled]="selectedDataSheet?.locked || resultLoader">Reset</button>
+            </div>
+
+            <!-- Tensile Plot Data -->
+            <div class="x-auto rounded-2 bg-surface p-4" fxFlex="none" fxLayout="column" fxLayoutGap="16px">
+              <div class="graph-ratio" id="plotly-div-3"></div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Adjust model parameters -->
+        <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header class="">
+            <mat-panel-title>Adjust model parameters</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div *ngIf="dataSheetResults && dataSheetResults.hss_weights_object" fxLayout="column" fxLayoutGap="16px">
+            <!-- Model Selection -->
+            <div fxFlex="none">
+              <div class="fw-semi-bold pb-1">Model to adjust</div>
+              <mat-form-field appearance="outline">
+                <mat-select placeholder="Choose an option" [(ngModel)]="modelAdjust"
+                  [disabled]="selectedDataSheet?.locked || resultLoader">
+                  <mat-option value="Hocket Sherby Swift">Hocket Sherby Swift</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <!-- Weight Adjustments -->
+            <div fxFlex="none" fxLayout="column" fxLayoutGap="16px" class="rounded-2 bg-surface p-4">
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Tensile Weight</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [ngModel]="tensileWeight"
+                      (ngModelChange)="tensileWeight = $event" [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Bulge Weight</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [ngModel]="bulgeWeight"
+                      (ngModelChange)="bulgeWeight = $event" [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Considere Weight</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [ngModel]="considereWeight"
+                      (ngModelChange)="considereWeight = $event"
+                      [disabled]="selectedDataSheet?.locked || resultLoader" />
+                  </mat-form-field>
+                </div>
+              </div>
+              <div fxFlex>
+                <button mat-stroked-button color="primary" (click)="reset_weights()"
+                  [disabled]="selectedDataSheet?.locked || resultLoader">
+                  Reset Weight to default
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="dataSheetResults && dataSheetResults.hss_complete_params"
+              class="x-auto rounded-2 bg-surface p-4">
+              <div class="custom-table-wrapper">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Index</th>
+                        <th *ngFor="let signature of getSignatures()">
+                          {{ signature }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let param of parametersOnlyParam_value()">
+                        <td>{{ param }}</td>
+                        <td *ngFor="let signature of getSignatures()">
+                          <div *ngIf="!isEditing(param, signature); else editInput"
+                            (dblclick)="!(selectedDataSheet?.locked || resultLoader) && enableEdit(param, signature)"
+                            class="editable-cell">
+                            {{ getCellValue(signature, param) }}
+                          </div>
+                          <ng-template #editInput>
+                            {{ getCellValue(signature, param) }}
+                          </ng-template>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="dataSheetResults && dataSheetResults.hss_complete_params"
+              class="x-auto rounded-2 bg-surface p-4">
+              <div class="custom-table-wrapper" style="height: 200px">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Index</th>
+                        <th *ngFor="let signature of getSignatures()">
+                          {{ signature }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let param of parametersWithOutParam_value()">
+                        <td>{{ param }}</td>
+                        <td *ngFor="let signature of getSignatures()">
+                          <div *ngIf="!isEditing(param, signature); else editInput"
+                            (dblclick)="!(selectedDataSheet?.locked || resultLoader) && enableEdit(param, signature)"
+                            class="editable-cell">
+                            {{ getModelCellValue(signature, param) }}
+                          </div>
+                          <ng-template #editInput>
+                            <input #inputField [ngModel]="getModelCellValue(signature, param)"
+                              (ngModelChange)="setCellValue(signature, param, $event)"
+                              (blur)="disableEdit(param, signature)"
+                              [disabled]="selectedDataSheet?.locked || resultLoader"
+                              (keyup.enter)="disableEdit(param, signature)" [attr.data-param]="param"
+                              [attr.data-signature]="signature" autofocus />
+                          </ng-template>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="x-auto rounded-2 bg-surface p-4" fxFlex="none" fxLayout="column" fxLayoutGap="16px">
+              <div fxLayout="row" fxLayoutGap="16px">
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Window tensile gradient</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [(ngModel)]="tensile_grad"
+                      [disabled]="selectedDataSheet?.locked || resultLoader"
+                      (ngModelChange)="updateTensileGradient($event)" placeholder="Enter value" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Window bulge gradient</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [(ngModel)]="bulge_grad"
+                      [disabled]="selectedDataSheet?.locked || resultLoader"
+                      (ngModelChange)="updateBulgeGradient($event)" placeholder="Enter value" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Window tensile n-value</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [(ngModel)]="tensile_n_grad"
+                      [disabled]="selectedDataSheet?.locked || resultLoader"
+                      (ngModelChange)="updateTensileNGradient($event)" placeholder="Enter value" />
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <div class="fw-semi-bold pb-1">Window bulge n-value</div>
+                  <mat-form-field appearance="outline">
+                    <input matInput type="number" min="1" step="0.01" [(ngModel)]="bulge_n_grad"
+                      [disabled]="selectedDataSheet?.locked || resultLoader"
+                      (ngModelChange)="updateBulgeNGradient($event)" placeholder="Enter value" />
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+
+            <div fxFlex="none" fxLayoutAlign="end center">
+              <button mat-stroked-button color='primary' (click)="reset('model-parameters')"
+                *ngIf="hasSectionChanged('model-parameters')"
+                [disabled]="selectedDataSheet?.locked || resultLoader">Reset</button>
+            </div>
+
+            <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign=" center">
+              <button mat-stroked-button color="primary" (click)="computeAndSaveChanges(true)"
+                [disabled]="selectedDataSheet?.locked || resultLoader">
+                Compute new local fit
+              </button>
+              <div>
+                <mat-spinner *ngIf="resultLoader" diameter="24"></mat-spinner>
+              </div>
+            </div>
+
+
+            <div class="graph-ratio" id="plotDiv1"></div>
+            <div class="graph-ratio" id="plotDiv3"></div>
+
+            <div *ngIf="modelResults && modelResults.df_model_params" class="x-auto rounded-2 bg-surface p-4"
+              fxFlex="none" fxLayout="column" fxLayoutGap="16px">
+              <div class="fw-semi-bold text-md">Comparison of models</div>
+              <div class="fw-semi-bold pb-1">Model parameters</div>
+              <div class="custom-table-wrapper" style="height: 156px">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <ng-container *ngFor="
+                            let key of getKeys(
+                              modelComparisonData['current fit']
+                            )
+                          ">
+                          <th>{{ key }}</th>
+                        </ng-container>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of getKeys(modelComparisonData)">
+                        <td class="model_fitting">
+                          {{
+                          item === "current fit"
+                          ? "Initial Fit"
+                          : item === "new local fit"
+                          ? "New Local Fit"
+                          : item
+                          }}
+                        </td>
+                        <ng-container *ngFor="let key of getKeys(modelComparisonData[item])">
+                          <td>
+                            {{ getFitValue(item, key) }}
+                          </td>
+                        </ng-container>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="fw-semi-bold pb-1">Model errors</div>
+              <div class="custom-table-wrapper" style="height: 156px">
+                <div class="float">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th class="bg-surface">Error type</th>
+                        <th class="border-right bg-surface">Total error</th>
+                        <ng-container *ngIf="modelResults.initial_fit_errors || modelResults.new_fit_errors">
+                          <th>Tensile</th>
+                          <th>Bulge</th>
+                          <th>Considere</th>
+                        </ng-container>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Initial Model Error Row -->
+                      <tr>
+                        <td class="fw-bold bg-surface">Initial Model Error</td>
+                        <td class="fw-bold border-right bg-surface">{{ getErrorValue("m_err_current") | number:'1.0-9'
+                          }}</td>
+                        <ng-container *ngIf="modelResults.initial_fit_errors">
+                          <td>{{ modelResults.initial_fit_errors?.tensile_error | number:'1.0-9' }}</td>
+                          <td>{{ modelResults.initial_fit_errors?.bulge_error | number:'1.0-9' }}</td>
+                          <td>{{ modelResults.initial_fit_errors?.considere_error | number:'1.0-9' }}</td>
+                        </ng-container>
+                      </tr>
+                      <!-- New Model Error Row -->
+                      <tr *ngIf="modelResults.m_err_new">
+                        <td class="fw-bold bg-surface">New Model Error</td>
+                        <td class="fw-bold border-right bg-surface">{{ getErrorValue("m_err_new") | number:'1.0-9' }}
+                        </td>
+                        <ng-container *ngIf="modelResults.new_fit_errors">
+                          <td>{{ modelResults.new_fit_errors?.tensile_error | number:'1.0-9' }}</td>
+                          <td>{{ modelResults.new_fit_errors?.bulge_error | number:'1.0-9' }}</td>
+                          <td>{{ modelResults.new_fit_errors?.considere_error | number:'1.0-9' }}</td>
+                        </ng-container>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Yield Surface -->
+              <div *ngIf="hasDfYieldData">
+                <div class="fw-semi-bold pb-1">Yield surface</div>
+                <div class="custom-table-wrapper">
+                  <div class="float">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th *ngFor="let key of dfYieldKeys">
+                            {{ key }}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td *ngFor="let item of dfYieldValues">
+                            {{ item.value }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!hasDfYieldData" class="fw-semi-bold text-red">
+                No yield surface data available.
+              </div>
+
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,142 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px">
+  <div fxFlex="none">
+    <h1 class="global-main-title">Users</h1>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="fixed-header"
+  >
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="220px" fxFlex.lt-md="150px">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Search"
+            [(ngModel)]="searchText"
+            (ngModelChange)="onSearchTextChange()"
+          />
+        </mat-form-field>
+      </div>
+      <div fxFlex="200px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>Role</mat-label>
+          <mat-select>
+            <mat-option 
+              *ngFor="let role of userRoles" 
+              [value]="role._id" 
+              class="capitalize" 
+              (click)="filterByRole(role._id)"
+            >{{role.role_type}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxFlex="200px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-label>User Type</mat-label>
+          <mat-select [value]="userType">
+            <mat-option [value]="'SSO User'" class="capitalize" (click)="filterByUserType('SSO')">SSO User</mat-option>
+            <mat-option [value]="'Databrick'" class="capitalize" (click)="filterByUserType('SSO')">Databrick</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxFlex="200px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-select></mat-select>
+        </mat-form-field>
+      </div>
+      <!-- <div fxFlex="none">
+        <div class="global-icon-button" (click)="onToggleSort()">
+          <mat-icon>swap_vert</mat-icon>
+        </div> 
+      </div>-->
+      <div fxFlex="none">
+        <div class="global-icon-button" (click)="onRefreshView()">
+          <mat-icon>cached</mat-icon>
+        </div>
+      </div>
+    </div>
+    <div>
+      <button mat-flat-button color="primary" (click)="addUser()">
+        <mat-icon class="material-symbols-outlined">add</mat-icon>
+        Invite user
+      </button>
+    </div>
+  </div>
+  <div fxFlex>
+    <mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.name ? element.name : "Unknown" }}
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.email ? element.email : "Unknown" }}
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="role">
+        <mat-header-cell mat-header-cell *matHeaderCellDef> Role </mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let element">
+          <mat-form-field appearance="outline" *ngIf="!element.is_super_admin">
+            <mat-select [value]="element.sites_and_roles[0].role_id">
+              <mat-option 
+                *ngFor="let role of userRoles" 
+                [value]="role._id" 
+                class="capitalize" 
+                selected="element.sites_and_roles[0].role_id==role._id" 
+                (click)="updateUserRole(element,role._id)"
+              >{{role.role_type}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="user_type">
+        <mat-header-cell mat-header-cell *matHeaderCellDef> User Type </mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let element">
+          {{isSsoUser(element)}}
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="dateAdded">
+        <mat-header-cell mat-header-cell *matHeaderCellDef> Invited </mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let element">
+          {{ element.created_at | date: 'd-MMM-yyyy h:mm a' }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <mat-header-cell mat-header-cell *matHeaderCellDef style="max-width: 80px;width: 80px;">&nbsp;</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let element" style="max-width: 80px;width: 80px;">
+          <button *ngIf="!element.is_super_admin" mat-icon-button [matMenuTriggerFor]="actionsMenu" [matMenuTriggerData]="{rowData: element}" (click)="actionMenu=true;deleteAction=false;">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="onRowSingleClick(row)"
+        (dblclick)="onRowDblClick(row)"
+        [class.selected]="isRowSelected(row)"
+      ></mat-row>
+    </mat-table>
+  </div>
+</div> 
+<mat-menu #actionsMenu="matMenu">
+  <ng-template matMenuContent let-rowData="rowData">
+    <ng-container *ngIf="!deleteAction">
+      <button mat-menu-item (click)="editUser(rowData)">Edit</button>
+      <button mat-menu-item (click)="deleteAction=true; $event.stopPropagation()">Delete</button>
+    </ng-container>
+    <ng-container *ngIf="deleteAction">
+      <div>Are you sure to delete?</div>
+      <button mat-menu-item (click)="deleteUser(rowData)">Yes</button>
+      <button mat-menu-item (click)="deleteAction=false; actionMenu=false;">No</button>
+    </ng-container>
+  </ng-template>
+</mat-menu>

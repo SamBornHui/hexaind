@@ -1,0 +1,16 @@
+<div class="pb-3">
+  <div class="fw-bold pb-1">Purpose:</div>
+  <div>{{ purpose }}</div>
+</div>
+<div class="pb-3">
+  <div class="fw-bold pb-1">Input:</div>
+  <div>{{ input }}</div>
+</div>
+<div class="pb-3">
+  <div class="fw-bold pb-1">Output:</div>
+  <div>{{ output }}</div>
+</div>
+<div *ngIf="showDescription">
+  <div class="fw-bold pb-1">Description:</div>
+  <div>{{ description }}</div>
+</div>

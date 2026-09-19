@@ -1,0 +1,10 @@
+{
+    "disabledThirdPartyWidgets": [
+        "Thermocalc"
+    ],
+    "disabledAIMLWidgets": [],
+    "disabledApps": [
+        "Datasheet Generator",
+        "Scrap Analysis"
+    ]
+}

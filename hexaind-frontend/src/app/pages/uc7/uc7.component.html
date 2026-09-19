@@ -1,0 +1,1852 @@
+<div fxLayout="column" class="dc-container">
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="header">
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+      <div fxFlex="none">
+        <button mat-icon-button class="global-back-button" (click)="navigate('tools')">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div fxFlex>
+        <h1 class="global-main-title">
+          {{ selectedSession }}
+          <mat-icon class="material-symbols-outlined global-info-icon" matTooltip="This page is the UC7 Configuration">
+            info
+          </mat-icon>
+        </h1>
+      </div>
+    </div>
+    <div>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="4px" class="bg-surface rounded-1 py-1 px-2"
+        *ngIf="showPolling">
+        <div>{{ pollingMsg }}</div>
+        <div>
+          <div class="spinner-container">
+            <mat-spinner diameter="40"></mat-spinner>
+            <div class="percentage">{{ pollingPercentage }}%</div>
+          </div>
+        </div>
+        <div>
+          <mat-icon class="global-icon-button-grey" (click)="cancelPolling()" matTooltip="Cancel">close</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div fxFlex fxLayout="column" fxLayoutGap="16px" class="p-6 y-auto">
+    <mat-accordion class="global-accordion">
+      <mat-expansion-panel expanded="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Data Catalog (High Level)</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div fxLayout="column" fxLayoutGap="8px">
+          <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="8px">
+            <div fxFlex="120px">
+              <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+                <div class="fw-bold">Fab</div>
+                <mat-icon class="material-symbols-outlined global-icon-button-grey icon-20" matTooltip="Advanced Filter"
+                  (click)="advanceSearchModal('fab')">instant_mix</mat-icon>
+              </div>
+              <mat-form-field appearance="outline">
+                <mat-select panelClass="data-catalog-select" [(ngModel)]="selectedFab" placeholder="Fab" #matSelect1
+                  (closed)="searchfab = ''">
+                  <div mat-select-header>
+                    <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchfab"
+                      (keydown)="$event.stopPropagation()" />
+                  </div>
+                  <div class="dc-dropdown-options">
+                    <mat-option *ngFor="let fab of filteredFabDropdownList" [value]="fab"
+                      (click)="matSelect1.open(); onFabSelect()">
+                      {{ fab }}
+                    </mat-option>
+                  </div>
+                  <div class="p-2 text-end">
+                    <button mat-flat-button color="primary" [disabled]="selectedFab == ''"
+                      (click)="matSelect1.close(); onTechClick()">
+                      Submit
+                    </button>
+                  </div>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="showPolling && fabDropdownList.length == 0">
+                <mat-progress-bar mode="determinate" [value]="fabLoadPercentage"></mat-progress-bar>
+              </div>
+            </div>
+            <div fxFlex="200px">
+              <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+                <div class="fw-bold">Tech Node</div>
+                <mat-icon class="material-symbols-outlined global-icon-button-grey icon-20" matTooltip="Advanced Filter"
+                  (click)="advanceSearchModal('tech_nodes')">instant_mix</mat-icon>
+              </div>
+              <mat-form-field appearance="outline">
+                <mat-select panelClass="data-catalog-select" [(ngModel)]="selectedTech" placeholder="Tech Nodes"
+                  #matSelect2 (closed)="searchTechNode = ''">
+                  <div mat-select-header>
+                    <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchTechNode"
+                      (keydown)="$event.stopPropagation()" />
+                  </div>
+                  <div class="dc-dropdown-options">
+                    <mat-option *ngFor="let node of filteredTechNodeDropdownList" [value]="node"
+                      (click)="matSelect2.open(); onTechSelect()">
+                      {{ node }}
+                    </mat-option>
+                  </div>
+                  <div class="p-2 text-end">
+                    <button mat-flat-button color="primary" [disabled]="selectedTech == ''"
+                      (click)="matSelect2.close(); onDidClick()">
+                      Submit
+                    </button>
+                  </div>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="showPolling && techDropdownList.length == 0">
+                <mat-progress-bar mode="determinate" [value]="techLoadPercentage"></mat-progress-bar>
+              </div>
+            </div>
+            <div fxFlex="120px">
+              <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+                <div class="fw-bold">Design Id</div>
+                <mat-icon class="material-symbols-outlined global-icon-button-grey icon-20" matTooltip="Advanced Filter"
+                  (click)="advanceSearchModal('design_id')">instant_mix</mat-icon>
+              </div>
+              <mat-form-field appearance="outline">
+                <mat-select panelClass="data-catalog-select" [(ngModel)]="selectedDid" placeholder="DID" #matSelect3
+                  (closed)="searchDid = ''">
+                  <div mat-select-header>
+                    <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchDid"
+                      (keydown)="$event.stopPropagation()" />
+                  </div>
+                  <div class="dc-dropdown-options">
+                    <mat-option *ngFor="let did of filteredDidDropdownList" [value]="did"
+                      (click)="matSelect3.open(); onDidSelect()">
+                      {{ did }}
+                    </mat-option>
+                  </div>
+                  <div class="p-2 text-end">
+                    <button mat-flat-button color="primary" [disabled]="selectedDid == ''"
+                      (click)="matSelect3.close(); onTravelerIdClick()">
+                      Submit
+                    </button>
+                  </div>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="showPolling && !didDropdownList.length">
+                <mat-progress-bar mode="determinate" [value]="didLoadPercentage"></mat-progress-bar>
+              </div>
+            </div>
+            <div fxFlex>
+              <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+                <div class="fw-bold">Traveler Id(s)</div>
+                <mat-icon class="material-symbols-outlined global-icon-button-grey icon-20" matTooltip="Advanced Filter"
+                  (click)="advanceSearchModal('traveler_id')">instant_mix</mat-icon>
+              </div>
+              <div class="multiple-select-container">
+                <mat-form-field appearance="outline">
+                  <mat-select panelClass="data-catalog-select" [(ngModel)]="selectedTravelerid"
+                    placeholder="Traveler Id(s)" #matSelect4 multiple (closed)="searchTravelerId = ''">
+                    <div mat-select-header>
+                      <div>
+                        <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchTravelerId"
+                          (keydown)="$event.stopPropagation()" />
+                      </div>
+                      <div>
+                        <mat-checkbox color="primary" [checked]="areTravelerIdsAllSelected()"
+                          (change)="travelerIdSelectAll($event)">Select All</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="dc-dropdown-options">
+                      <mat-option *ngFor="let traveler of filteredTravelerIdDropdownList" [value]="traveler"
+                        (click)="matSelect4.open(); onTravelerIdSelect()">
+                        {{ traveler }}
+                      </mat-option>
+                    </div>
+                    <div class="p-2 text-end">
+                      <button mat-flat-button color="primary" [disabled]="selectedTravelerid == ''"
+                        (click)="matSelect4.close(); onTravelerClick()">
+                        Submit
+                      </button>
+                    </div>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div *ngIf="showPolling && travelerIdDropdownList.length == 0">
+                <mat-progress-bar mode="determinate" [value]="travelerIdLoadPercentage"></mat-progress-bar>
+              </div>
+            </div>
+            <div fxFlex="none">
+              <div class="fw-bold pb-1">Traveler Step(s)</div>
+              <button mat-stroked-button color="primary" (click)="travelerStepsModal(setTravelerStepId)"
+                (closePanelClicked)="onCloseTravelerStepsModal()">Select</button>
+            </div>
+            <div fxFlex="240px">
+              <div class="fw-bold pb-1">Date Range</div>
+              <mat-form-field class="w-100" appearance="outline">
+                <mat-date-range-input [max]="maxDate" [rangePicker]="picker">
+                  <input matStartDate placeholder="Start date" [(ngModel)]="startDate"
+                    (dateChange)="startChange($event)" />
+                  <input matEndDate placeholder="End date" [(ngModel)]="endDate" (dateChange)="endChange($event)" />
+                </mat-date-range-input>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+              </mat-form-field>
+            </div>
+            <div fxFlex="100px">
+              <div>
+                <button mat-flat-button color="primary" (click)="dcHighLevelSubmit()" [disabled]="isdcHighLevelSubmit">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <div fxLayout="row">
+      <div fxFlex="50">
+        <div class="fw-bold pb-1">Select Use Case</div>
+        <mat-form-field appearance="outline">
+          <mat-select [(value)]="selectedUCOption" placeholder="Select an UC" (selectionChange)="useCaseChange()">
+            <mat-option value="UC2">UC2 Data Pull</mat-option>
+            <mat-option value="UC3">UC3 Data Pull</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div *ngIf="selectedUCOption === 'UC2'">
+      <div fxLayout="column" fxLayoutGap="8px" class="p-2">
+        <div class="border-all">
+          <div class="bg-surface p-2 fw-bold">Data Source</div>
+          <div class="p-2">
+            <div fxLayout="row" fxLayoutGap="16px">
+              <mat-checkbox color="primary" [(ngModel)]="isFDTraceOptions" [checked]="isUC2FdChecked"
+                (change)="UC2FdClicked($event)">FD Trace Aggregate Data</mat-checkbox>
+              <mat-checkbox color="primary" [(ngModel)]="isSigmaOptions" [checked]="isUC2SigmaChecked"
+                (change)="UC2SigmaClicked($event)">Sigma</mat-checkbox>
+              <mat-checkbox color="primary" disabled>E3 R2R Data</mat-checkbox>
+            </div>
+          </div>
+        </div>
+        <mat-accordion class="global-accordion" *ngIf="isFDTraceOptions">
+          <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="w-100">
+                  <div>FD Trace Aggregate Data</div>
+                  <div><button mat-flat-button color="primary" (click)="onGenerateClick($event)"
+                      [disabled]="isGenerating" class="custom-btn">Generate</button></div>
+                </div>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxLayoutGap="8px">
+              <div>
+                <!-- Recipe Name Section -->
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Recipe Name</div>
+                </div>
+
+                <!-- Tool Name Section -->
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Tool Name</div>
+                </div>
+
+                <!-- Step IDs Section -->
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Step IDs</div>
+                </div>
+
+                <!-- Sensors Section -->
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Sensors</div>
+                </div>
+
+                <div fxFlex="66px">&nbsp;</div>
+              </div>
+
+              <div *ngFor="let group of toolGroups; let i = index" fxLayout="row" fxLayoutGap="8px"
+                fxLayoutAlign="start end">
+                <!-- Recipe Name Section -->
+                <div fxFlex>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select Recipe" panelClass="data-catalog-select"
+                        [(ngModel)]="uC2FdselectedRecipeNames[i]"
+                        (selectionChange)="onUC2RecipeSelectionChange($event.value,i)" #matSelectRecipe
+                        (closed)="searchRecipeName = ''">
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchRecipeName"
+                              (ngModelChange)="filterRecipes(i)" />
+                          </div>
+                          <div *ngIf="filteredRecipeNames[i]">
+                            <mat-checkbox color="primary" [(ngModel)]="isRecipeSelectAll[i]"
+                              (change)="toggleRecipeSelectAll(i)">
+                              Select All
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options" *ngIf="!filteredRecipeNames[i]">
+                          <mat-option disabled>No items available</mat-option>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngFor="let recipe of filteredRecipeNames" [value]="recipe.recipe_name">
+                            {{ recipe.recipe_name }}
+                          </mat-option>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="p-2">
+                          <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <button mat-icon-button color="primary" (click)="toggleAddRecipeInput(i)">
+                              <mat-icon>{{ showAddRecipeInput[i] ? 'remove' : 'add' }}</mat-icon>
+                            </button>
+                          </div>
+                          <div fxLayout="column" fxLayoutGap="10px" *ngIf="showAddRecipeInput[i]">
+                            <mat-form-field appearance="outline">
+                              <mat-label>Recipe Name</mat-label>
+                              <input matInput placeholder="Enter recipe name" [(ngModel)]="newRecipeName" />
+                            </mat-form-field>
+                            <!-- <mat-form-field appearance="outline">
+                                <mat-label>Recipe ID</mat-label>
+                                <input matInput placeholder="Enter recipe ID" [(ngModel)]="newRecipeId" />
+                              </mat-form-field> -->
+                            <button mat-flat-button color="primary" (click)="addNewRecipe(i)">Add Recipe</button>
+                          </div>
+                        </div>
+                        <div class="p-2 text-end">
+                          <button mat-flat-button color="primary" (click)="matSelectRecipe.close(); onRecipeClick(i)">
+                            Submit
+                          </button>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Tool Name Section -->
+                <div fxFlex>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select" panelClass="data-catalog-select"
+                        [(ngModel)]="uC2SelectedToolIds[i]"
+                        (selectionChange)="onUC2ToolNameSelectionChange($event.value,i)" #matSelectTool
+                        (closed)="searchToolId = ''" multiple>
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="filterToolsSearchTerm"
+                              (ngModelChange)="filterTools(i)" />
+                          </div>
+                          <div *ngIf="filteredTools[i]">
+                            <mat-checkbox color="primary" [(ngModel)]="isUC2ToolNameSelectAll[i]"
+                              (change)="toggleSelectAll(matSelectTool,i)">
+                              Select All
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options" *ngIf="!filteredTools[i]">
+                          <mat-option disabled>No items available</mat-option>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngFor="let tool of filteredTools[i]" [value]="tool.TOOL_ID">
+                            {{ tool.TOOL_NAME }}
+                          </mat-option>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="p-2">
+                          <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <button mat-icon-button color="primary" (click)="toggleAddToolInput(i)">
+                              <mat-icon>{{ showAddToolInput[i] ? 'remove' : 'add' }}</mat-icon>
+                            </button>
+                          </div>
+                          <div fxLayout="column" fxLayoutGap="10px" *ngIf="showAddToolInput[i]">
+                            <mat-form-field appearance="outline">
+                              <mat-label>Tool Name</mat-label>
+                              <input matInput placeholder="Enter tool name" [(ngModel)]="newToolName" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline">
+                              <mat-label>Tool ID</mat-label>
+                              <input matInput placeholder="Enter tool ID" [(ngModel)]="newToolId" />
+                            </mat-form-field>
+                            <button mat-flat-button color="primary" (click)="addNewTool(i)">Add Tool</button>
+                          </div>
+                        </div>
+                        <div class="p-2 text-end">
+                          <button mat-flat-button color="primary"
+                            (click)="matSelectTool.close(); onStepIdClick(i,false,'')">
+                            Submit
+                          </button>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Step IDs Section -->
+                <div fxFlex>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple [(ngModel)]="uC2SelectedStepIds[i]"
+                        (ngModelChange)="onStepIdSelectionChange(i)" placeholder="Select"
+                        panelClass="data-catalog-select" #matSelectStepid (closed)="searchStepId = ''">
+                        <div mat-select-header>
+                          <div *ngIf="filteredStepIdDropdownList[i]">
+                            <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchStepId"
+                              (ngModelChange)="filterStepIds(i)" />
+                          </div>
+                          <div *ngIf="filteredStepIdDropdownList[i]">
+                            <mat-checkbox color="primary" [(ngModel)]="isStepIdAllSelected[i]"
+                              (change)="toggleStepIdsSelectAll(i)">
+                              Select All
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <!-- <div class="dc-dropdown-options" *ngIf="isUC2TraceStepIdsValue && filteredStepIdDropdownList[i].length == 0">
+                          <mat-option  disabled>No items available</mat-option>
+                        </div> -->
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngIf="!filteredStepIdDropdownList[i]" disabled>No items available</mat-option>
+                          <mat-option *ngFor="let stepId of filteredStepIdDropdownList[i]" [value]="stepId">
+                            {{ stepId }}
+                          </mat-option>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="p-2">
+                          <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <button mat-icon-button color="primary" (click)="toggleAddStepIdInput(i)">
+                              <mat-icon>{{ showAddStepIdInput[i] ? 'remove' : 'add' }}</mat-icon>
+                            </button>
+                          </div>
+                          <div fxLayout="column" fxLayoutGap="10px" *ngIf="showAddStepIdInput[i]">
+                            <mat-form-field appearance="outline">
+                              <mat-label>Step ID</mat-label>
+                              <input matInput placeholder="Enter new Step ID" [(ngModel)]="newStepId" />
+                            </mat-form-field>
+                            <button mat-flat-button color="primary" (click)="addNewStepId(i)">Add Step ID</button>
+                          </div>
+                        </div>
+                        <div class="p-2 text-end">
+                          <button mat-flat-button color="primary"
+                            (click)="matSelectStepid.close(); onStepIdbtnClick(i,false,'')">
+                            Submit
+                          </button>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Sensors Section -->
+                <div fxFlex>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple [(ngModel)]="uC2FdTraceAggrSelectedSensors[i]"
+                        (ngModelChange)="onSensorSelectionChange(i)" placeholder="Sensors" #matSelectSensor
+                        (closed)="searchSensors = ''">
+                        <div mat-select-header>
+                          <div *ngIf="filteredSensorDropdownList[i]">
+                            <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="searchSensor"
+                              (ngModelChange)="filterSensors(i)" />
+                          </div>
+                          <div *ngIf="filteredSensorDropdownList[i]">
+                            <mat-checkbox color="primary" [(ngModel)]="isSensorAllSelected[i]"
+                              (change)="toggleSensorsSelectAll(i)">
+                              Select All
+                            </mat-checkbox>
+                          </div>
+                        </div>
+                        <div *ngIf="!filteredSensorDropdownList[i]">
+                          <mat-option disabled>No items available</mat-option>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngFor="let sensor of filteredSensorDropdownList[i]" [value]="sensor">
+                            {{ sensor }}
+                          </mat-option>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="p-2">
+                          <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <button mat-icon-button color="primary" (click)="toggleAddSensorInput(i)">
+                              <mat-icon>{{ showAddSensorInput[i] ? 'remove' : 'add' }}</mat-icon>
+                            </button>
+                          </div>
+                          <div fxLayout="column" fxLayoutGap="10px" *ngIf="showAddSensorInput[i]">
+                            <mat-form-field appearance="outline">
+                              <mat-label>Sensor</mat-label>
+                              <input matInput placeholder="Enter new Sensor" [(ngModel)]="newSensor" />
+                            </mat-form-field>
+                            <button mat-flat-button color="primary" (click)="addNewSensor(i)">Add Sensor</button>
+                          </div>
+                        </div>
+                        <div class="p-2 text-end">
+                          <button mat-flat-button color="primary" (click)="matSelectSensor.close(); onSensorsClick()">
+                            Submit
+                          </button>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Remove Group Button -->
+                <div fxFlex="66px" fxLayout="row" fxLayoutGap="8px" class="mb-2">
+                  <mat-icon *ngIf="i > 0" class="material-symbols-outlined global-icon-button-sm"
+                    (click)="removeGroup(i)">remove</mat-icon>
+                  <mat-icon *ngIf="i === toolGroups.length - 1" class="material-symbols-outlined global-icon-button-sm"
+                    (click)="addNewGroup(false,i)">add</mat-icon>
+                </div>
+              </div>
+
+              <div fxLayout="row" fxLayoutAlign="space-between center">
+                <div>
+                  <div *ngIf="resultDataFilePath">File Path : {{ resultDataFilePath }}</div>
+                  <div fxLayout="row" *ngIf="isuc2FDTraceResultFailed" fxLayoutGap="8px" fxLayoutAlign="end end">
+                    UC2 Trace Path : FAILED
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutGap="8px">
+                  <button mat-stroked-button color="primary" [disabled]="!resultDataFilePath"
+                    (click)="UC2FDAggSourceDataPreview('FD Trace')">Aggregate Data Preview</button>
+                  <button mat-stroked-button color="primary" (click)="getResetFilterApply($event)">Reset</button>
+                  <button mat-flat-button color="primary" [disabled]="isUC2FDGenerateButton"
+                    (click)="finalAggregateData()">
+                    Generate FD Aggregate
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+
+        <mat-accordion class="global-accordion" *ngIf="isSigmaOptions">
+          <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Sigma</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxLayoutGap="8px">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <div fxFlex="none">
+                  <input type="file" #fileInput (change)="onGQLFileSelected($event)" accept=".gql"
+                    style="display: none;" />
+                  <button mat-flat-button color="primary" [disabled]="uc2SigmaUploadButton"
+                    (click)="browseGQLInputClick(fileInput)">Upload</button>
+                </div>
+                <div>
+                  <button mat-flat-button color="primary" [disabled]="uc2SigmaGenerateButton"
+                    (click)="FDTraceSigmaGenerateData()">
+                    Generate
+                  </button>
+                </div>
+                <div>
+                  <button mat-stroked-button color="primary" (click)="UC2SigmaReset(fileInput)">Reset</button>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px">
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Measurement Steps <span class="text-red">*</span></div>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select" [ngModel]="UC2SigmaSelectedMeasurementSteps"
+                        #matSelectMeasureSteps panelClass="data-catalog-select"
+                        (selectionChange)="uc2SigmaDataChange($event.value, 'measurement_steps')">
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search"
+                              *ngIf="measurementStepGQLFileList.length > 0" [(ngModel)]="uc2SearchTerm"
+                              (ngModelChange)="UC2MeasumentStepSearch($event)" />
+                          </div>
+                          <div>
+                            <mat-checkbox color="primary" [(ngModel)]="isUC2SigmaMeasurementStepsSelectAll"
+                              *ngIf="measurementStepGQLFileList.length > 0"
+                              (change)="UC2SigmaMeasurementStepsSelectAll()">Select All</mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options" style="max-height: 160px">
+                          <mat-option *ngIf="measurementStepGQLFileList.length === 0" disabled>No items
+                            available</mat-option>
+                          <mat-option *ngFor="let measurementStep of measurementStepGQLFileList"
+                            [value]="measurementStep">{{ measurementStep }}</mat-option>
+                        </div>
+                        <div fxFlex="none" class="p-2">
+                          <mat-form-field appearance="outline">
+                            <input matInput placeholder="Add Input Value"
+                              [(ngModel)]="uc2SigmaMeasurementStepsInputValue"
+                              (keydown)="blockMatSelectSpace($event)" />
+                            <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaMeasureStepsAddInput()">check</mat-icon>
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaMeasureStepsClearSearch()">clear</mat-icon>
+                            </div>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="p-2 text-end">
+                          <button mat-flat-button color="primary" [disabled]="uc2SigmaMeasumentStepsSubmitButton"
+                            (click)="matSelectMeasureSteps.close(); onUC2SigmaMeasurementStepsSubmit()">
+                            Submit
+                          </button>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Measurement Parameters <span class="text-red">*</span></div>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select" [(ngModel)]="UC2SigmaSelectedMeasurementParameters"
+                        panelClass="data-catalog-select"
+                        (selectionChange)="uc2SigmaDataChange($event.value, 'measurement_parameters')">
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="uc2SearchTerm"
+                              *ngIf="measurementParametersGQLFileList.length > 0 "
+                              (ngModelChange)="UC2MeasumentParametersSearch($event)" />
+                          </div>
+                          <div>
+                            <mat-checkbox color="primary" [(ngModel)]="isUC2SigmaMeasureParametersSelectAll"
+                              *ngIf="measurementParametersGQLFileList.length > 0 "
+                              (change)="UC2SigmaMeasurementParametersSelectAll()">Select All</mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngIf="measurementParametersGQLFileList.length === 0" disabled>No items
+                            available</mat-option>
+                          <mat-option *ngFor="let measurementParameters of measurementParametersGQLFileList"
+                            [value]="measurementParameters">{{measurementParameters}}</mat-option>
+                        </div>
+                        <div fxFlex="none" class="p-2">
+                          <mat-form-field appearance="outline">
+                            <input matInput placeholder="Add Input Value"
+                              [(ngModel)]="uc2SigmaMeasurementParametersInputValue"
+                              (keydown)="blockMatSelectSpace($event)" />
+                            <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaMeasureParametersAddInput()">check</mat-icon>
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaMeasureParametersClearSearch()">clear</mat-icon>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start end">
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Point Steps<span class="text-red">*</span></div>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select" [ngModel]="UC2SigmaSelectedPointSteps"
+                        #matSelectPointSteps panelClass="data-catalog-select"
+                        (selectionChange)="uc2SigmaDataChange($event.value, 'point_steps')">
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search"
+                              *ngIf="point_stepsGQLFileList.length > 0" [(ngModel)]="uc2SearchTerm"
+                              (ngModelChange)="UC2PointStepsSearch($event)" />
+                          </div>
+                          <div>
+                            <mat-checkbox color="primary" [(ngModel)]="isUC2SigmaPointStepsSelectAll"
+                              *ngIf="point_stepsGQLFileList.length > 0" (change)="UC2SigmaPointStepsSelectAll()">Select
+                              All</mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngIf="point_stepsGQLFileList.length === 0" disabled>No items
+                            available</mat-option>
+                          <mat-option *ngFor="let pointSteps of point_stepsGQLFileList"
+                            [value]="pointSteps">{{pointSteps}}</mat-option>
+                        </div>
+                        <div fxFlex="none" class="p-2">
+                          <mat-form-field appearance="outline">
+                            <input matInput placeholder="Add Input Value" [(ngModel)]="uc2SigmaPointStepsInputValue"
+                              (keydown)="blockMatSelectSpace($event)" />
+                            <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaPointStepsAddInput()">check</mat-icon>
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaPointStepsClearSearch()">clear</mat-icon>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                        <div class="p-2 text-end">
+                          <button mat-flat-button color="primary" [disabled]="uc2SigmaPointStepsSubmitButton"
+                            (click)="matSelectPointSteps.close(); onUC2SigmaPointStepsSubmit()">
+                            Submit
+                          </button>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Point Parameters<span class="text-red">*</span></div>
+                  <div class="multiple-select-container">
+                    <!-- [(value)]="" -->
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select" [ngModel]="UC2SigmaSelectedPointParameters"
+                        panelClass="data-catalog-select"
+                        (selectionChange)="uc2SigmaDataChange($event.value, 'point_parameters')">
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search"
+                              *ngIf="point_parametersGQLFileList.length > 0" [(ngModel)]="uc2SearchTerm"
+                              (ngModelChange)="UC2PointParametersSearch($event)" />
+                          </div>
+                          <div>
+                            <mat-checkbox color="primary" [(ngModel)]="isUC2SigmaPointParametersSelectAll"
+                              *ngIf="point_parametersGQLFileList.length > 0"
+                              (change)="UC2SigmaPointParametersSelectAll()">Select All</mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngIf="point_parametersGQLFileList.length === 0" disabled>No items
+                            available</mat-option>
+                          <mat-option *ngFor="let pointParameters of point_parametersGQLFileList"
+                            [value]="pointParameters">{{pointParameters}}</mat-option>
+                        </div>
+                        <div fxFlex="none" class="p-2">
+                          <mat-form-field appearance="outline">
+                            <input matInput placeholder="Add Input Value"
+                              [(ngModel)]="uc2SigmaPointParametersInputValue" (keydown)="blockMatSelectSpace($event)" />
+                            <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaPointParametersAddInput()">check</mat-icon>
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaPointParametersClearSearch()">clear</mat-icon>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start end">
+                <div fxFlex>
+                  <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+                    <div class="fw-bold">Run Parameters</div>{{selected_path}}
+                    <mat-icon class="material-symbols-outlined global-icon-button-grey icon-20"
+                      matTooltip="Advanced Filter"
+                      (click)="advanceSearcSigmahModal('run_parameters',UC2SigmaSelectedRunParameters,selected_path)">instant_mix</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutGap="8px">
+                    <div fxFlex>
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Add Input Value" [(ngModel)]="UC2SigmaSelectedRunParameters"
+                          (keydown)="blockMatSelectSpace($event)" />
+                      </mat-form-field>
+                    </div>
+                    <!-- Input box for adding new values -->
+                    <!-- <div fxFlex="200px">
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Add Input Value" [(ngModel)]="uc2SigmaRunParametersInputValue"
+                          (keydown)="blockMatSelectSpace($event)" />
+                        <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                          <mat-icon class="global-icon-button-grey"
+                            (click)="UC2SigmaRunParametersAddInput()">check</mat-icon>
+                          <mat-icon class="global-icon-button-grey"
+                            (click)="UC2SigmaRunParametersClearSearch()">clear</mat-icon>
+                        </div>
+                      </mat-form-field>
+                    </div> -->
+                  </div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Wafer Parameters<span class="text-red">*</span></div>
+                  <div class="multiple-select-container">
+                    <mat-form-field appearance="outline">
+                      <mat-select multiple placeholder="Select" [ngModel]="UC2SigmaSelectedWaferParameters"
+                        panelClass="data-catalog-select"
+                        (selectionChange)="uc2SigmaDataChange($event.value, 'wafer_parameters')">
+                        <div mat-select-header>
+                          <div>
+                            <input class="dc-dropdown-search" placeholder="Search"
+                              *ngIf="waferParametersGQLFileList.length > 0" [(ngModel)]="uc2SearchTerm"
+                              (ngModelChange)="UC2WaferParametersSearch($event)" />
+                          </div>
+                          <div>
+                            <mat-checkbox color="primary" [(ngModel)]="isUC2SigmaWaferParametersSelectAll"
+                              *ngIf="waferParametersGQLFileList.length > 0"
+                              (change)="UC2SigmaWaferParametersSelectAll()">Select All</mat-checkbox>
+                          </div>
+                        </div>
+                        <div class="dc-dropdown-options">
+                          <mat-option *ngIf="waferParametersGQLFileList.length === 0" disabled>No items
+                            available</mat-option>
+                          <mat-option *ngFor="let waferParameters of waferParametersGQLFileList"
+                            [value]="waferParameters">{{waferParameters}}</mat-option>
+                        </div>
+                        <div fxFlex="none" class="p-2">
+                          <mat-form-field appearance="outline">
+                            <input matInput placeholder="Add Input Value"
+                              [(ngModel)]="uc2SigmaWaferParametersInputValue" (keydown)="blockMatSelectSpace($event)" />
+                            <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaWaferParametersAddInput()">check</mat-icon>
+                              <mat-icon class="global-icon-button-grey"
+                                (click)="UC2SigmaWaferParametersClearSearch()">clear</mat-icon>
+                            </div>
+                          </mat-form-field>
+                        </div>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                <div fxFlex="none">
+                  <button mat-flat-button color="primary" disabled>
+                    Join Aggregate FD Data
+                  </button>
+                </div>
+                <div fxFlex>
+                  <div *ngIf="isuc2SigmaResultPath" fxLayoutGap="8px">
+                    UC2 Sigma Path : {{uc2SigmaResultPath}}
+                  </div>
+                  <div *ngIf="isuc2SigmaResultFailed">
+                    UC2 Sigma Path : FAILED
+                  </div>
+                </div>
+                <div fxFlex="none" fxLayout="row" fxLayoutGap="8px">
+                  <button mat-stroked-button color="primary" (click)="UC2DataSourceDataPreview('Sigma','uc2')">Sigma Data
+                    Preview</button>
+                  <button mat-stroked-button color="primary" (click)="UC2SigmaClearOptions()">Clear Options</button>
+                  <button mat-flat-button color="primary" [disabled]="!isUC2SigmaDownloadCheck"
+                    (click)="UC2SigmaDownload()">
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+    <div *ngIf="selectedUCOption === 'UC3'">
+      <div fxLayout="column" fxLayoutGap="8px" class="p-2">
+        <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start end">
+          <div fxFlex="25">
+            <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+              <div fxLayout="row" fxLayoutAlign="start start">
+                <div class="fw-bold px-2">Lot ID</div>
+                <div *ngIf="isUC3SigmaLotIdsBeforeApi"><mat-spinner diameter="14"></mat-spinner></div>
+              </div>
+              <div>Count: <span class="fw-bold">{{lotIdsDropdownCount}}</span></div>
+            </div>
+            <!-- <mat-form-field appearance="outline">
+              <mat-select multiple placeholder="Select" (selectionChange)="checkLotIds()"
+                [(ngModel)]="selectedLotIds" panelClass="data-catalog-select">
+                <div mat-select-header>
+                  <div>
+                    <mat-checkbox color="primary" [checked]="areUC3LotIdsAllSelected()" (change)="uc3LotIdsSelectAll($event)">Select
+                      All</mat-checkbox>
+                  </div>
+                  <div>
+                    <input class="dc-dropdown-search" [(ngModel)]="searchUc3SigmaLotIds" (keydown)="$event.stopPropagation()"
+                      placeholder="Search" />
+                  </div>
+                </div>
+                <div class="dc-dropdown-options">
+                  <mat-option *ngFor="let lotIds of filteredUc3LotIdsList" [value]="lotIds">{{lotIds}}</mat-option>
+                </div>
+                <div class="dc-dropdown-add">
+                  <input placeholder="Enter new item" />
+                  <mat-icon>add</mat-icon>
+                </div>
+              </mat-select>
+            </mat-form-field>   -->
+            <div>
+              <mat-form-field fxFlex (click)="getLotIds()" appearance="outline" style="padding-top: 10px">
+                <mat-label>Click to configure</mat-label>    
+                <input matInput [value]="selectedLotIds.slice(0,10) || 'Click to configure'" disabled style="pointer-events: none;">
+              </mat-form-field>  
+            </div>      
+            <div *ngIf="showPolling && lotIdsDropdownList.length == 0">
+              <mat-progress-bar mode="determinate" [value]="lotIdsLoadPercentage"></mat-progress-bar>
+            </div>
+          </div>
+          <div fxFlex="25">
+            <div fxLayout="row" fxLayoutAlign="space-between center" class="pb-1">
+              <div class="fw-bold">Wafer ID</div>
+              <div>Count: <span class="fw-bold">{{waferIdsDropdownCount}}</span></div>
+            </div>
+            <div>
+              <mat-form-field (click)="openWaferIdSelectionComponent()" fxFlex appearance="outline" style="padding-top: 10px">
+                <mat-label>Click to configure</mat-label>    
+                <input matInput [value]="selectedWaferIds.slice(0,10) || 'Click to configure'" disabled style="pointer-events: none;">
+              </mat-form-field>  
+            </div>   
+            <div *ngIf="showPolling && waferIdsDropdownList.length == 0">
+              <mat-progress-bar mode="determinate" [value]="WaferIdsLoadPercentage"></mat-progress-bar>
+            </div>
+          </div>
+          <div fxFlex class="pb-4">Baseline Traveler: <span class="fw-bold">{{baselineTravelerId}}</span></div>
+          <div fxFlex="none">
+            <button mat-stroked-button color="primary" class="me-2" (click)="uc3LotWaferReset()">Reset</button>
+            <button mat-flat-button color="primary" (click)="uc3LotWaferSave()">Save</button>
+          </div>
+        </div>
+        <div class="border-all">
+          <div class="bg-surface p-2 fw-bold">Data Source Selection</div>
+          <div fxLayout="column" fxLayoutGap="8px" class="p-2">
+            <div fxLayout="row" fxLayoutGap="16px">
+              <mat-checkbox color="primary" [(ngModel)]="isFDContextTrace">FD Context</mat-checkbox>
+              <mat-checkbox color="primary" [(ngModel)]="isSIGMADataCatalogue" (click)="uc3SigmaCheck()">SIGMA</mat-checkbox>
+              <mat-checkbox color="primary" [(ngModel)]="isProbeDataCatalogue" [checked]="isUC3ProbeChecked" (change)="uc3ProbeCheck($event)">Probe</mat-checkbox>
+              <mat-checkbox color="primary" disabled>SWR</mat-checkbox>
+              <mat-checkbox color="primary" disabled>Param</mat-checkbox>
+            </div>
+            <div fxLayout="row" fxLayoutGap="16px">
+              <mat-checkbox color="primary" disabled>RDA</mat-checkbox>
+              <mat-checkbox color="primary" disabled>DIMS</mat-checkbox>
+              <mat-checkbox color="primary" disabled>Bonder-Bondee</mat-checkbox>
+              <mat-checkbox color="primary" disabled>Space Calculated</mat-checkbox>
+              <mat-checkbox color="primary" disabled>Photo</mat-checkbox>
+            </div>
+          </div>
+        </div>
+        <mat-accordion class="global-accordion" *ngIf="isProbeDataCatalogue">
+          <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Probe</mat-panel-title>
+              <button mat-flat-button color="primary" (click)="getProbeGenarate($event)" [disabled]="uc3ProbeGenerateButton">
+                Generate
+              </button>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxLayoutGap="8px">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+                <div fxFlex fxLayout="column" fxLayoutGap="4px">
+                  <div fxLayout="row" fxLayoutGap="8px">
+                    
+                    <div fxFlex="300px">
+                      <div class="fw-bold pb-1">Pareto Names</div>
+                      <mat-form-field appearance="outline">
+                        <mat-select multiple placeholder="Select" panelClass="data-catalog-select" [(ngModel)]="selectedParitoNames" (ngModelChange)="updateParitoNames($event)">
+                          <div mat-select-header>
+                            <div>
+                              <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="inputParitoNames" (ngModelChange)="inputSearchParitoNames()" (keydown)="$event.stopPropagation()"/>
+                            </div>
+                            <div>
+                              <mat-checkbox color="primary" [checked]="ParitoTNamesSelectAllChecked()" *ngIf="searchParitoNames.length > 0" (change)="UC3ProbeParitoNamesSelectAll($event)">Select All</mat-checkbox>
+                            </div>
+                          </div>
+                          <div class="dc-dropdown-options">
+                            <mat-option *ngFor="let names of paritoNames" [value]="names">{{names}}</mat-option>
+                          </div>
+
+                          <div fxFlex="none">
+                            <mat-form-field appearance="outline">
+                              <input
+                                matInput
+                                placeholder="Add Input Value"
+                                [(ngModel)]="newparitoNames"
+                                (keydown)="blockMatSelectSpace($event)"
+                              />
+                              <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">            
+                                <mat-icon class="global-icon-button-grey" (click)="addNewParitoNames()" >check</mat-icon>
+                                <mat-icon class="global-icon-button-grey" (click)="clearParitoNames()">clear</mat-icon>
+                              </div>
+                            </mat-form-field>
+                          </div>
+                          <!-- <div class="p-2">
+                            <div fxLayout="row" fxLayoutAlign="space-between center">
+                              <button mat-icon-button color="primary" (click)="toggleAddParitoNamesInput()">
+                                <mat-icon>{{ showAddParitoTitle ? 'remove' : 'add' }}</mat-icon>
+                              </button>
+                            </div>
+                            <div fxLayout="column" fxLayoutGap="10px" *ngIf="showAddParitoTitle">
+                              <mat-form-field appearance="outline">
+                                <mat-label>Parito Name</mat-label>
+                                <input matInput placeholder="Enter parito name" [(ngModel)]="newParitoTitle" />
+                              </mat-form-field>
+                              <button mat-flat-button color="primary" (click)="addNewParitoNames()">Add Name</button>
+                            </div>
+                          </div> -->
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+
+                    <div fxFlex = "300px">
+                      <div class="fw-bold pb-1">Pareto Title (For DRAM)</div>
+                      <mat-form-field appearance="outline">
+                        <mat-select multiple placeholder="Select" panelClass="data-catalog-select" [(ngModel)]="selectedParitoTitle"  (ngModelChange)="updateParitoTitle($event)">
+                          <div mat-select-header>
+                            <div>
+                              <input class="dc-dropdown-search" placeholder="Search" [(ngModel)]="inputParitoTitle" (ngModelChange)="inputSearchParitoTitle()" (keydown)="$event.stopPropagation()" />
+                            </div>
+                            <div>
+                              <mat-checkbox color="primary" [checked]="ParitoTitleSelectAllChecked()" *ngIf="searchParitoTitle.length > 0" (change)="UC3ProbeParitoTitleSelectAll($event)">Select All</mat-checkbox>
+                            </div>
+                          </div>
+                          <div class="dc-dropdown-options">
+                            <mat-option *ngFor="let title of paritoTitle" [value]="title">{{title}}</mat-option>
+                          </div>
+                          <!-- <div class="dc-dropdown-add">
+                            <input placeholder="Enter new item" />
+                            <mat-icon>add</mat-icon>
+                          </div> -->
+                          <div fxFlex="none">
+                            <mat-form-field appearance="outline">
+                              <input
+                                matInput
+                                placeholder="Add Input Value"
+                                [(ngModel)]="newParitoTitle"
+                                (keydown)="blockMatSelectSpace($event)"
+                              />
+                              <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">            
+                                <mat-icon class="global-icon-button-grey" (click)="addNewParitoTitle()" >check</mat-icon>
+                                <mat-icon class="global-icon-button-grey" (click)="clearParitoTitle()">clear</mat-icon>
+                              </div>
+                            </mat-form-field>
+                          </div>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                    <div fxFlex>
+                      <div class="fw-bold pb-1">Die Counts</div>
+                    </div>
+                  </div>
+                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                    <div fxFlex>
+                      <div class="fw-bold pb-1">Region A</div>
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter Value" [(ngModel)]="inputProbeRegionA" (ngModelChange)="updateRegionA($event)"/>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex>
+                      <div class="fw-bold pb-1">Region B</div>
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter Value" [(ngModel)]="inputProbeRegionB" (ngModelChange)="updateRegionB($event)"/>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex>
+                      <div class="fw-bold pb-1">Region C</div>
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter Value" [(ngModel)]="inputProbeRegionC" (ngModelChange)="updateRegionC($event)"/>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex>
+                      <div class="fw-bold pb-1">Region D</div>
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter Value" [(ngModel)]="inputProbeRegionD" (ngModelChange)="updateRegionD($event)"/>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex>
+                      <div class="fw-bold pb-1">Region E</div>
+                      <mat-form-field appearance="outline">
+                        <input matInput placeholder="Enter Value" [(ngModel)]="inputProbeRegionE" (ngModelChange)="updateRegionE($event)"/>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div fxFlex="none" class="fw-bold pt-8">OR</div>
+                <div fxFlex>
+                  <div class="fw-bold pb-1">Upload Target Data</div>
+                  <button mat-flat-button color="primary" (click)="UC3ProbeModelPopUp()">
+                    Choose File
+                  </button>
+                  <p *ngIf="upload_file_path; else noFile">Uploaded File</p>
+                  <ng-template #noFile>
+                    <p>No file uploaded</p>
+                  </ng-template>
+                </div>
+                
+              </div>
+              <div div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end end">
+                <div fxLayoutGap="8px" fxLayoutAlign="center center">
+                  <div *ngIf="isuc3ProbeResultPath" >
+                    UC2 Probe Path : {{uc3ProbeResultPath}}
+                  </div>
+                  <div fxLayout="row" *ngIf="isuc3ProbeReloadResultFailed">
+                    UC3 Probe Path : FAILED
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end end">
+                  <button mat-stroked-button color="primary" (click)="uc3ProbeSave()">Save</button>
+                  <button mat-stroked-button color="primary" (click)="UC3ProbeDataPreview('Probe')" [disabled]="uc3ProbePreviewButton">UC3 Probe
+                    Preview</button>
+                    <button mat-stroked-button color="primary" (click)="UC3ProbeReset()">Reset</button>
+
+                    <button mat-flat-button color="primary" (click)="getProbeDownload()">
+                      Download
+                    </button>                
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+        <mat-accordion class="global-accordion" *ngIf="isFDContextTrace">
+          <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>FD Context (Filter Lots - Wafers)</mat-panel-title>
+              <span class="spacer"></span>
+              <button mat-raised-button color="primary" (click)="onGenerate($event)">Generate Data</button>
+            </mat-expansion-panel-header>
+            <!-- <div fxLayout="column" fxLayoutGap="4px">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex>
+                  <div class="fw-bold">Process Steps</div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold">Recipes</div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold">Tool Names</div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold">Run IDs</div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold">Start Date</div>
+                </div>
+                <div fxFlex="60px">&nbsp;</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">1111-22 Sample Traveler Step</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">MainRecipe/1_Product</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">KOKU_Furnance</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">155307</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-date-range-input>
+                      <input matStartDate placeholder="Start date" />
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="60px" fxLayout="row" fxLayoutGap="8px">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey">remove_circle</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">1111-22 Sample Traveler Step</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">MainRecipe/1_Product</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">KOKU_Furnance</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">155307</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-date-range-input>
+                      <input matStartDate placeholder="Start date" />
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="60px" fxLayout="row" fxLayoutGap="8px">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey">remove_circle</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">1111-22 Sample Traveler Step</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">MainRecipe/1_Product</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">KOKU_Furnance</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option value="Option1">155307</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <mat-date-range-input>
+                      <input matStartDate placeholder="Start date" />
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                  </mat-form-field>
+                </div>
+                <div fxFlex="60px" fxLayout="row" fxLayoutGap="8px">
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey">remove_circle</mat-icon>
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey">add_circle</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <div>Lot Count: <span class="fw-bold">23</span></div>
+                <div>Wafer Count: <span class="fw-bold">23</span></div>
+                <button mat-stroked-button color="primary">Reset</button>
+                <button mat-flat-button color="primary" disabled>
+                  Apply Filters
+                </button>
+              </div>
+            </div> -->
+
+            <div *ngIf="isFDContextDownloadPath">
+              File path : {{FDContextQueryFilePath}}
+            </div>
+
+            <div fxLayout="column" fxLayoutGap="4px">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex>
+                  <div class="fw-bold">Process Steps</div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold">Recipes</div>
+                </div>
+                <div fxFlex>
+                  <div class="fw-bold">Tool Names</div>
+                </div>
+                <!-- <div fxFlex><div class="fw-bold">Run IDs</div></div>
+                <div fxFlex><div class="fw-bold">Start Date</div></div> -->
+                <div fxFlex="60px">&nbsp;</div>
+              </div>
+
+              <div *ngFor="let row of rows; let i = index" fxLayout="row" fxLayoutGap="8px"
+                fxLayoutAlign="start center">
+                <div fxFlex>
+                  <mat-form-field appearance="outline" (click)="getProcessSteps('TRAVELER_STEP', i)">
+                    <mat-select multiple placeholder="Select" [(ngModel)]="row.processSteps"
+                      (ngModel)="rows[i].processSteps" panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option *ngFor="let item of FDContextList.processStepsList"
+                          [value]="item">{{item}}</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline" (click)="getProcessSteps('RECIPE_NAME', i)">
+                    <mat-select multiple placeholder="Select" [(ngModel)]="row.recipes"
+                      panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option *ngFor="let item of FDContextList.recipeName" [value]="item">{{item}}</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div fxFlex>
+                  <mat-form-field appearance="outline" (click)="getProcessSteps('TOOL_NAME', i)">
+                    <mat-select multiple placeholder="Select" [(ngModel)]="row.toolNames"
+                      panelClass="data-catalog-select">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option *ngFor="let item of FDContextList.toolName" [value]="item">{{item}}</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <!-- <div fxFlex>
+                  <mat-form-field appearance="outline" (click)="getProcessSteps('RUN_ID', i)">
+                    <mat-select multiple placeholder="Select" panelClass="data-catalog-select" [(ngModel)]="row.runIds">
+                      <div mat-select-header>
+                        <div>
+                          <input class="dc-dropdown-search" placeholder="Search" />
+                        </div>
+                        <div>
+                          <mat-checkbox color="primary">Select All</mat-checkbox>
+                        </div>
+                      </div>
+                      <div class="dc-dropdown-options">
+                        <mat-option *ngFor="let item of FDContextList.runID" [value]="item">{{item}}</mat-option>
+                      </div>
+                      <div class="dc-dropdown-add">
+                        <input placeholder="Enter new item" />
+                        <mat-icon>add</mat-icon>
+                      </div>
+                    </mat-select>
+                  </mat-form-field>
+                </div> -->
+                <!-- <div fxFlex>
+                  <mat-form-field appearance="outline">
+                    <input matInput [matDatepicker]="picker" placeholder="Select a date" [(ngModel)]="row.startDate" (dateChange)="onStartDateChange($event, i)">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                  </mat-form-field>
+                </div> -->
+
+                <div fxFlex="60px" fxLayout="row" fxLayoutGap="8px">
+                  <mat-icon *ngIf="i > 0" class="material-symbols-outlined global-icon-button-grey"
+                    (click)="removeRow(i)">remove_circle</mat-icon>
+                  <mat-icon *ngIf="i === rows.length - 1" class="material-symbols-outlined global-icon-button-grey"
+                    (click)="addRow(i)">add_circle</mat-icon>
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center">
+                <div *ngIf="fdContextFinalPath">
+                  FD Context Path : {{fdContextFinalPath}}
+                </div>
+                <div fxFlex></div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="center center">
+                  <div>Lot Count: <span class="fw-bold">23</span></div>
+                  <div>Wafer Count: <span class="fw-bold">23</span></div>
+                  <button mat-stroked-button color="primary">Reset1</button>
+                  <button mat-flat-button color="primary" (click)="getProcessStepsFilterApply()">
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </mat-expansion-panel>
+        </mat-accordion>
+        <mat-accordion class="global-accordion" *ngIf="isSIGMADataCatalogue">
+          <mat-expansion-panel expanded="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>SIGMA</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div fxLayout="column" fxLayoutGap="8px">
+              <div fxLayout="row" fxLayoutGap="24px">
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div class="fw-bold">Use Probe</div>
+                <div><mat-slide-toggle color="primary" [(ngModel)]="uc3SigmaUseProbe" (change)="onUC3ToggleChange($event)"></mat-slide-toggle></div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div class="fw-bold">Wafer Level</div>
+                <div> <mat-slide-toggle color="primary" [(ngModel)]="isUc3WaferLevel" (change)="onUC3ToggleChange($event)"></mat-slide-toggle></div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div class="fw-bold">Point level</div>
+                <div><mat-slide-toggle color="primary" [(ngModel)]="isUc3SelectRegionLevel" (change)="onTogglePointLevel($event)"></mat-slide-toggle></div>
+              </div>
+              <div fxFlex="150px">
+                <mat-form-field appearance="outline" *ngIf="isUc3SelectRegionLevel">
+                  <mat-select multiple placeholder="Select" panelClass="Select region level"
+                    (selectionChange)="uc3SigmaMetroRegionsClicked()"
+                    [(ngModel)]="uc3SigmaMetroRegionsSelected">
+                    <div class="ps-1 border-bottom">
+                      <mat-checkbox color="primary" [(ngModel)]="isUc3SigmaMetroRegionsSelectAll"
+                        (change)="uc3SigmaMetroRegionsSelectAll($event)">Select All</mat-checkbox>
+                    </div>
+                    <mat-option *ngFor="let region of uc3SigmaMetroRegionsList"
+                      [value]="region">{{region}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div class="fw-bold">Lotid level</div>
+                <div><mat-slide-toggle color="primary" [(ngModel)]="isUc3SelectLotidLevel" (change)="onToggleLotidLevel($event)"></mat-slide-toggle></div>
+              </div> -->
+              </div>
+                 
+
+              <div fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start start">
+                <div fxFlex fxLayout="column" fxLayoutGap="4px">
+                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                    <div fxFlex>
+                      <div class="fw-bold">Metro Steps</div>
+                    </div>
+                    <div fxFlex="120px">
+                      <div fxLayout="row" fxLayoutAlign="start start">
+                        <div class="fw-bold">Common Test IDs</div>
+                        <div *ngIf="isUC3SigmaCommonIdsBeforeApi"><mat-spinner diameter="14"></mat-spinner></div>
+                      </div>
+                    </div>
+                    <!-- <div fxFlex="60px">&nbsp;</div> -->
+                  </div>
+                  <div fxLayout="row" fxLayoutGap="8px" *ngFor="let rows of metro_rows; let i = index"
+                    fxLayoutAlign="start center">
+                    <div fxFlex>
+                      <div class="multiple-select-container">
+                        <mat-form-field appearance="outline" (click)="uc3SigmaMetroStepsClick(i)">
+                          <mat-select multiple placeholder="Select" #uc3MetroSteps panelClass="data-catalog-select"
+                            (selectionChange)="uc3SigmaMetroStepsOptionsClicked(i)"
+                            [(ngModel)]="uc3SigmaMetroStepsSelected[i]" (closed)="searchUc3SigmaMetroSteps = ''">
+                            <div mat-select-header>
+                              <div>
+                                <input class="dc-dropdown-search" placeholder="Search"
+                                  [(ngModel)]="searchUc3SigmaMetroSteps" (keydown)="$event.stopPropagation()" />
+                              </div>
+                              <div>
+                                <mat-checkbox color="primary" [(ngModel)]="isUc3SigmaMetroSelectAll[i]"
+                                  (change)="uc3SigmaMetroStepsSelectAll($event,i)">Select All</mat-checkbox>
+                              </div>
+                            </div>
+                            <div class="dc-dropdown-options">
+                              <mat-option (click)="uc3MetroSteps.open()"
+                                *ngFor="let item of filtereduc3SigmaMetroStepPrefixList"
+                                [value]="item.split(' ')[0]">{{item}}</mat-option>
+                            </div>
+                            <div fxFlex="none">
+                              <mat-form-field appearance="outline">
+                                <input matInput placeholder="Add Input Value" [(ngModel)]="uc3SigmaMetroStepsAddNew"
+                                  (keydown)="blockMatSelectSpace($event)" />
+                                <div matSuffix fxLayout="row" fxLayoutGap="4px" class="pe-1">
+                                  <mat-icon class="global-icon-button-grey"
+                                    (click)="addNewMetroStepsInput(i)">check</mat-icon>
+                                  <mat-icon class="global-icon-button-grey"
+                                    (click)="clearMetroStepsInput()">clear</mat-icon>
+                                </div>
+                              </mat-form-field>
+                            </div>
+                            <div class="p-2 text-end">
+                              <button mat-flat-button color="primary"
+                                (click)="uc3MetroSteps.close(); saveMetroSteps(i)">
+                                Submit
+                              </button>
+                            </div>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                    <div fxFlex="120px" fxLayout="column" fxLayoutGap="4px">
+                      <button mat-stroked-button color="primary" (click)="sigmaCommonTestIds(i)"
+                        (closePanelClicked)="onCloseTravelerStepsModal()">Select</button>
+                    </div>
+                    <!-- <div fxFlex="60px" fxLayout="row" fxLayoutGap="8px">
+                      <mat-icon *ngIf="i > 0" class="material-symbols-outlined global-icon-button-grey"
+                        (click)="removeMetroStepsRow(i)">remove_circle</mat-icon>
+                      <mat-icon *ngIf="i === metro_rows.length - 1"
+                        class="material-symbols-outlined global-icon-button-grey"
+                        (click)="addMetroStepsRow()">add_circle</mat-icon>
+                    </div> -->
+                  </div>
+                </div>
+                <div fxFlex="none" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start start">
+                  <div fxFlex="120px">
+                    <div class="fw-bold pb-1">Padding Days</div>
+                    <mat-form-field appearance="outline">
+                      <input type="number" matInput placeholder="Enter days" [(ngModel)]="uc3PaddingDays"
+                        (input)="uc3PaddingDaysChange($event)" />
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="none">
+                    <div class="fw-bold pb-1">Integration of back of wafer measurement
+                    </div>
+                    <div class="pt-3" style="height: 44px;">
+                      <mat-slide-toggle color="primary" [(ngModel)]="isUc3integrateWafer" (change)="onUC3ToggleChange($event)"></mat-slide-toggle>
+                    </div>
+                  </div>
+                  <!-- <div fxFlex="none">
+                    <div class="fw-bold pb-1">Wafer Level</div>
+                    <div class="pt-3" style="height: 44px;">
+                      <mat-slide-toggle color="primary" [(ngModel)]="isUc3WaferLevel" (change)="onUC3ToggleChange($event)"></mat-slide-toggle>
+                    </div>
+                  </div>
+                  <div fxFlex="none">
+                    <div class="fw-bold pb-1">Point Level</div>
+                    <div fxLayout="row" fxLayoutGap="16px" style="height: 44px;">
+                      <div fxFlex="none" class="pt-3">
+                        <mat-slide-toggle color="primary" [(ngModel)]="isUc3SelectRegionLevel" (change)="onTogglePointLevel($event)"></mat-slide-toggle>
+                      </div>
+                      <div fxFlex="150px">
+                        <mat-form-field appearance="outline" *ngIf="isUc3SelectRegionLevel">
+                          <mat-select multiple placeholder="Select" panelClass="Select region level"
+                            (selectionChange)="uc3SigmaMetroRegionsClicked()"
+                            [(ngModel)]="uc3SigmaMetroRegionsSelected">
+                            <div class="ps-1 border-bottom">
+                              <mat-checkbox color="primary" [(ngModel)]="isUc3SigmaMetroRegionsSelectAll"
+                                (change)="uc3SigmaMetroRegionsSelectAll($event)">Select All</mat-checkbox>
+                            </div>
+                            <mat-option *ngFor="let region of uc3SigmaMetroRegionsList"
+                              [value]="region">{{region}}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                <div fxFlex>
+                  <div *ngIf="isUC3SigmaResultPath || isuc3SigmaResultFailed">
+                    <strong>UC3 Sigma Path : </strong>{{ isUC3SigmaResultPath ? uc3SigmaResultPath : 'FAILED' }}
+                  </div>
+                </div>
+                <div fxFlex="none" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                  <button mat-stroked-button color="primary" (click)="uc3SigmaSave()">Save</button>
+                  <button mat-stroked-button color="primary" (click)="UC2DataSourceDataPreview('Sigma','uc3')" [disabled]="!isUC3SigmaResultPath">Sigma Data
+                    Preview</button>
+                  <button mat-stroked-button color="primary" (click)="uc3SigmaReset()">Reset</button>
+                  <button mat-flat-button color="primary" (click)="uc3SigmaDownload()">
+                    Download
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+    <div fxLayout="column">
+      <!-- <div class="middle-center">
+        <mat-spinner [diameter]="50" class="table-spinner" *ngIf="tableSpinner"></mat-spinner>
+    </div> -->
+      <div fxFlex="none" fxLayout="row" fxLayoutAlign="end center">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <div *ngIf="colWiseValues.length > 0">
+            {{ clickedRows.size }} Selected |
+            <a class="fw-bold" style="cursor: pointer" (click)="selectAllRows()">{{
+              this.totalCount == this.clickedRows.size
+              ? "Unselect All"
+              : "Select All"
+              }}</a>
+            <span *ngIf="displayClear()">
+              |
+              <a class="fw-bold" style="cursor: pointer" (click)="unselectAllRows()">Unselect All</a></span>
+          </div>
+          <div *ngIf="colWiseValues.length > 0">
+            <mat-paginator [length]="totalCount" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
+              (page)="onPageChange($event)" aria-label="Select page">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+      <div fxLayout="column" fxLayoutAlign="center center" *ngIf="isLoading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+      <div fxFlex="300px" class="y-auto" style="z-index: auto" *ngIf="flag === 1 && colWiseValues.length > 0">
+        <table mat-table [dataSource]="tableData" *ngIf="colWiseValues.length > 0">
+          <ng-container [matColumnDef]="column['colName']" *ngFor="let column of colWiseValues">
+            <th mat-header-cell *matHeaderCellDef>
+              <div class="pb-1">{{ column["colName"] }}</div>
+              <!-- <div class="multiple-select-container mb-2">
+              <mat-form-field appearance="outline">
+                <mat-select
+                  placeholder="{{column['colName']}}"
+                  multiple
+                  [(ngModel)]="selectedItemsMap[column['colName']['selectedItems']]"
+                >
+                  <mat-checkbox
+                    [checked]="getAllSelected(column)"
+                    (change)="toggleSelectAll(column, $event.checked)"
+                  >
+                    Select All
+                  </mat-checkbox>
+                  <div>
+                    <div fxLayout="row">
+                  <input
+                        class="dc-dropdown-search"
+                        placeholder="Search"
+                        [(ngModel)]="searchQueries[column['colName']]"
+                      />
+                </div>                    
+                    <mat-option
+                      *ngFor="let option of getFilteredOptions(column)"
+                      [value]="option"
+                      (click)="onOptionClick(option, column)"
+                    >
+                      {{ option.item_text }}
+                    </mat-option>
+                  </div>
+                  <div class="p-2 text-end">
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      [disabled]="selectedTech == ''"
+                      (click)="matSelect2.close(); tableDropdownSubmit(column)"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </mat-select>
+              </mat-form-field>
+            </div> -->
+
+              <div style="width: auto" *ngIf="column['colName'] !== 'START_DATE'">
+                <ng-multiselect-dropdown class="table-multiselect" [placeholder]="'Select'"
+                  [settings]="columnFilterSettings" [data]="column['colValues']" [(ngModel)]="column['selectedItems']"
+                  (onSelect)="onColfilterSelect(column)" (onSelectAll)="onSelectAll(column)"
+                  (onDeSelectAll)="onDeSelectAll(column)" (onDeSelect)="onColfilterSelect(column)">
+                </ng-multiselect-dropdown>
+              </div>
+              <div *ngIf="column['colName'] === 'START_DATE'" style="padding-bottom: 17px">
+                <mat-form-field class="w-100" appearance="outline">
+                  <mat-date-range-input [max]="maxDate" [rangePicker]="picker">
+                    <input matStartDate placeholder="Start date" [(ngModel)]="filterStartDate" />
+                    <input matEndDate placeholder="End date" [(ngModel)]="filterEndDate"
+                      (dateChange)="filterEndChange(column)" />
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-date-range-picker #picker></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element[column["colName"]] }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row (click)="onRowClick(row)" [class.demo-row-is-clicked]="clickedRows.has(row['index'])"
+            *matRowDef="let row; columns: displayedColumns" [hidden]="tableDataLoading" [ngStyle]="{
+            'background-color': clickedRows.has(row['index']) ? '#f0f0f0' : '',
+            cursor: 'pointer',
+            'border-bottom': '1px solid #ddd'
+          }"></tr>
+        </table>
+        <div fxFlex *ngIf="tableDataLoading">
+          <mat-spinner [diameter]="24"></mat-spinner>
+        </div>
+      </div>
+      <div class="centered-info-message" *ngIf="isDataAvailable && !tableDataLoading">
+        No Data Available
+      </div>
+      <!-- <a class="card main-func visualise-button" *ngIf="clickedRows.size > 0" (click)="getCommonSensor()">
+        <span>View Sensors</span>
+    </a> -->
+    </div>
+  </div>
+</div>

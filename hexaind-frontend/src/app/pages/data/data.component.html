@@ -1,0 +1,331 @@
+<div class="h-100 p-8" fxLayout="column" fxLayoutGap="8px">
+  <div fxFlex="none">
+    <h1 class="global-main-title">{{ pageTitle }}
+      <mat-icon class="material-symbols-outlined global-info-icon"
+        matTooltip="This page is the repository for datasets and will serve as a central hub for project members to import, discover, manage, and collaborate on datasets.">
+        info
+      </mat-icon>
+    </h1>
+  </div>
+  <div fxFlex="none" fxLayout="row" fxLayoutAlign="space-between center" class="fixed-header">
+    <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign=" center" fxHide.lt-sm>
+      <div fxFlex="220px" fxFlex.lt-md="150px">
+        <mat-form-field appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput placeholder="Search" [(ngModel)]="searchText" (input)="onSearchTextChange($event)" />
+        </mat-form-field>
+      </div>
+      <div fxFlex="140px" fxHide.lt-lg>
+        <mat-form-field appearance="outline">
+          <mat-select placeholder="Owner">
+            <mat-option *ngFor="let dataset of dataset_owners"
+              [value]=" selectedValue ? dataset.user_id : 'Select Owner'" (click)="datasetOwner(dataset)">{{
+              dataset.user_name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxFlex="none">
+        <div class="global-icon-button" (click)="onToggleSort()">
+          <mat-icon>swap_vert</mat-icon>
+        </div>
+      </div>
+      <div fxFlex="none">
+        <div class="global-icon-button" (click)="onRefreshView()">
+          <mat-icon>cached</mat-icon>
+        </div>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+      <div *ngIf="assets.create || assets === 'server_admin'">
+        <button mat-flat-button color="primary" [matMenuTriggerFor]="importMenu">
+          <mat-icon class="material-symbols-outlined">upload</mat-icon>
+          Import
+        </button>
+      </div>
+    </div>
+  </div>
+  <div fxFlex class="y-auto">
+    <ng-container *ngIf="assetType === 'dataset'">
+      <div *ngIf="searchResults.length === 0 && isDataSetLoaded" class="global-nodata centered-info-message">
+        No datasets are present for this project
+      </div>
+      <table mat-table [dataSource]="datasetSource" *ngIf="searchResults.length != 0 && isDataSetLoaded" matSort
+        (matSortChange)="sortData($event)">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let element">
+            <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+              <div (click)="openDataPreviewDialog(element)" class="data-icon">
+                <svg viewBox="0 0 24 24" class="svg-icon">
+                  <use *ngIf="isCsvFile(element)" xlink:href="#icon-csv"></use>
+                  <use *ngIf="isParquetFile(element)" xlink:href="#icon-parquet"></use>
+                  <use *ngIf="isPythonFile(element)" xlink:href="#icon-python"></use>
+                  <use *ngIf="isJsonFile(element)" xlink:href="#icon-json"></use>
+                  <use *ngIf="isTextFile(element)" xlink:href="#icon-txt"></use>
+                  <use *ngIf="isImageFile(element)" xlink:href="#icon-image"></use>
+                  <use *ngIf="isPDFFile(element)" xlink:href="#icon-pdf"></use>
+                </svg>
+              </div>
+              <div fxFlex>{{ element.name }}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="global-type-chip">{{ element.type }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="size">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.size }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="created_by">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Owner</th>
+          <td mat-cell *matCellDef="let element">{{ element.created_by }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Created at <p>Local Time</p>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.created_at | date: "d-MMM-yyyy h:mm a" }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="last_modified">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Last Modified <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+              matTooltip="User's local time">info</mat-icon>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.last_modified | date: "d-MMM-yyyy h:mm a" }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="more_vert">
+          <th mat-header-cell *matHeaderCellDef width="40">&nbsp;</th>
+          <td mat-cell *matCellDef="let element">
+            <mat-icon [matMenuTriggerFor]="moreOptions" [matMenuTriggerData]="{ rowData: element }"
+              (click)="$event.stopPropagation()">more_vert</mat-icon>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row class="custom-mat-row" *matRowDef="let row; columns: displayedColumns"
+          (click)="openDataPreviewDialog(row)" [class.selected]="isWorkflowRowSelected(row)"></tr>
+      </table>
+    </ng-container>
+    <ng-container *ngIf="assetType === 'module'">
+      <table mat-table [dataSource]="searchModuleResults" matSort>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let element">
+            <div fxLayout="row" fxLayoutAlign=" center" fxLayoutGap="8px">
+              <div>
+                <img class="global-img-32" src="assets/python.png" />
+              </div>
+              <div fxFlex>{{ element.name }}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="global-type-chip">{{ element.module_type }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="size">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
+          <td mat-cell *matCellDef="let element"></td>
+        </ng-container>
+
+        <ng-container matColumnDef="owner">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Owner</th>
+          <td mat-cell *matCellDef="let element"></td>
+        </ng-container>
+
+        <ng-container matColumnDef="last_modified">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Last Modified <mat-icon class="material-symbols-outlined text-grey icon-20 ms-1"
+              matTooltip="User's local time">info</mat-icon>
+          </th>
+          <td mat-cell *matCellDef="let element"></td>
+        </ng-container>
+
+        <ng-container matColumnDef="more_vert">
+          <th mat-header-cell *matHeaderCellDef width="40">&nbsp;</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button [matMenuTriggerFor]="deleteConfirmation"
+              [matMenuTriggerData]="{ rowData: element }">
+              <mat-icon class="material-symbols-outlined">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="openDataPreviewDialog(row)"
+          [class.selected]="isWorkflowRowSelected(row)"></tr>
+      </table>
+    </ng-container>
+  </div>
+</div>
+<mat-menu #importMenu="matMenu" yPosition="below">
+  <div class="scrollable">
+    <!-- <p class="import-data-panel text-grey fw-bold">From connectors</p>
+    <button mat-menu-item (click)="openConnectorPopup('BIGQUERY')">
+      <div fxLayout="row">
+        <img src="assets/BigQuery.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">BigQuery</span>
+      </div>
+    </button> -->
+    <p class="import-data-panel text-grey fw-bold">From mounted drive</p>
+    <button mat-menu-item (click)="showMountedDriveDialog()">
+      <div fxLayout="row">
+        <img src="assets/disk_drive.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">Disk drive</span>
+      </div>
+    </button>
+    <p class="import-data-panel text-grey fw-bold">From local file</p>
+    <button mat-menu-item (click)="fileInputModule.click()">
+      <input #fileInputModule type="file" accept=".py" (change)="uploadModule($event, 'Python')"
+        style="display: none" />
+      <div fxLayout="row">
+        <img src="assets/python.png" alt="Python Module file" class="data-import-icons" />
+        <span class="import-data-sources">Python</span>
+      </div>
+    </button>
+    <button mat-menu-item (click)="fileInputCSV.click()">
+      <input #fileInputCSV type="file" accept=".csv" (change)="uploadFile($event, 'CSV')" style="display: none" />
+      <div fxLayout="row">
+        <img src="assets/CSV_file.png" alt="CSV file" class="data-import-icons" />
+        <span class="import-data-sources">CSV</span>
+      </div>
+    </button>
+    <button mat-menu-item (click)="fileInputParquet.click()">
+      <input #fileInputParquet type="file" accept=".parquet" (change)="uploadFile($event, 'PARQUET')"
+        style="display: none" />
+      <div fxLayout="row">
+        <img src="assets/parquet.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">Parquet</span>
+      </div>
+    </button>
+    <button mat-menu-item (click)="fileInputjSON.click()">
+      <input #fileInputjSON type="file" accept=".json" (change)="uploadFile($event, 'JSON')" style="display: none" />
+      <div fxLayout="row">
+        <img src="assets/json.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">JSON</span>
+      </div>
+    </button>
+    <button mat-menu-item (click)="fileInputText.click()">
+      <input #fileInputText type="file" accept=".txt" (change)="uploadFile($event, 'TEXT')" style="display: none" />
+      <div fxLayout="row">
+        <img src="assets/txtIcon.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">Text</span>
+      </div>
+    </button>
+    <!-- <button mat-menu-item [matMenuTriggerFor]="importSubMenu">
+      <div fxLayout="row">
+        <img src="assets/image.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">Image</span>
+      </div>
+    </button>
+    <button mat-menu-item [matMenuTriggerFor]="importSubMenu">
+      <div fxLayout="row">
+        <img src="assets/pdf.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">PDF</span>
+      </div>
+    </button>
+    <button mat-menu-item>
+      <div fxLayout="row">
+        <img src="assets/upload_file.png" alt="PNG file" class="data-import-icons" />
+        <span class="import-data-sources">Upload files</span>
+      </div>
+    </button> -->
+  </div>
+</mat-menu>
+
+<mat-menu #deleteConfirmation="matMenu" xPosition="before" class="global-menu">
+  <ng-template matMenuContent let-rowData="rowData">
+    <div mat-menu-item class="header">Are You Sure?</div>
+    <button mat-menu-item (click)="deleteData(rowData)">
+      <mat-icon>check</mat-icon> Yes
+    </button>
+    <button mat-menu-item><mat-icon>close</mat-icon> No</button>
+  </ng-template>
+</mat-menu>
+
+<mat-menu #importSubMenu="matMenu" yPosition="below">
+  <button mat-menu-item>
+    <div fxLayout="row">
+      <img src="assets/files_black.png" alt="PNG file" class="data-import-icons" />
+      <span class="import-data-sources">File(s)</span>
+    </div>
+  </button>
+  <button mat-menu-item>
+    <div fxLayout="row">
+      <img src="assets/folder.png" alt="PNG file" class="data-import-icons" />
+      <span class="import-data-sources">Folder</span>
+    </div>
+  </button>
+</mat-menu>
+
+<mat-menu #moreOptions="matMenu" xPosition="before" class="global-menu">
+  <ng-template matMenuContent let-rowData="rowData">
+    <div *ngIf="!showDeleteConfirmation">
+      <button mat-menu-item (click)="openDatasetDownload(rowData)"
+        *ngIf="assets.update == true || assets == 'server_admin'">
+        <mat-icon class="material-symbols-outlined">download</mat-icon>
+        <span>Download</span>
+      </button>
+      <button mat-menu-item (click)="openDatasetRenameDialog(rowData)"
+        *ngIf="assets.update == true || assets == 'server_admin'">
+        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <span>Rename</span>
+      </button>
+      <button mat-menu-item (click)="openDataPreviewDialog(rowData)" *ngIf="
+          (assets.read || assets === 'server_admin') &&
+          rowData.module_type !== 'PYTHON'
+        ">
+        <mat-icon>visibility</mat-icon>
+        <span>Preview</span>
+      </button>
+      <button mat-menu-item (click)="displayPreviewMessage()" *ngIf="
+          (assets.read || assets === 'server_admin') &&
+          rowData.module_type === 'PYTHON'
+        ">
+        <!-- remove this after preview available for Python files-->
+        <mat-icon>visibility</mat-icon>
+        <span>Preview</span>
+      </button>
+      <button mat-menu-item (click)="showDeleteConfirmation = true; $event.stopPropagation()"
+        *ngIf="assets.delete == true || assets == 'server_admin'">
+        <mat-icon class="material-symbols-outlined">delete</mat-icon>
+        <span>Delete</span>
+      </button>
+      <button mat-menu-item *ngIf="rowData.dataset_location[0].extension === '.parquet'"
+        (click)="ConvertToCsv(rowData)">
+        <mat-icon class="material-symbols-outlined">move_group</mat-icon>
+        <span>Convert to csv</span>
+      </button>
+    </div>
+    <div *ngIf="showDeleteConfirmation">
+      <div mat-menu-item class="header">Are You Sure?</div>
+      <button mat-menu-item (click)="deleteData(rowData)">
+        <mat-icon>check</mat-icon> Yes
+      </button>
+      <button mat-menu-item (click)="showDeleteConfirmation = false; $event.stopPropagation()">
+        <mat-icon>close</mat-icon> No
+      </button>
+    </div>
+  </ng-template>
+</mat-menu>
+<app-notification #notification></app-notification>

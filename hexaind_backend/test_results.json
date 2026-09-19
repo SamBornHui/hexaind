@@ -1,0 +1,92 @@
+[
+  {
+    "test_file": "extra_trees",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/extra_trees/test_extra_trees.py ...                [100%]\n\n======================== 3 passed in 112.15s (0:01:52) ========================="
+  },
+  {
+    "test_file": "linear_regression",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/linear_regression/test_linear_regression.py ...    [100%]\n\n============================== 3 passed in 13.33s =============================="
+  },
+  {
+    "test_file": "mobo",
+    "environment": "hexaind3_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.0.2, pluggy-1.4.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.23.5, jaxtyping-0.2.25, mock-3.12.0, anyio-3.7.1, typeguard-2.13.3\nasyncio: mode=strict\ncollected 1 item\n\napp/tests/services/AI/mobo/test_mobo.py .                                [100%]\n\n============================== 1 passed in 16.84s =============================="
+  },
+  {
+    "test_file": "rescale",
+    "environment": "hexaind3_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.0.2, pluggy-1.4.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.23.5, jaxtyping-0.2.25, mock-3.12.0, anyio-3.7.1, typeguard-2.13.3\nasyncio: mode=strict\ncollected 2 items\n\napp/tests/services/AI/rescale/test_rescale.py ..                         [100%]\n\n============================== 2 passed in 16.35s =============================="
+  },
+  {
+    "test_file": "mpr",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/multi_polynomial_regression/test_mpr.py ...        [100%]\n\n============================== 3 passed in 21.31s =============================="
+  },
+  {
+    "test_file": "xgboost",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/xgboost/test_xgboost.py ...                        [100%]\n\n============================== 3 passed in 18.22s =============================="
+  },
+  {
+    "test_file": "nnfastai",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/nnfastai/test_nnfastai.py ...                      [100%]\n\n============================== 3 passed in 25.82s =============================="
+  },
+  {
+    "test_file": "nn_torch",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/nn_torch/test_nn_torch.py ...                      [100%]\n\n============================== 3 passed in 26.94s =============================="
+  },
+  {
+    "test_file": "active_learning",
+    "environment": "hexaind3_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.0.2, pluggy-1.4.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.23.5, jaxtyping-0.2.25, mock-3.12.0, anyio-3.7.1, typeguard-2.13.3\nasyncio: mode=strict\ncollected 1 item\n\napp/tests/services/AI/active_learning/test_active_learning.py .          [100%]\n\n============================== 1 passed in 24.73s =============================="
+  },
+  {
+    "test_file": "catboost",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/catboost/test_catboost.py ...                      [100%]\n\n============================== 3 passed in 50.70s =============================="
+  },
+  {
+    "test_file": "rf",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/randomforest/test_rf.py ...                        [100%]\n\n======================== 3 passed in 111.11s (0:01:51) ========================="
+  },
+  {
+    "test_file": "svm",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 4 items\n\napp/tests/services/AI/svm/test_svm.py ....                               [100%]\n\n============================== 4 passed in 27.52s =============================="
+  },
+  {
+    "test_file": "gpr",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/gpr/test_gpr.py ...                                [100%]\n\n============================== 3 passed in 15.12s =============================="
+  },
+  {
+    "test_file": "gpc",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/gaussian_process_cls/test_gpc.py ...               [100%]\n\n============================== 3 passed in 22.48s =============================="
+  },
+  {
+    "test_file": "knn",
+    "environment": "hexaind3_ml_environment",
+    "status": "PASS",
+    "output": "============================= test session starts ==============================\nplatform darwin -- Python 3.10.13, pytest-8.3.3, pluggy-1.5.0\nrootdir: /Users/msacbook/Desktop/hexaind3/hexaind_backend\nconfigfile: pyproject.toml\nplugins: asyncio-0.24.0, jaxtyping-0.2.19, typeguard-4.3.0, anyio-4.4.0, mock-3.14.0\nasyncio: mode=strict, default_loop_scope=None\ncollected 3 items\n\napp/tests/services/AI/k_nearest_neighbors/test_knn.py ...                [100%]\n\n============================== 3 passed in 13.42s =============================="
+  }
+]

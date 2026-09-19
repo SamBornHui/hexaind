@@ -1,0 +1,410 @@
+<div class="image-cleanup-container" fxLayout="row" fxLayoutGap="16px">
+  <div fxFlex="none" class="pe-4 border-right">
+    <app-image-left-nav *ngIf="foldersList.length > 0" [foldersList]="foldersList" class="h-100"
+      (headerClicked)="leftmenuFolderSelection($event)"
+      (contentClicked)="onContentClicked($event)"></app-image-left-nav>
+  </div>
+
+  <div *ngIf="loading ==true" fxFlex fxLayout="row" fxLayoutAlign="center center">
+    <mat-spinner diameter="24"></mat-spinner>
+  </div>
+
+  <div *ngIf="loading ==false" fxFlex fxLayout="row" fxLayoutGap="16px">
+    <!-- Show original image block -->
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="editModeType=='' && !showImagesPreview">
+      <div fxFlex fxLayout="column">
+        <div fxFlex class="global-image-container">
+          <img [src]="imageBlobs.originalImage" class="global-image-fit" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Show rotation image block -->
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="editModeType == 'rotation' && !showImagesPreview">
+      <div fxFlex fxLayout="column" class="p-relative">
+        <div fxFlex class="global-image-container" style="overflow: hidden; position: relative;">
+          <img [src]="imageBlobs.modifiedImage || imageBlobs.originalImage" class="global-image-fit" [ngStyle]="{
+            'transform': 'rotate(' + (rotation - appliedRotation) + 'deg) scale(' + zoomLevel + ')',
+            'transform-origin': 'center'
+          }" />
+        </div>
+
+        <!-- Zoom controls -->
+        <div class="zoom-controls">
+          <div class="mb-3">
+            <mat-icon (click)="zoomIn()" class="material-symbols-outlined global-icon-button-grey">zoom_in</mat-icon>
+          </div>
+          <div>
+            <mat-icon (click)="zoomOut()" class="material-symbols-outlined global-icon-button-grey">zoom_out</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show crop image block -->
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="editModeType=='crop' && !showImagesPreview">
+
+      <div fxFlex fxLayout="row" fxLayoutGap="16px">
+        <div fxFlex="50" fxLayout="column">
+          <div fxFlex="none" class="image-type-title">Original Image</div>
+          <div fxFlex class="p-relative">
+            <div class="global-image-fit source-image">
+              <image-cropper 
+                [imageURL]="imageBlobs.rotatedImage? imageBlobs.rotatedImage: imageBlobs.originalImage"
+                [maintainAspectRatio]="false" 
+                [containWithinAspectRatio]="false" 
+                [cropper]="cropObj['cropperPosition']"
+                (cropperReady)="cropperReady($event)" (imageCropped)="cropImageCropped($event)"
+                (imageLoaded)="cropImageloaded($event)">
+              </image-cropper>
+            </div>
+          </div>
+        </div>
+        <div fxFlex="50" fxLayout="column" *ngIf="cropObj['tempImage']!=''">
+          <div fxFlex="none" class="image-type-title">Cropped Image</div>
+          <div fxFlex class="p-relative">
+            <img loading="lazy"
+              [src]="this.cropObj['tempImage']?this.cropObj['tempImage'] : this.imageBlobs.modifiedImage"
+              class="global-image-fit float centered-h" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show image masking block -->
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="editModeType === 'mask' && !showImagesPreview">
+      <div fxFlex fxLayout="column">
+        <div fxFlex class="global-image-container" style="position: relative; overflow: hidden;">
+          <!-- <img #image [src]="imageBlobs.modifiedImage" class="global-image-fit" /> -->
+          <canvas #annotationCanvas style="max-width: 100%; max-height: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show scalebar image block -->
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="editModeType=='scalebar' && !showImagesPreview">
+      <div fxFlex fxLayout="column">
+        <div fxFlex="none" class="image-type-title">Original Image</div>
+        <div fxFlex class="source-image p-relative">
+          <image-cropper [imageURL]="imageBlobs.modifiedImage" [aspectRatio]="1 / 1" [maintainAspectRatio]="false"
+            [containWithinAspectRatio]="false" (imageCropped)="scalebarImageCropped($event)"
+            (imageLoaded)="scalebarImageloaded($event)"
+            [disabled]="!scalebarObj['activateReadScalebar'] || scalebarObj['scalebar_type']=='auto'" class="global-image-fit float centered-h"></image-cropper>
+        </div>
+      </div>
+      <div fxFlex fxLayout="column">
+        <div fxFlex="none" class="image-type-title">Scalebar Image</div>
+        <div fxFlex class="p-relative"
+          *ngIf="scalebarObj['scalebarImageOptions']['tempImage']!='' && scalebarObj['scalebar_type']=='manual' && this.scalebarObj['activateReadScalebar']">
+          <img loading="lazy" id="canvas_image" (load)="scaleBarDrawer()"
+            [src]="scalebarObj['scalebarImageOptions']['tempImage']" class="global-image-fit float centered-h" />
+          <canvas #scalecanvas class="scale_canvas" class="global-image-fit float centered-h"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show image preview block -->
+    <div fxFlex fxLayout="row" fxLayoutGap="16px" *ngIf="showImagesPreview">
+      <div fxFlex class="images-preview-container" *ngIf="checkIfFolderImages()">
+        <div fxLayout="row wrap" fxLayoutGap="12px grid">
+          <div fxFlex="none" *ngFor="let image of selectedFolder.img_details let imgIndex = index">
+            <div class="image-container">
+              <img 
+                [src]="image['displayImage']" 
+                class="thumbnail" 
+                (click)="imageFullView(image)" 
+                title="{{getImageName(image.image)}}">
+                <div class="mask-indicator" *ngIf="!hasMasked(image)" title="No mask"></div>
+                <div class="read-scale-indicator" *ngIf="!hasScalebar(image)" title="No scalebar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div [ngClass]="{ 'disabled-image-operation': loading }" fxFlex="280px" fxFlex.gt-md="320px" fxFlex.gt-lg="360px"
+    class="ps-4 border-left" fxLayout="column" fxLayoutGap="16px" *ngIf="!showImagesPreview">
+    <div fxFlex class="y-auto">
+      <mat-accordion togglePosition="before" class="global-accordion-alt">
+        <mat-expansion-panel (opened)="openPanel('rotation')" (closed)="closePanel('rotation')">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Rotate</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row" fxLayoutGap="16px">
+              <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                <div>
+                  <mat-icon class="global-icon-button-grey" matTooltip="Rotate Left"
+                    (click)="rotateLeft()">rotate_left</mat-icon>
+                </div>
+                <div>90°</div>
+              </div>
+              <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                <div>
+                  <mat-icon class="global-icon-button-grey" matTooltip="Rotate Right"
+                    (click)="rotateRight()">rotate_right</mat-icon>
+                </div>
+                <div>90°</div>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start center">
+              <div fxFlex>
+                <mat-slider min="0" max="360" (input)="updateAndValidateRotation($event)">
+                  <input matSliderThumb [(ngModel)]="sliderRotation" #slider />
+                </mat-slider>
+              </div>
+              <div fxFlex="60px">
+                <mat-form-field appearance="outline">
+                  <input matInput type="number" min="0" max="100" [(ngModel)]="sliderRotation"
+                    (blur)="handleFocusOut($event)" (input)="updateAndValidateRotation($event)" />
+                </mat-form-field>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <span>Selected Rotation Angle: {{ rotation }}°</span>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+              <mat-icon matTooltip="Reset" class="global-icon-button-grey" (click)="reset('rotate')">history</mat-icon>
+              <mat-icon matTooltip="Apply to Image" class="global-icon-button-grey"
+                (click)="applyRotation('single')">check</mat-icon>
+              <mat-icon matTooltip="Apply to All Images" class="global-icon-button-grey"
+                (click)="applyRotation('all')">done_all</mat-icon>
+            </div>
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel (opened)="openPanel('crop')" (closed)="closePanel('crop')">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Crop</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+              <div>
+                <mat-slide-toggle color="primary" [(ngModel)]="autoCrop"
+                  [disabled]="this.imageDetail['category'] === 'NA'" (change)="onToggleCropChange($event)">Auto
+                  Crop</mat-slide-toggle>
+              </div>
+              <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center"
+                (click)="changeCropImageType('manual')">
+                <div>
+                  <mat-icon class="global-icon-button-grey" [ngClass]="{
+                      'global-icon-button-grey': !autoCrop,
+                      'global-icon-button-primary': autoCrop
+                    }">crop</mat-icon>
+                </div>
+                <div>Manual</div>
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div fxFlex>Raw image (W x H / px)</div>
+              <div fxFlex="none" class="fw-bold">{{imageDetail.shape[1]}} x {{imageDetail.shape[0]}}</div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+              <div fxFlex>Cropped image (W x H / px)</div>
+              <div fxFlex="40px">
+                <input class="custom-input" value="{{ cropObj.croppedImageWidth }}" />
+              </div>
+              <div fxFlex="none">x</div>
+              <div fxFlex="40px">
+                <input class="custom-input" value="{{ cropObj.croppedImageHeight }}" />
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+              <mat-icon matTooltip="Reset" class="global-icon-button-grey" (click)="reset('crop')">history</mat-icon>
+              <mat-icon matTooltip="Apply to Image" class="global-icon-button-grey"
+                (click)="applyCrop('individual');">check</mat-icon>
+
+              <mat-icon matTooltip="Apply to All Images" class="global-icon-button-grey"
+                (click)="applyCrop('all');">done_all</mat-icon>
+            </div>
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel (opened)="openPanel('mask')" (closed)="closePanel('mask')">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Mask</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="column">
+              <div *ngIf="image_masking.length === 0" class="global-nodata centered-info-message">
+                Mask data not available
+              </div>
+              <div *ngFor="let mask of image_masking; let i = index" fxFlex="none" fxLayout="row" fxLayoutGap="4px"
+                fxLayoutAlign="start center" class="py-1 border-bottom">
+                <div fxFlex>
+                  <!-- Display Mode -->
+                  <ng-container *ngIf="currentEditMask !== mask">
+                    <!-- <span>{{ mask.mask_name }}</span> -->
+                    <mat-radio-group [(ngModel)]="selectedMask" (change)="updateSelectedMask(mask)">
+                      <mat-radio-button [value]="mask">
+                        {{mask.mask_name}}
+                      </mat-radio-button>
+                    </mat-radio-group>
+                  </ng-container>
+
+                  <!-- Edit Mode -->
+                  <div *ngIf="currentEditMask === mask">
+                    <mat-form-field appearance="outline">
+                      <input matInput [(ngModel)]="mask.mask_name" />
+                      <div fxLayout="row" fxLayoutGap="4px" class="pe-1" matSuffix>
+                        <mat-icon class="global-icon-button-grey" (click)="cancelEdit()">close</mat-icon>
+                        <mat-icon class="global-icon-button-grey" (click)="updateSelectedMaskName(mask.mask_name, i)"
+                          [ngClass]="{'disabled': mask.mask_name.trim() === originalName.trim() || mask.mask_name.trim() === ''}">check</mat-icon>
+                      </div>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div fxFlex="none">
+                  <mat-icon *ngIf="currentEditMask !== mask" class="material-symbols-outlined global-icon-button-grey"
+                    (click)="editMask(mask)">edit</mat-icon>
+                  <mat-icon class="material-symbols-outlined global-icon-button-grey" [matMenuTriggerFor]="deleteMask"
+                    (click)="MaskingObj = mask">delete</mat-icon>
+                </div>
+              </div>
+
+            </div>
+            <div *ngIf="image_masking.length > 0" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+              <mat-icon matTooltip="Reset" class="global-icon-button-grey" (click)="reset('mask')">history</mat-icon>
+              <mat-icon class="global-icon-button-grey" (click)="createImagesMasking()"
+                [ngClass]="{'disabled': !isMaskModified}" [disabled]="!isMaskModified">check</mat-icon>
+            </div>
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel (opened)="openPanel('scalebar')" (closed)="closePanel('scalebar')">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Read Scale</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+              <div>
+                <mat-slide-toggle color="primary" [checked]="(scalebarObj['scalebar_type']=='auto')"
+                  [disabled]="this.imageDetail['category'] === 'NA'"
+                  (change)="onToggleChange($event)">Auto</mat-slide-toggle>
+              </div>
+              <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign="start center">
+                <div (click)="readScalebar('manual')">
+                  <svg class="svg-icon global-icon-button-grey">
+                    <use xlink:href="#scale-bar"></use>
+                  </svg>
+                </div>
+                <div>Manual</div>
+              </div>
+              <!-- <div>
+                <mat-checkbox color="primary" checked>Snap</mat-checkbox>
+              </div> -->
+            </div>
+            <!-- <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div fxFlex>Scale start (X,Y)</div>
+              <div fxFlex="56px">
+                <input class="custom-input" value="900" />
+              </div>
+              <div fxFlex="56px">
+                <input class="custom-input" value="1000" />
+              </div>
+            </div>
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div fxFlex>Scale end (X,Y)</div>
+              <div fxFlex="56px">
+                <input class="custom-input" value="1200" />
+              </div>
+              <div fxFlex="56px">
+                <input class="custom-input" value="1000" />
+              </div>
+            </div> -->
+            <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <div fxFlex>Scale physical length</div>
+              <div fxFlex="56px">
+                <input class="custom-input" [(ngModel)]="scalebarObj['scalebarByPhysical']"
+                  [disabled]="(scalebarObj['scalebarByImageTemp']==undefined || scalebarObj['scalebarByImageTemp']=='') && (scalebarObj['scalebarByImage']==undefined || scalebarObj['scalebarByImage']=='')" />
+              </div>
+              <div fxFlex="56px">
+                <mat-select class="custom-input" [(ngModel)]="scalebarObj['scalebarByPhysicalUnit']"
+                  [disabled]="(scalebarObj['scalebarByImageTemp']==undefined || scalebarObj['scalebarByImageTemp']=='') && (scalebarObj['scalebarByImage']==undefined || scalebarObj['scalebarByImage']=='')">
+                  <mat-option *ngFor="let unit of unitValues;" [value]="unit.unit">
+                    {{unit.unit}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="fw-bold" *ngIf="getResultScaleValue()!=''">
+              Scale = {{getResultScaleValue()}}
+            </div>
+            <div fxLayout="row" fxLayoutAlign="space-between center">
+              <div>
+                <mat-checkbox color="primary" [(ngModel)]="applyAllImageScale">
+                  <span class="text-sm">Apply to all images in folder</span>
+                </mat-checkbox>
+              </div>
+              <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="end center">
+                <!-- <mat-icon class="global-icon-button-grey">close</mat-icon> -->
+                <mat-icon class="global-icon-button-grey" matTooltip="Apply scalebar"
+                  (click)="applyScalebar()">check</mat-icon>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+    <!-- <div fxFlex="200px" fxLayout="column">
+      <div fxFlex="none" class="fw-bold pb-2 border-bottom">
+        Material Metadata
+      </div>
+      <div fxFlex class="y-auto">
+        <table class="material-metadata-table">
+          <tbody>
+            <tr>
+              <td class="fw-bold">Materials</td>
+              <td>Ni-based Super alloy</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Temperature_(C)</td>
+              <td>850</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Time_(h)</td>
+              <td>2258</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Rupture stress_(MPa)</td>
+              <td>260</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Fraction</td>
+              <td>0.585</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">No_of_objects</td>
+              <td>269</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Average_object_area_(px)</td>
+              <td>2278.457</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Min_object_area_(px)</td>
+              <td>225</td>
+            </tr>
+            <tr>
+              <td class="fw-bold">Max_object_area_(px)</td>
+              <td>23317</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div> -->
+  </div>
+  <!-- <app-images-preview fxFlex *ngIf="showImagesPreview"></app-images-preview> -->
+</div>
+<!-- <div fxLayout="row" fxLayoutAlign="end center">
+  <button mat-flat-button color="primary">Save</button>
+</div> -->
+
+<mat-menu #deleteMask="matMenu" class="global-menu">
+  <div mat-menu-item class="header">Are You Sure?</div>
+  <button mat-menu-item (click)="confirmDelete(MaskingObj)">
+    <mat-icon class="material-symbols-outlined">check</mat-icon> Yes
+  </button>
+  <button mat-menu-item (click)="cancelDelete()">
+    <mat-icon class="material-symbols-outlined">close</mat-icon> No
+  </button>
+</mat-menu>

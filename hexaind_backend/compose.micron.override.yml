@@ -1,0 +1,21 @@
+services:
+  micron_setup:
+    user: 0:0
+    volumes:
+      - hexaind-data:${TDAM_SHARED_PATH}
+  micron_apis:
+    deploy:
+      replicas: 1
+    environment:
+      - DEV_MODE=True
+    user: 0:0
+    volumes:
+      - hexaind-data:${TDAM_SHARED_PATH}
+  micron_action_worker:
+    deploy:
+      replicas: 1
+    environment:
+      - DEV_MODE=True
+    user: 0:0
+    volumes:
+      - hexaind-data:${TDAM_SHARED_PATH}

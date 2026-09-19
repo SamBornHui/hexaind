@@ -1,0 +1,119 @@
+<div fxLayout="column" class="h-100">
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 border-bottom"
+  >
+    <div>
+      <h1>Save as workflow template</h1>
+    </div>
+    <div>
+      <button mat-icon-button (click)="onClosePanel()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div fxFlex="none" fxLayout="column" fxLayoutGap="16px" class="p-6">
+    <!-- <img [src]="data.screenshot"> -->
+    <div>
+      <div
+        fxLayout="row"
+        fxLayoutGap="4px"
+        fxLayoutAlign="start center"
+        class="mb-1"
+      >
+        <div class="fw-bold">Name</div>
+        <div>
+          <mat-icon
+            class="material-symbols-outlined global-info-icon"
+            matTooltip="The name of the workflow."
+            >info</mat-icon
+          >
+        </div>
+      </div>
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          id="name"
+          name="newWorkflowName"
+          required
+          [(ngModel)]="workflowTemplateName"
+          placeholder="Enter name"
+          (ngModelChange)="validate()"
+        />
+        <mat-error *ngIf="workflowSessionNameError">
+          {{ workflowSessionNameError }}
+        </mat-error>
+      </mat-form-field>
+      <mat-error *ngIf="workflowSessionNameExistsError">
+        {{ workflowSessionNameExistsError }}
+      </mat-error>
+    </div>
+    <div>
+      <div
+        fxLayout="row"
+        fxLayoutGap="4px"
+        fxLayoutAlign="start center"
+        class="mb-1"
+      >
+        <div class="fw-bold">Description</div>
+        <div>
+          <mat-icon
+            class="material-symbols-outlined global-info-icon"
+            matTooltip="The description of the workflow."
+            >info</mat-icon
+          >
+        </div>
+      </div>
+      <mat-form-field appearance="outline">
+        <textarea
+          matInput
+          rows="5"
+          required
+          [(ngModel)]="workflowTemplateDescription"
+          placeholder="Enter description"
+          (ngModelChange)="validate()"
+        ></textarea>
+        <mat-error *ngIf="workflowSessionDescriptionError">
+          {{ workflowSessionDescriptionError }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <ng-container *ngIf="workflowSessionOwnerError">
+      <div class="text-red">{{ workflowSessionOwnerError }}</div>
+    </ng-container>
+  </div>
+  <div
+    fxFlex="none"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="p-6 pt-0"
+  >
+    <div>
+      <ng-container *ngIf="isCreatingWorkflowSession">
+        <mat-spinner diameter="24"></mat-spinner>
+      </ng-container>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+      <button
+        mat-stroked-button
+        color="primary"
+        id="closeButton"
+        [disabled]="isCreatingWorkflowSession"
+        (click)="onClosePanel()"
+      >
+        Cancel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        id="createButton"
+        [disabled]="disableSubmit"
+        (click)="onCreateWorkflowTemplate()"
+      >
+        Create
+      </button>
+    </div>
+  </div>
+</div>

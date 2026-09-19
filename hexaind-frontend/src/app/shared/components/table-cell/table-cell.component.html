@@ -1,0 +1,33 @@
+<div class="mst-table-cell__tree-arrow" *ngIf="column._hasTreeArrow">
+  <mst-tree-item
+    [item]="item"
+    [index]="rowIndex"
+    [keyField]="keyField"
+    nameField=""
+    (arrowClick)="onArrowClick($event)"
+  />
+</div>
+<div *ngIf="!editing" class="mst-table-cell__content mst-shared-truncate">
+  <div class="mst-table-cell__content__checkbox" *ngIf="column._hasCheckbox">
+    <mst-input type="checkbox" [value]="selectedRow" />
+  </div>
+  <ng-container *ngIf="column.template">
+    <ng-container
+      *ngTemplateOutlet="
+        column.template;
+        context: { column, columns, columnIndex, rowIndex, item }
+      "
+    ></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!column.template && column.field">{{
+    item[column.field]
+  }}</ng-container>
+</div>
+<mst-input
+  *ngIf="editing"
+  [type]="column.editorInfo?.type || 'text'"
+  [value]="item[column.field || '']"
+  (change)="onEdit($event)"
+  (blur)="onBlur()"
+  (keyDown)="onKeyDown($event)"
+/>

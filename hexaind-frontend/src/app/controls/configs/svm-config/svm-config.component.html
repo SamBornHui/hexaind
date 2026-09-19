@@ -1,0 +1,468 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="widgetdataInformation"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-select [ngModel]="getSelectedInputWidget()" (ngModelChange)="setSelectedInputWidget($event)"
+                  name="inputWidgetSelector" placeholder="Select input">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton1" [disabled]="!inputChangeMade"
+            (click)="onInputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="saveButton" [disabled]="!inputChangeMade" (click)="onInputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output" [(ngModel)]="widgetOutput"
+                  (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutGap="10px">
+            <div fxFlex="50" fxFlex.lt-lg="100">
+              <div class="fw-bold pb-1">Select Output 2</div>
+              <mat-form-field appearance="outline">
+                <input matInput type="string" placeholder="Select output2" [(ngModel)]="widgetOutput2"
+                  (ngModelChange)="widgetOutput2 = $event; outputChangeMade = true;" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton2" [disabled]="!outputChangeMade"
+            (click)="onOutputCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton2" [disabled]="!outputChangeMade"
+            (click)="onOutputSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="100" fxFlex.lt-lg="100">
+              <div fxLayout="row" fxLayoutAlign="space-between center" class="p-4">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                  <div class="fw-bold">Problem Type</div>
+                  <mat-icon class="material-symbols-outlined text-grey" matTooltip="Problem Type">info</mat-icon>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="24px" *ngIf="configCache">
+                  <mat-radio-group [(ngModel)]="configCache.problem_type" (ngModelChange)="onProblemTypeChange($event)">
+                    <mat-radio-button color="primary" value="regression">
+                      Regression
+                    </mat-radio-button>
+                    <mat-radio-button color="primary" value="classification">
+                      Classification
+                    </mat-radio-button>
+                  </mat-radio-group>
+                </div>
+              </div>
+              <mat-accordion class="global-accordion">
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>Features List</mat-panel-title>
+                  </mat-expansion-panel-header>
+
+                  <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="space-between center">
+                    <div fxLayout="row" fxLayoutGap="8px">
+                      <div fxFlex="none" class="fw-bold border-bottom pb-1">
+                        NUMERICAL
+                      </div>
+                    </div>
+                    <div fxLayout="row" fxLayoutGap="25px" fxLayoutAlign="end center">
+                      <mat-slide-toggle [(ngModel)]="isScientificNotationEnabled" color="primary">
+                        Scientific Notation
+                      </mat-slide-toggle>
+                      <div *ngIf="numericalDataSource.length > 0">
+                        <mat-form-field appearance="outline">
+                          <mat-icon matPrefix>search</mat-icon>
+                          <input matInput [(ngModel)]="numFeatureSearch" placeholder="Search columns"
+                            (keyup)="onsearchFeaureInput('numerical')" />
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="global-nodata" *ngIf="numericalDataSource.length === 0">
+                    No numerical features exists.
+                  </div>
+                  <div class="y-auto" style="max-height: 470px" *ngIf="numericalDataSource.length > 0">
+                    <table mat-table [dataSource]="numericalDataSource | featureNameSearch:numFeatureSearch">
+                      <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>Feature name</th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.name }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="input">
+                        <th mat-header-cell *matHeaderCellDef width="80" class="numerical-select-all">
+                          <label>
+                            <mat-checkbox [(ngModel)]="allInputChecked" (change)="toggleAllCheckbox($event)"
+                              matTooltip="Select All">
+                            </mat-checkbox>
+                            Input
+                          </label>
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <mat-checkbox [(ngModel)]="elementData.inputChecked"
+                            (change)="toggleCheckbox(elementData, 'input')">
+                          </mat-checkbox>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="output">
+                        <th mat-header-cell *matHeaderCellDef width="80">
+                          Output
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <mat-checkbox [(ngModel)]="elementData.outputChecked"
+                            (change)="toggleCheckbox(elementData, 'output')" [disabled]="
+                              configCache?.problem_type == 'classification'
+                            ">
+                          </mat-checkbox>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="count">
+                        <th mat-header-cell *matHeaderCellDef width="80">
+                          Count
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.count }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="std">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Std
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <span [innerHTML]="elementData.std | scientificNumber:isScientificNotationEnabled"></span>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="mean">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Mean
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <span [innerHTML]="elementData.mean | scientificNumber:isScientificNotationEnabled"></span>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="min">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Min
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <span [innerHTML]="elementData.min | scientificNumber:isScientificNotationEnabled"></span>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="max">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Max
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <span [innerHTML]="elementData.max | scientificNumber:isScientificNotationEnabled"></span>
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="numericalDisplayedColumns sticky: true"></tr>
+                      <tr mat-row *matRowDef="let row; columns: numericalDisplayedColumns"></tr>
+                    </table>
+                  </div>
+
+                  <div fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-between center">
+                    <div fxLayout="row" fxLayoutGap="8px">
+                      <div fxFlex="none" class="fw-bold border-bottom pb-1">
+                        CATEGORICAL
+                      </div>
+                    </div>
+                    <div *ngIf="categoricalDataSource.length > 0">
+                      <mat-form-field appearance="outline">
+                        <mat-icon matPrefix>search</mat-icon>
+                        <input matInput [(ngModel)]="catFeatureSearch" placeholder="Search columns"
+                          (keyup)="onsearchFeaureInput('categorical')" />
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div class="global-nodata" *ngIf="categoricalDataSource.length === 0">
+                    No categorical features exists.
+                  </div>
+
+                  <div class="y-auto" style="max-height: 470px" *ngIf="categoricalDataSource.length > 0">
+                    <table mat-table [dataSource]="categoricalDataSource | featureNameSearch:catFeatureSearch">
+                      <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>Feature name</th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.name }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="input">
+                        <th mat-header-cell *matHeaderCellDef width="80" class="numerical-select-all">
+                          <label>
+                            <mat-checkbox [(ngModel)]="allCatInputChecked"
+                              (change)="toggleAllCheckboxCategorical($event)" matTooltip="Select All Categorical">
+                            </mat-checkbox>
+                            Input
+                          </label>
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <mat-checkbox [(ngModel)]="elementData.inputChecked"
+                            (change)="toggleCheckbox(elementData, 'input')">
+                          </mat-checkbox>
+                        </td>
+                      </ng-container>
+
+                      <ng-container *ngIf="configCache?.output_cols" matColumnDef="output">
+                        <th mat-header-cell *matHeaderCellDef width="80">
+                          Output
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          <mat-checkbox [(ngModel)]="elementData.outputChecked"
+                            (change)="toggleCheckbox(elementData, 'output')" [disabled]="categoricalOutputColumn()">
+                          </mat-checkbox>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="count">
+                        <th mat-header-cell *matHeaderCellDef width="80">
+                          Count
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.count }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="unique">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Unique
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.unique }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="top">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Top
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.top }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="freq">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Freq
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.freq }}
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="missing">
+                        <th mat-header-cell *matHeaderCellDef width="120">
+                          Missing
+                        </th>
+                        <td mat-cell *matCellDef="let elementData">
+                          {{ elementData.missing }}
+                        </td>
+                      </ng-container>
+
+                      <tr mat-header-row *matHeaderRowDef="
+                          categoricalDisplayedColumns;
+                          sticky: true
+                        "></tr>
+                      <tr mat-row *matRowDef="
+                          let row;
+                          columns: categoricalDisplayedColumns
+                        "></tr>
+                    </table>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+              <div fxLayout="column" fxLayoutGap="8px" class="bg-surface rounded-1 p-4 mt-4">
+                <div class="fw-bold">Selected Features</div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+                  <div fxFlex="100px">Inputs ({{configCache?.input_cols?.length}}):</div>
+                  <div fxFlex fxLayout="row wrap" fxLayoutGap="4px grid" class="text-sm">
+                    <div fxFlex="none" *ngFor="let input of configCache?.input_cols">
+                      <div class="global-type-chip primary">{{input}}</div>
+                    </div>
+                  </div>
+                </div>
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start start">
+                  <div fxFlex="100px">Outputs ({{ getOutputLength() }}):</div>
+                  <div fxFlex fxLayout="row wrap" fxLayoutGap="4px grid" class="text-sm">
+                    <div fxFlex="none" *ngFor="let output of configCache?.output_cols">
+                      <div class="global-type-chip primary">{{output}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4">
+                <div *ngIf="
+                    configCache && configCache.problem_type === 'classification'
+                  " fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <div class="fw-bold">Sampling</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Sampling">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="24px" *ngIf="configCache">
+                    <mat-radio-group [(ngModel)]="configCache.sampling"
+                      (ngModelChange)="ontoggleSamplingChange($event)">
+                      <mat-radio-button color="primary" value="smote">Over Sampling</mat-radio-button>
+                      <mat-radio-button color="primary" value="randomus">Under Sampling</mat-radio-button>
+                      <mat-radio-button color="primary" value="none">None</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+
+                <!-- Kernel Selection Section -->
+                <div fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <div class="fw-bold">Kernel Type</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Kernel Type">info</mat-icon>
+                  </div>
+                  <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="24px" *ngIf="configCache">
+                    <mat-radio-group [(ngModel)]="configCache.kernel" (ngModelChange)="onKernelChange($event)">
+                      <mat-radio-button color="primary" value="linear">Linear</mat-radio-button>
+                      <mat-radio-button color="primary" value="rbf">RBF</mat-radio-button>
+                      <mat-radio-button color="primary" value="poly">Polynomial</mat-radio-button>
+                      <mat-radio-button color="primary" value="sigmoid">Sigmoid</mat-radio-button>
+                    </mat-radio-group>
+                  </div>
+                </div>
+
+                <!-- C Parameter Section -->
+                <div *ngIf="configCache" fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <div class="fw-bold">C (Regularization)</div>
+                    <mat-icon class="material-symbols-outlined text-grey"
+                      matTooltip="C (Regularization)">info</mat-icon>
+                  </div>
+                  <div fxLayout="40px">
+                    <mat-form-field appearance="outline">
+                      <input matInput type="number" min="0.001" [(ngModel)]="configCache.C" (input)="inputChange()" />
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Gamma Parameter Section -->
+                <div *ngIf="
+                    configCache &&
+                    (configCache.kernel === 'rbf' ||
+                      configCache.kernel === 'poly' ||
+                      configCache.kernel === 'sigmoid')
+                  " fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <div class="fw-bold">Gamma</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Gamma">info</mat-icon>
+                  </div>
+                  <div fxLayout="40px">
+                    <mat-form-field appearance="outline">
+                      <input matInput type="number" min="0.0001" [(ngModel)]="configCache.gamma"
+                        (input)="inputChange()" />
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Coef0 Parameter Section -->
+                <div *ngIf="
+                    configCache &&
+                    (configCache.kernel === 'poly' ||
+                      configCache.kernel === 'sigmoid')
+                  " fxLayout="row" fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <div class="fw-bold">Coef0</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Coef0">info</mat-icon>
+                  </div>
+                  <div fxLayout="40px">
+                    <mat-form-field appearance="outline">
+                      <input matInput type="number" min="0" [(ngModel)]="configCache.coef0" (input)="inputChange()" />
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Degree Parameter Section -->
+                <div *ngIf="configCache && configCache.kernel === 'poly'" fxLayout="row"
+                  fxLayoutAlign="space-between center" class="border-bottom py-2">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <div class="fw-bold">Degree</div>
+                    <mat-icon class="material-symbols-outlined text-grey" matTooltip="Degree">info</mat-icon>
+                  </div>
+                  <div fxLayout="40px">
+                    <mat-form-field appearance="outline">
+                      <input matInput type="number" min="1" [(ngModel)]="configCache.degree" (input)="inputChange()" />
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeMade" (click)="onCancel()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeMade" (click)="onSave()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+        <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+          <button mat-stroked-button color="primary" id="closeButton3" [disabled]="!changeSetting"
+            (click)="onCancelSetting()">
+            Cancel
+          </button>
+          <button mat-flat-button color="primary" id="createBeutton3" [disabled]="!changeSetting"
+            (click)="onSaveSetting()">
+            Save
+          </button>
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="SVM Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"
+  (callParentFunction)="openModelPreveiwDialog($event)"></app-config-action-bar>

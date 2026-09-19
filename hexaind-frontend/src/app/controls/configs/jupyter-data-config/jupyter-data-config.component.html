@@ -1,0 +1,189 @@
+<div fxLayout="column" class="p-relative h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs" disabled="disabled">
+        <div class="global-widget-area">
+          <!-- <table mat-table [dataSource]="inputWidgets" class="mat-elevation-z1 table-bordered">
+      
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef class="table-header"> Select </th>
+              <td mat-cell *matCellDef="let inputWidget">
+                <mat-checkbox
+                  [checked]="isChecked(inputWidget)"
+                  (change)="toggleInputSelection(inputWidget, $event.checked)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="inputName">
+              <th mat-header-cell *matHeaderCellDef class="table-header"> Input Name </th>
+              <td mat-cell *matCellDef="let inputWidget">
+                {{ getWidgetOutputName(inputWidget) }}
+              </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="dataType">
+              <th mat-header-cell *matHeaderCellDef class="table-header"> Data Type </th>
+              <td mat-cell *matCellDef="let inputWidget">
+                <span>Tabular</span>
+              </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="argumentName">
+              <th mat-header-cell *matHeaderCellDef class="table-header"> Argument Name </th>
+              <td mat-cell *matCellDef="let inputWidget">
+                <mat-form-field appearance="outline">
+                  <input matInput [(ngModel)]="inputWidget.argumentName" placeholder="Enter Argument Name">
+                </mat-form-field>
+              </td>
+            </ng-container>
+      
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      
+          </table> -->
+        </div>
+      </mat-tab>
+      
+      
+      
+      <mat-tab label="Outputs" disabled="disabled">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <!-- <div fxFlex="50" fxLayout="column" fxLayoutGap="8px">
+              <div fxFlex="none">
+                This widget generate 1 output: Tabular data
+              </div>
+              <div fxLayout="row" fxLayoutGap="4px" fxLayoutAlign=" center">
+                <div class="fw-bold pb-1">Select Output</div>
+                <div>
+                  <mat-icon class="material-symbols-outlined text-grey" matTooltip="Select Output">info</mat-icon>
+                </div>
+              </div>
+             
+            </div> -->
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          
+          <!-- Notebook Configuration Section -->
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Jupyter Configuration </mat-panel-title>
+            </mat-expansion-panel-header>
+      
+            <mat-card class="parameters-card">
+              <!-- Launch Server Button at the Top -->
+              <mat-card-actions align="start" class="button-container">
+                <button mat-flat-button color="primary" class="launch-button" (click)="openJupyterHub($event)">
+                  <mat-icon class="material-symbols-outlined">play_arrow</mat-icon>
+                  Launch <span fxHide.lt-md>Server</span>
+                </button> 
+                <div *ngIf="loading" class="spinner-overlay">
+                  <mat-spinner></mat-spinner>
+                </div>
+              </mat-card-actions>
+      
+              <mat-card-content>
+                <div class="param-container">
+                  <!-- Memory Limit Dropdown -->
+                  <div fxLayout="row" fxLayoutAlign="start center" class="param-row">
+                    <mat-form-field appearance="outline" class="param-input">
+                      <mat-label>Memory Limit (RAM)</mat-label>
+                      <mat-select [(value)]="selectedMemoryLimit" 
+                                  (selectionChange)="onParameterChange('memoryLimit', $event.value)">
+                        <mat-option *ngFor="let option of memoryLimitOptions" [value]="option">
+                          {{ option }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+              
+                  <!-- CPU Cores Dropdown -->
+                  <div fxLayout="row" fxLayoutAlign="start center" class="param-row">
+                    <mat-form-field appearance="outline" class="param-input">
+                      <mat-label>CPU Cores</mat-label>
+                      <mat-select [(value)]="selectedCpuCore" 
+                                  (selectionChange)="onParameterChange('cpuCores', $event.value)">
+                        <mat-option *ngFor="let option of cpuCoreOptions" [value]="option">
+                          {{ option }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                 <!-- Notebook Image Dropdown -->
+                <div fxLayout="row" fxLayoutAlign="start center" class="param-row">
+                  <mat-form-field appearance="outline" class="param-input">
+                    <mat-label>Notebook Image</mat-label>
+                    <mat-select [(value)]="selectedNotebookImage" 
+                                (selectionChange)="onParameterChange('notebookImage', $event.value)">
+                      <mat-option *ngFor="let option of notebookImageOptions" [value]="option.value">
+                        {{ option.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                </div>
+              </mat-card-content>
+              
+            </mat-card>
+          </mat-expansion-panel>
+      
+          <!-- Notebook Selection Section -->
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Notebook Selection </mat-panel-title>
+            </mat-expansion-panel-header>
+      
+            <mat-card class="parameters-card">
+              <mat-card-content>
+                <div fxLayout="row" fxLayoutAlign="start center" class="param-row">
+                  <mat-form-field appearance="outline" class="param-input">
+                    <mat-label>Notebook File</mat-label>
+                    <mat-select [(value)]="selectedNotebook" (selectionChange)="onNotebookSelectionChange()">
+                      <mat-option *ngFor="let notebook of notebookList" [value]="notebook">
+                        {{ notebook }}
+                      </mat-option>
+                    </mat-select>
+                    <button mat-icon-button matSuffix (click)="refreshNotebookList()" class="refresh-button">
+                      <mat-icon>refresh</mat-icon>
+                    </button>
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+            
+          </mat-expansion-panel> 
+      
+        </div>
+      </mat-tab>
+      
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings (notifyParent)="onAppSettingsUpdated()" />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="global-widget-actions" *ngIf="!workflowCanvasService.IsViewingRunMode">
+    <button [disabled]="!changeMade" mat-stroked-button color="primary" id="closeButton" (click)="onCancel()">
+      Cancel
+    </button>
+    <button [disabled]="!changeMade" mat-flat-button color="primary" (click)="onSave()" id="createBeutton">
+      Save
+    </button>
+  </div>
+</div>
+<app-config-action-bar widgetName="JUPYTER Widget" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>

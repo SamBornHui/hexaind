@@ -1,0 +1,134 @@
+<div fxLayout="column" class="h-100">
+  <div fxFlex class="y-auto">
+    <mat-tab-group mat-stretch-tabs="false" class="h-100" [selectedIndex]="defaultTabIndex">
+      <mat-tab label="Information">
+        <div class="global-widget-area">
+          <app-configs-information [widgetData]="data"></app-configs-information>
+        </div>
+      </mat-tab>
+      <mat-tab label="Inputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Input</div>
+              <mat-form-field appearance="outline">
+                <mat-label>Select input widget</mat-label>
+                <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" [ngModel]="getSelectedInputWidget()"
+                  (ngModelChange)="setSelectedInputWidget($event)" name="inputWidgetSelector">
+                  <mat-option *ngFor="let inputWidget of inputWidgets" [value]="inputWidget">
+                    {{ getWidgetOutputName(inputWidget) }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Outputs">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50">
+              <div class="fw-bold pb-1">Select Output</div>
+              <mat-form-field appearance="outline">
+                <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                  placeholder="Select output" [(ngModel)]="widgetOutput" (ngModelChange)="widgetOutput = $event" />
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Parameters">
+        <div class="global-widget-area">
+          <div fxLayout="row">
+            <div fxFlex="50" fxLayout="column" fxLayoutGap="24px">
+              <div>
+                <mat-radio-group [disabled]="workflowCanvasService.IsViewingRunMode" color="primary"
+                  [(ngModel)]="selectedOption">
+                  <mat-radio-button value="A">Select from existing modules</mat-radio-button>
+                  <mat-radio-button value="B">Upload a new module</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              <div *ngIf="selectedOption === 'A'">
+                <div class="fw-bold pb-1">Select module name</div>
+                <mat-form-field appearance="outline">
+                  <mat-select [disabled]="workflowCanvasService.IsViewingRunMode" placeholder="Select connection"
+                    [(ngModel)]="config!.post_rescale_module_id">
+                    <mat-option *ngFor="let module of module_list" [value]="module._id">
+                      {{ module.name }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div fxLayout="column" fxLayoutGap="16px" *ngIf="selectedOption === 'B'">
+                <div fxLayout="column" fxLayoutGap="8px">
+                  <div>
+                    <input [disabled]="workflowCanvasService.IsViewingRunMode" #customfileInput hidden
+                      (change)="onFileChanged($event)" #customfile type="file" id="customfile" accept=".py, .zip" />
+                    <button [disabled]="workflowCanvasService.IsViewingRunMode" type="button" mat-flat-button
+                      color="primary" (click)="customfile.click()">
+                      Select and upload
+                    </button>
+                  </div>
+                  <div>
+                    <div class="fw-bold pb-1">Post rescale files</div>
+                    <div class="y-auto" style="max-height: 200px;">
+                      <!-- <table mat-table [dataSource]="config['post_rescale_data']">
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef>File Name</th>
+                                    <td mat-cell *matCellDef="let element">{{ element.file_name }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="type">
+                                    <th mat-header-cell *matHeaderCellDef>Uploaded File ID</th>
+                                    <td mat-cell *matCellDef="let element"></td>
+                                </ng-container>
+                                <ng-container matColumnDef="actions">
+                                    <th mat-header-cell *matHeaderCellDef width="40">&nbsp;</th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <button mat-icon-button>
+                                            <mat-icon class="material-symbols-outlined">
+                                                delete
+                                            </mat-icon>
+                                        </button>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                            </table> -->
+                      <!-- <div class="mx-4 my-4">{{file['name']}}</div> -->
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-bold pb-1">Post rescale module name</div>
+                  <mat-form-field appearance="outline">
+                    <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                      placeholder="Enter the module name" id="moduleName" [(ngModel)]="module_name" />
+                  </mat-form-field>
+                  <div id="errorTextName" class="text-red"></div>
+                </div>
+                <div>
+                  <div class="fw-bold pb-1">Post rescale module description</div>
+                  <mat-form-field appearance="outline">
+                    <input [disabled]="workflowCanvasService.IsViewingRunMode" matInput type="string"
+                      placeholder="Enter the module description" id="moduleDescription"
+                      [(ngModel)]="module_description" />
+                  </mat-form-field>
+                  <div id="errorTextDescription" class="text-red"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Settings">
+        <div class="global-widget-area">
+          <app-settings />
+        </div>
+      </mat-tab>
+      <mat-tab *ngIf="workflowCanvasService.IsViewingRunMode" label="Run Status">
+        <app-execution-status widgetUrn="{{ getWidgetUrn() }}" />
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<app-config-action-bar widgetName="Post Rescale" widgetUrn="{{ getWidgetUrn() }}" siteId="1"></app-config-action-bar>
